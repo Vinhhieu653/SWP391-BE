@@ -27,17 +27,17 @@ app.get('/', (req, res) => res.send('API is running...'))
 
 // Connect DB and start server
 async function startServer() {
-    try {
-        await sequelize.authenticate()
-        console.log('PostgreSQL connected ✅')
+  try {
+    await sequelize.authenticate()
+    console.log('PostgreSQL connected ✅')
 
-        app.listen(PORT, () => {
-            console.log(`Server running on http://localhost:${PORT}`)
-        })
-    } catch (err) {
-        console.error('DB connect error ❌', err)
-        process.exit(1) // thoát app nếu DB lỗi
-    }
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`)
+    })
+  } catch (err) {
+    console.error('DB connect error ❌', err)
+    process.exit(1) // thoát app nếu DB lỗi
+  }
 }
 
 startServer()
