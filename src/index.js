@@ -7,6 +7,8 @@ import swaggerUi from 'swagger-ui-express'
 import swaggerSpec from './configs/swagger.js'
 import testRoute from './routes/test.route.js'
 import errorHandler from './middlewares/errorHandler.js'
+import { basicAuth } from './middlewares/authSwagger.js'
+import authRouter from './routes/auth.js'
 
 dotenv.config()
 
@@ -20,10 +22,12 @@ app.use(express.json())
 app.use(errorHandler)
 
 // Routes
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
-app.use(testRoute)
+app.use('/api-docs', basicAuth, swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 app.get('/', (req, res) => res.send('API is running...'))
+
+app.use(testRoute)
+app.use('/api/v1/auth', authRouter)
 
 // Connect DB and start server
 async function startServer() {
@@ -32,7 +36,7 @@ async function startServer() {
     console.log('PostgreSQL connected ✅')
 
     app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`)
+      console.log(`✅ Server running at http://localhost:${PORT}/api-docs/`)
     })
   } catch (err) {
     console.error('DB connect error ❌', err)

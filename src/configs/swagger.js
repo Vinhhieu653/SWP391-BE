@@ -4,17 +4,36 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Claim Request API',
+      title: 'School Medical Management System API',
       version: '1.0.0',
-      description: 'Swagger doc for Claim Request project 🚀'
+      description: 'Swagger documentation for School Medical Management System 📚🩺'
     },
     servers: [
       {
         url: 'http://localhost:3333'
       }
+    ],
+    tags: [
+      // thứ tự tags hiển thị
+      { name: 'Test', description: 'Test server' },
+      { name: 'Auth', description: 'Authentication endpoints' }
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      }
+    },
+    security: [
+      {
+        bearerAuth: []
+      }
     ]
   },
-  apis: ['./src/routes/*.js'] // nơi chứa comment API
+  apis: ['./src/routes/*.js']
 }
 
 const swaggerSpec = swaggerJSDoc(options)
