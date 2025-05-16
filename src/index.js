@@ -6,7 +6,8 @@ import sequelize from './database/db.js'
 import swaggerUi from 'swagger-ui-express'
 import swaggerSpec from './configs/swagger.js'
 import testRoute from './routes/test.route.js'
-import authRouter from './routes/login.js'
+import loginRouter from './routes/login.js'
+import logoutRouter from './routes/logout.js'
 import testRouter from './routes/testRouter.js'
 import { basicAuth } from './middlewares/authSwagger.js'
 import { notFoundHandler, errorHandler } from './middlewares/api-response/responseUtils.js'
@@ -30,7 +31,8 @@ app.get('/', (req, res) => res.send('API is running...'))
 // Routes chính
 app.use(testRoute)
 app.use(testRouter)
-app.use('/api/v1/auth', authRouter)
+app.use('/api/v1/auth', loginRouter)
+app.use('/api/v1/auth', logoutRouter)
 
 // Xử lý lỗi
 app.use(notFoundHandler)
