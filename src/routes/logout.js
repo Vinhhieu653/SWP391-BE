@@ -51,7 +51,11 @@ router.post('/logout', async (req, res) => {
   }
 
   try {
-    // Xoá refreshToken khỏi Redis
+    const stored = await redisClient.get(refreshToken)
+    if (!stored) {
+      return apiResponse(res, { status: 400, success: false, message: 'Refresh token invalid or already logged out' })
+    }
+
     await redisClient.del(refreshToken)
 
     return apiResponse(res, { status: 200, success: true, message: 'Logged out successfully' })
