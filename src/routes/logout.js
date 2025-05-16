@@ -2,18 +2,9 @@ import express from 'express'
 import jwt from 'jsonwebtoken'
 import argon2 from 'argon2'
 import { apiResponse, notFoundHandler, errorHandler } from '../middlewares/api-response/responseUtils.js'
+import redisClient from '../configs/redisClient.js' // nhớ import client Redis
 
 const router = express.Router()
-
-const users = []
-
-const createUser = async () => {
-    const passwordHash = await argon2.hash('123456')
-    users.push({ id: 1, username: 'admin', passwordHash })
-}
-createUser()
-
-let refreshTokens = []
 /**
  * @swagger
  * /api/v1/auth/logout:
@@ -52,15 +43,22 @@ let refreshTokens = []
  *       500:
  *         description: Server error
  */
-router.post('/logout', (req, res) => {
-    const { refreshToken } = req.body
+router.post('/logout', async (req, res) => {
+  const { refreshToken } = req.body
 
-    if (!refreshToken) {
-        return apiResponse(res, { status: 400, success: false, message: 'Refresh token missing' })
-    }
+  if (!refreshToken) {
+    return apiResponse(res, { status: 400, success: false, message: 'Refresh token missing' })
+  }
 
-    refreshTokens = refreshTokens.filter(token => token !== refreshToken)
+  try {
+    // Xoá refreshToken khỏi Redis
+    await redisClient.del(refreshToken)
 
     return apiResponse(res, { status: 200, success: true, message: 'Logged out successfully' })
+  } catch (err) {
+    console.error('Redis error when deleting token:', err)
+    return apiResponse(res, { status: 500, success: false, message: 'Server error' })
+  }
 })
+
 export default router
