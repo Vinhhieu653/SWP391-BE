@@ -8,7 +8,8 @@
     "start": "nodemon src/index.js",
     "dev": "nodemon src/index.js",
     "lint": "eslint . --fix",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "docker": "docker-compose up"
   },
   "type": "module",
   "keywords": [],

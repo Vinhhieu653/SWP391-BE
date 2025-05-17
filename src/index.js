@@ -9,7 +9,7 @@ import testRoute from './routes/test.route.js'
 import loginRouter from './routes/login.js'
 import logoutRouter from './routes/logout.js'
 import refreshTokenRouter from './routes/refresh-token.js'
-import testRouter from './routes/testRouter.js'
+import testRouter from './routes/testResponseApi.js'
 import { basicAuth } from './middlewares/authSwagger.js'
 import { notFoundHandler, errorHandler } from './middlewares/api-response/responseUtils.js'
 
