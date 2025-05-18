@@ -123,6 +123,7 @@ router.post('/login', async (req, res) => {
     })
 
     return apiResponse(res, {
+      status: 201,
       message: 'Login successful',
       data: { accessToken, refreshToken }
     })

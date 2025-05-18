@@ -104,6 +104,7 @@ router.post('/refresh-token', async (req, res) => {
     })
 
     return apiResponse(res, {
+      status: 200,
       success: true,
       message: 'Token refreshed',
       data: { accessToken: newAccessToken }
