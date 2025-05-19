@@ -4,11 +4,11 @@ import morgan from 'morgan'
 import cors from 'cors'
 import sequelize from './database/db.js'
 import swaggerUi from 'swagger-ui-express'
-import swaggerSpec from './configs/swagger.js'
+import swaggerSpec from './configs/swagger.config.js'
 import testRoute from './routes/test.route.js'
-import loginRouter from './routes/login.js'
-import logoutRouter from './routes/logout.js'
-import refreshTokenRouter from './routes/refresh-token.js'
+import loginRouter from './routes/auth/login.route.js'
+import logoutRouter from './routes/auth/logout.route.js'
+import refreshTokenRouter from './routes/auth/refresh-token.route.js'
 import testRouter from './routes/testResponseApi.js'
 import { basicAuth } from './middlewares/authSwagger.js'
 import { notFoundHandler, errorHandler } from './middlewares/api-response/responseUtils.js'
@@ -29,7 +29,7 @@ app.use('/api-docs', basicAuth, swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 // Root
 app.get('/', (req, res) => res.send('API is running...'))
 
-// Routes chính
+// Main Routes 
 app.use(testRoute)
 app.use(testRouter)
 app.use('/api/v1/auth', loginRouter)

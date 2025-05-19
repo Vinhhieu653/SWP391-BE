@@ -31,7 +31,7 @@ services:
       - postgres
       - redis
     ports:
-      - '3333:3333'
+      - '${PORT}:${PORT}'
     volumes:
       - .:/app
       - /app/node_modules

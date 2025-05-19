@@ -1,23 +1,7 @@
 import express from 'express'
-import jwt from 'jsonwebtoken'
-import argon2 from 'argon2'
-import redisClient from '../configs/redisClient.js'
-import { apiResponse } from '../middlewares/api-response/responseUtils.js'
+import { loginController } from '../../controllers/auth/login.controller.js'
 
 const router = express.Router()
-
-const users = []
-
-const createUser = async () => {
-  const passwordHash = await argon2.hash('123456')
-  users.push({ id: 1, username: 'admin', passwordHash })
-}
-createUser()
-
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET
-const ACCESS_TOKEN_EXPIRES_IN = process.env.ACCESS_TOKEN_EXPIRES_IN || '8h'
-const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d'
 /**
  * @swagger
  * /api/v1/auth/login:
@@ -42,7 +26,7 @@ const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d'
  *                 type: string
  *                 example: 123456
  *     responses:
- *       200:
+ *       201:
  *         description: Login success
  *         content:
  *           application/json:
@@ -104,32 +88,6 @@ const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d'
  *                 data:
  *                   type: null
  */
-
-router.post('/login', async (req, res) => {
-  const { username, password } = req.body
-  const user = users.find((u) => u.username === username)
-  if (!user) return apiResponse(res, { status: 401, success: false, message: 'Invalid credentials' })
-
-  try {
-    const validPassword = await argon2.verify(user.passwordHash, password)
-    if (!validPassword) return apiResponse(res, { status: 401, success: false, message: 'Invalid credentials' })
-
-    const accessToken = jwt.sign({ userId: user.id }, ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRES_IN })
-    const refreshToken = jwt.sign({ userId: user.id }, REFRESH_TOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN })
-
-    // 🧠 Lưu refresh token vô Redis (key = token, value = userId)
-    await redisClient.set(refreshToken, user.id.toString(), {
-      EX: 7 * 24 * 60 * 60 // 7 ngày
-    })
-
-    return apiResponse(res, {
-      status: 201,
-      message: 'Login successful',
-      data: { accessToken, refreshToken }
-    })
-  } catch (err) {
-    return apiResponse(res, { status: 500, success: false, message: 'Server error' })
-  }
-})
+router.post('/login', loginController)
 
 export default router

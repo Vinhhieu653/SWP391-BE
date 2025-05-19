@@ -1,14 +1,7 @@
 import express from 'express'
-import jwt from 'jsonwebtoken'
-import redisClient from '../configs/redisClient.js'
-import { apiResponse } from '../middlewares/api-response/responseUtils.js'
+import { refreshTokenController } from '../../controllers/auth/refresh-token.controller.js'
 
 const router = express.Router()
-
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET
-const ACCESS_TOKEN_EXPIRES_IN = process.env.ACCESS_TOKEN_EXPIRES_IN || '8h'
-
 /**
  * @swagger
  * /api/v1/auth/refresh-token:
@@ -84,34 +77,6 @@ const ACCESS_TOKEN_EXPIRES_IN = process.env.ACCESS_TOKEN_EXPIRES_IN || '8h'
  *                   type: string
  *                   example: Invalid or expired token
  */
-
-router.post('/refresh-token', async (req, res) => {
-  const { refreshToken } = req.body
-  if (!refreshToken) {
-    return apiResponse(res, { status: 401, success: false, message: 'Missing refresh token' })
-  }
-
-  try {
-    const decoded = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET)
-    const stored = await redisClient.get(refreshToken)
-
-    if (!stored || stored !== decoded.userId.toString()) {
-      return apiResponse(res, { status: 403, success: false, message: 'Invalid refresh token' })
-    }
-
-    const newAccessToken = jwt.sign({ userId: decoded.userId }, ACCESS_TOKEN_SECRET, {
-      expiresIn: ACCESS_TOKEN_EXPIRES_IN
-    })
-
-    return apiResponse(res, {
-      status: 200,
-      success: true,
-      message: 'Token refreshed',
-      data: { accessToken: newAccessToken }
-    })
-  } catch (err) {
-    return apiResponse(res, { status: 403, success: false, message: 'Invalid or expired token' })
-  }
-})
+router.post('/refresh-token', refreshTokenController)
 
 export default router
