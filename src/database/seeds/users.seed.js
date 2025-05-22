@@ -3,11 +3,11 @@ import Role from '../../models/data/role.model.js'
 import argon2 from 'argon2'
 
 const users = [
-  { username: 'admin', email: 'admin@example.com', password: '123456', roleName: 'admin' },
-  { username: 'nurse1', email: 'nurse1@example.com', password: '123456', roleName: 'nurse' },
-  { username: 'student1', email: 'student1@example.com', password: '123456', roleName: 'student' },
-  { username: 'parent1', email: 'parent1@example.com', password: '123456', roleName: 'parent' },
-  { username: 'manager1', email: 'manager1@example.com', password: '123456', roleName: 'manager' }
+  { username: 'admin', email: 'admin@example.com', password: 'Login123@', roleName: 'admin' },
+  { username: 'nurse1', email: 'nurse1@example.com', password: 'Login123@', roleName: 'nurse' },
+  { username: 'student1', email: 'student1@example.com', password: 'Login123@', roleName: 'student' },
+  { username: 'parent1', email: 'parent1@example.com', password: 'Login123@', roleName: 'parent' },
+  { username: 'manager1', email: 'manager1@example.com', password: 'Login123@', roleName: 'manager' }
 ]
 
 export async function seedUsers() {
@@ -28,6 +28,8 @@ export async function seedUsers() {
       }
     })
 
-    if (created) console.log(`Created user: ${u.username} with role ${u.roleName}`)
+    if (created) {
+      console.log(`Created user: ${u.username} with role ${u.roleName}`)
+    }
   }
 }

@@ -5,11 +5,21 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon src/index.js",
-    "dev": "nodemon src/index.js",
+    "docker:dev": "docker compose --env-file ./.env -f docker-compose.yml up",
+    "start:dev": "nodemon --legacy-watch src/index.js",
+    "dev": "nodemon index.js",
     "lint": "eslint . --fix",
-    "format": "prettier --write .",
-    "docker": "docker-compose up"
+    "format": "prettier --write ."
+  },
+  "nodemon.json": {
+    "watch": [
+      "src"
+    ],
+    "ext": "js,json",
+    "ignore": [
+      "node_modules"
+    ],
+    "legacyWatch": true
   },
   "type": "module",
   "keywords": [],

@@ -1,20 +1,26 @@
 import { loginService } from '../../services/auth/login.service.js'
-import { apiResponse } from '../../middlewares/api-response/responseUtils.js'
 
 export const loginController = async (req, res) => {
   try {
     const { username, password } = req.body
-    const result = await loginService(username, password)
-    return apiResponse(res, {
+    const { accessToken, refreshToken, user } = await loginService(username, password)
+
+    res.status(201).json({
       status: 201,
+      success: true,
       message: 'Login successful',
-      data: result
+      data: {
+        accessToken,
+        refreshToken,
+        user
+      }
     })
-  } catch (err) {
-    return apiResponse(res, {
-      status: err.status || 500,
+  } catch (error) {
+    res.status(error.status || 500).json({
+      status: error.status || 500,
       success: false,
-      message: err.message || 'Server error'
+      message: error.message || 'Server error',
+      data: null
     })
   }
 }

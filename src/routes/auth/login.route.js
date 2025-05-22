@@ -1,6 +1,7 @@
-import { loginController } from '../../controllers/auth/login.controller.js'
 import express from 'express'
-import { authorizeRoles } from '../../middlewares/auth.middleware.js'
+import { loginController } from '../../controllers/auth/login.controller.js'
+import { authorizeRoles, authenticateToken } from '../../middlewares/auth.middleware.js'
+
 const router = express.Router()
 
 /**
@@ -25,9 +26,9 @@ const router = express.Router()
  *                 example: admin
  *               password:
  *                 type: string
- *                 example: 123456
+ *                 example: Login123@
  *     responses:
- *       200:
+ *       201:
  *         description: Login success
  *         content:
  *           application/json:
@@ -36,7 +37,7 @@ const router = express.Router()
  *               properties:
  *                 status:
  *                   type: number
- *                   example: 200
+ *                   example: 201
  *                 success:
  *                   type: boolean
  *                   example: true
@@ -52,6 +53,18 @@ const router = express.Router()
  *                     refreshToken:
  *                       type: string
  *                       example: your.jwt.refresh.token
+ *                     user:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: number
+ *                           example: 1
+ *                         username:
+ *                           type: string
+ *                           example: admin
+ *                         role:
+ *                           type: string
+ *                           example: admin
  *       401:
  *         description: Invalid credentials
  *         content:
@@ -90,5 +103,150 @@ const router = express.Router()
  *                   type: null
  */
 router.post('/login', loginController)
+/**
+ * @swagger
+ * /api/v1/auth/admin:
+ *   get:
+ *     summary: Check admin role access
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Chỉ admin mới xem được
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Chỉ admin mới xem được
+ *       '401':
+ *         description: Unauthorized / Token invalid
+ *       '403':
+ *         description: Forbidden / Role không đủ
+ */
+
+router.get('/admin', authenticateToken, authorizeRoles('admin'), (req, res) => {
+  res.status(200).json({ message: 'Chỉ admin mới xem được' })
+})
+/**
+ * @swagger
+ * /api/v1/auth/nurse:
+ *   get:
+ *     summary: Check nurse role access
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Chỉ nurse mới xem được
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Chỉ nurse mới xem được
+ *       '401':
+ *         description: Unauthorized / Token invalid
+ *       '403':
+ *         description: Forbidden / Role không đủ
+ */
+
+router.get('/nurse', authenticateToken, authorizeRoles('nurse'), (req, res) => {
+  res.status(200).json({ message: 'Chỉ nurse mới xem được' })
+})
+/**
+ * @swagger
+ * /api/v1/auth/student:
+ *   get:
+ *     summary: Check student role access
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Chỉ student mới xem được
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Chỉ student mới xem được
+ *       '401':
+ *         description: Unauthorized / Token invalid
+ *       '403':
+ *         description: Forbidden / Role không đủ
+ */
+
+router.get('/student', authenticateToken, authorizeRoles('student'), (req, res) => {
+  res.status(200).json({ message: 'Chỉ student mới xem được' })
+})
+/**
+ * @swagger
+ * /api/v1/auth/parent:
+ *   get:
+ *     summary: Check parent role access
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Chỉ parent mới xem được
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Chỉ parent mới xem được
+ *       '401':
+ *         description: Unauthorized / Token invalid
+ *       '403':
+ *         description: Forbidden / Role không đủ
+ */
+
+router.get('/parent', authenticateToken, authorizeRoles('parent'), (req, res) => {
+  res.status(200).json({ message: 'Chỉ parent mới xem được' })
+})
+/**
+ * @swagger
+ * /api/v1/auth/manager:
+ *   get:
+ *     summary: Check manager role access
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Chỉ manager mới xem được
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Chỉ manager mới xem được
+ *       '401':
+ *         description: Unauthorized / Token invalid
+ *       '403':
+ *         description: Forbidden / Role không đủ
+ */
+
+router.get('/manager', authenticateToken, authorizeRoles('manager'), (req, res) => {
+  res.status(200).json({ message: 'Chỉ manager mới xem được' })
+})
 
 export default router

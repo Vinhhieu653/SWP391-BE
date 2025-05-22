@@ -1,26 +1,45 @@
-import jwt from 'jsonwebtoken'
+import User from '../../models/data/user.model.js'
+import Role from '../../models/data/role.model.js'
 import argon2 from 'argon2'
+import jwt from 'jsonwebtoken'
 import redisClient from '../../configs/redisClient.config.js'
-import users from '../../models/data/user.model.js'
-
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET
-const ACCESS_TOKEN_EXPIRES_IN = process.env.ACCESS_TOKEN_EXPIRES_IN || '1d'
-const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d'
+import {
+  ACCESS_TOKEN_SECRET,
+  REFRESH_TOKEN_SECRET,
+  ACCESS_TOKEN_EXPIRES_IN,
+  REFRESH_TOKEN_EXPIRES_IN
+} from '../../configs/env.config.js'
 
 export const loginService = async (username, password) => {
-  const user = users.find((u) => u.username === username)
+  const user = await User.findOne({
+    where: { username },
+    include: [{ model: Role }]
+  })
+
   if (!user) throw { status: 401, message: 'Invalid credentials' }
 
-  const validPassword = await argon2.verify(user.passwordHash, password)
+  const validPassword = await argon2.verify(user.password, password)
   if (!validPassword) throw { status: 401, message: 'Invalid credentials' }
 
-  const accessToken = jwt.sign({ userId: user.id }, ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRES_IN })
+  const roleName = user.Role?.name || 'user'
+
+  const accessToken = jwt.sign({ userId: user.id, role: roleName }, ACCESS_TOKEN_SECRET, {
+    expiresIn: ACCESS_TOKEN_EXPIRES_IN
+  })
+
   const refreshToken = jwt.sign({ userId: user.id }, REFRESH_TOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN })
 
   await redisClient.set(refreshToken, user.id.toString(), {
-    EX: 7 * 24 * 60 * 60 // 7 ngày
+    EX: 7 * 24 * 60 * 60
   })
 
-  return { accessToken, refreshToken }
+  return {
+    accessToken,
+    refreshToken,
+    user: {
+      id: user.id,
+      username: user.username,
+      role: roleName
+    }
+  }
 }
