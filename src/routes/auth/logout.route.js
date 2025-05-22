@@ -28,14 +28,15 @@ const router = express.Router()
  *         description: Server error
  */
 router.post(
-    '/logout',
-    [
-        body('refreshToken')
-            .notEmpty().withMessage('Refresh token is required')
-            .matches(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)
-            .withMessage('Invalid refresh token format')
-    ],
-    logoutController
+  '/logout',
+  [
+    body('refreshToken')
+      .notEmpty()
+      .withMessage('Refresh token is required')
+      .matches(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)
+      .withMessage('Invalid refresh token format')
+  ],
+  logoutController
 )
 
 export default router

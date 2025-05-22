@@ -1,7 +1,8 @@
-import express from 'express'
 import { loginController } from '../../controllers/auth/login.controller.js'
-
+import express from 'express'
+import { authorizeRoles } from '../../middlewares/auth.middleware.js'
 const router = express.Router()
+
 /**
  * @swagger
  * /api/v1/auth/login:
@@ -26,7 +27,7 @@ const router = express.Router()
  *                 type: string
  *                 example: 123456
  *     responses:
- *       201:
+ *       200:
  *         description: Login success
  *         content:
  *           application/json:

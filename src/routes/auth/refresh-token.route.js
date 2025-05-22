@@ -1,7 +1,7 @@
-import express from 'express'
 import { refreshTokenController } from '../../controllers/auth/refresh-token.controller.js'
-
+import express from 'express'
 const router = express.Router()
+
 /**
  * @swagger
  * /api/v1/auth/refresh-token:
