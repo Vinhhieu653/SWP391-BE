@@ -10,7 +10,8 @@ export async function seedRoles() {
   // Xóa role không còn trong roles list
   for (const role of existingRoles) {
     if (!roles.includes(role.name)) {
-      await role.destroy()
+      await db.User.destroy({ where: {}, truncate: true });
+      await db.Role.destroy({ where: {}, truncate: true });
       console.log(`Removed role: ${role.name}`)
     }
   }
