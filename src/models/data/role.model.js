@@ -13,6 +13,10 @@ const Role = sequelize.define(
     name: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   },
   {

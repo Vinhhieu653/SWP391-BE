@@ -48,8 +48,8 @@ async function startServer() {
     await sequelize.authenticate()
     console.log('PostgreSQL connected ✅')
 
-    // Tạo bảng và thay đổi cấu trúc bảng nếu cần
-    await sequelize.sync({ alter: true })
+    // Tạo bảng
+    await sequelize.sync({ force: true })
 
     //tạo seeds
     await seedRoles()
