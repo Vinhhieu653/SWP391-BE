@@ -27,7 +27,16 @@ app.use(morgan('dev'))
 app.use(express.json())
 
 // Docs route
-app.use('/api-docs', basicAuth, swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+app.use(
+  '/api-docs',
+  basicAuth,
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    swaggerOptions: {
+      persistAuthorization: true
+    }
+  })
+)
 
 // Root
 app.get('/', (req, res) => res.send('API is running...'))
