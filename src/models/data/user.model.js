@@ -15,6 +15,10 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false
     },
+    fullname: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
     password: {
       type: DataTypes.STRING,
       allowNull: false
@@ -26,10 +30,6 @@ const User = sequelize.define(
     phoneNumber: {
       type: DataTypes.STRING,
       allowNull: true
-    },
-    status: {
-      type: DataTypes.ENUM('pending', 'approved', 'rejected'),
-      defaultValue: 'pending'
     },
     roleId: {
       type: DataTypes.INTEGER,

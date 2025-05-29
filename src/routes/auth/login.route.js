@@ -18,12 +18,12 @@ const router = express.Router()
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - email
  *               - password
  *             properties:
- *               username:
+ *               email:
  *                 type: string
- *                 example: admin
+ *                 example: admin@example.com
  *               password:
  *                 type: string
  *                 example: Login123@
@@ -192,16 +192,16 @@ router.get('/student', authenticateToken, authorizeRoles('student'), (req, res) 
 })
 /**
  * @swagger
- * /api/v1/auth/parent:
+ * /api/v1/auth/guardian:
  *   get:
- *     summary: Check parent role access
+ *     summary: Check guardian role access
  *     tags:
  *       - Auth
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       '200':
- *         description: Chỉ parent mới xem được
+ *         description: Chỉ guardian mới xem được
  *         content:
  *           application/json:
  *             schema:
@@ -209,14 +209,14 @@ router.get('/student', authenticateToken, authorizeRoles('student'), (req, res) 
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Chỉ parent mới xem được
+ *                   example: Chỉ guardian mới xem được
  *       '401':
  *         description: Unauthorized / Token invalid
  *       '403':
  *         description: Forbidden / Role không đủ
  */
 
-router.get('/parent', authenticateToken, authorizeRoles('parent'), (req, res) => {
-  res.status(200).json({ message: 'Chỉ parent mới xem được' })
+router.get('/guardian', authenticateToken, authorizeRoles('guardian'), (req, res) => {
+  res.status(200).json({ message: 'Chỉ guardian mới xem được' })
 })
 export default router
