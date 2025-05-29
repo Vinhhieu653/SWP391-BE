@@ -10,10 +10,12 @@ import loginRouter from './routes/auth/login.route.js'
 import logoutRouter from './routes/auth/logout.route.js'
 import blogRoutes from './routes/blog/blog.route.js'
 import refreshTokenRouter from './routes/auth/refresh-token.route.js'
+import registerRouter from './routes/auth/register.route.js'
 import { basicAuth } from './middlewares/authSwagger.js'
 import { notFoundHandler, errorHandler } from './middlewares/api-response/responseUtils.js'
 import User from './models/data/user.model.js'
 import Role from './models/data/role.model.js'
+
 import Blog from './models/data/blog.model.js'
 import { seedRoles } from './database/seeds/role.seed.js'
 import { seedUsers } from './database/seeds/users.seed.js'
@@ -48,6 +50,7 @@ app.use(testRoute)
 app.use('/api/v1/auth', loginRouter)
 app.use('/api/v1/auth', logoutRouter)
 app.use('/api/v1/auth', refreshTokenRouter)
+app.use('/api/v1/users', registerRouter)
 app.use('/api/v1/blogs', blogRoutes)
 
 
@@ -62,7 +65,7 @@ async function startServer() {
     console.log('PostgreSQL connected ✅')
 
     // Tạo bảng
-    await sequelize.sync({ force: true })
+    await sequelize.sync({ alter: true })
 
     //tạo seeds
     await seedRoles()

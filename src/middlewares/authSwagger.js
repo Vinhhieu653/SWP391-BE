@@ -17,10 +17,7 @@ export const basicAuth = (req, res, next) => {
 
   const [username, password] = Buffer.from(base64Credentials, 'base64').toString().split(':')
 
-  if (
-    username === process.env.API_DOCS_USERNAME &&
-    password === process.env.API_DOCS_PASSWORD
-  ) {
+  if (username === process.env.API_DOCS_USERNAME && password === process.env.API_DOCS_PASSWORD) {
     next()
   } else {
     res.set('WWW-Authenticate', 'Basic realm="Swagger Docs"')

@@ -1,24 +1,23 @@
-// seeds/role.seed.js
 import Role from '../../models/data/role.model.js'
 
-const roles = ['admin', 'nurse', 'student', 'parent', 'manager']
+const roles = [
+  { name: 'admin', description: 'System administrator' },
+  { name: 'nurse', description: 'School nurse' },
+  { name: 'student', description: 'Student role' },
+  { name: 'parent', description: 'Parent of a student' }
+]
 
 export async function seedRoles() {
-  const existingRoles = await Role.findAll()
-  const existingRoleNames = existingRoles.map((r) => r.name)
-
-  // Xóa role không còn trong roles list
-  for (const role of existingRoles) {
-    if (!roles.includes(role.name)) {
-      await db.User.destroy({ where: {}, truncate: true })
-      await db.Role.destroy({ where: {}, truncate: true })
-      console.log(`Removed role: ${role.name}`)
-    }
-  }
-
-  // Tạo role mới
   for (const role of roles) {
-    const [instance, created] = await Role.findOrCreate({ where: { name: role } })
-    if (created) console.log(`Created role: ${role}`)
+    const [instance, created] = await Role.findOrCreate({
+      where: { name: role.name },
+      defaults: {
+        description: role.description
+      }
+    })
+
+    if (created) {
+      console.log(`✅ Created role: ${role.name}`)
+    }
   }
 }

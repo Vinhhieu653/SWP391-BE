@@ -219,34 +219,4 @@ router.get('/student', authenticateToken, authorizeRoles('student'), (req, res) 
 router.get('/parent', authenticateToken, authorizeRoles('parent'), (req, res) => {
   res.status(200).json({ message: 'Chỉ parent mới xem được' })
 })
-/**
- * @swagger
- * /api/v1/auth/manager:
- *   get:
- *     summary: Check manager role access
- *     tags:
- *       - Auth
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       '200':
- *         description: Chỉ manager mới xem được
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Chỉ manager mới xem được
- *       '401':
- *         description: Unauthorized / Token invalid
- *       '403':
- *         description: Forbidden / Role không đủ
- */
-
-router.get('/manager', authenticateToken, authorizeRoles('manager'), (req, res) => {
-  res.status(200).json({ message: 'Chỉ manager mới xem được' })
-})
-
 export default router

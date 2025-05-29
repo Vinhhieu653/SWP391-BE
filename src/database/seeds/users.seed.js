@@ -3,11 +3,34 @@ import Role from '../../models/data/role.model.js'
 import argon2 from 'argon2'
 
 const users = [
-  { username: 'admin', email: 'admin@example.com', password: 'Login123@', roleName: 'admin' },
-  { username: 'nurse1', email: 'nurse1@example.com', password: 'Login123@', roleName: 'nurse' },
-  { username: 'student1', email: 'student1@example.com', password: 'Login123@', roleName: 'student' },
-  { username: 'parent1', email: 'parent1@example.com', password: 'Login123@', roleName: 'parent' },
-  { username: 'manager1', email: 'manager1@example.com', password: 'Login123@', roleName: 'manager' }
+  {
+    username: 'admin',
+    email: 'admin@example.com',
+    password: 'Login123@',
+    phoneNumber: '0123456789',
+    roleName: 'admin'
+  },
+  {
+    username: 'nurse1',
+    email: 'nurse1@example.com',
+    password: 'Login123@',
+    phoneNumber: '0987654321',
+    roleName: 'nurse'
+  },
+  {
+    username: 'student1',
+    email: 'student1@example.com',
+    password: 'Login123@',
+    phoneNumber: '0909090909',
+    roleName: 'student'
+  },
+  {
+    username: 'parent1',
+    email: 'parent1@example.com',
+    password: 'Login123@',
+    phoneNumber: '0911223344',
+    roleName: 'parent'
+  }
 ]
 
 export async function seedUsers() {
@@ -24,12 +47,14 @@ export async function seedUsers() {
       defaults: {
         email: u.email,
         password: passwordHash,
+        phoneNumber: u.phoneNumber,
+        status: 'approved',
         roleId: role.id
       }
     })
 
     if (created) {
-      console.log(`Created user: ${u.username} with role ${u.roleName}`)
+      console.log(`✅ Created user: ${u.username} with role ${u.roleName}`)
     }
   }
 }

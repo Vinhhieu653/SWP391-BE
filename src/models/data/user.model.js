@@ -23,17 +23,13 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false
     },
-    phone: {
+    phoneNumber: {
       type: DataTypes.STRING,
       allowNull: true
     },
-    address: {
-      type: DataTypes.STRING,
-      allowNull: true
-    },
-    isActive: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true
+    status: {
+      type: DataTypes.ENUM('pending', 'approved', 'rejected'),
+      defaultValue: 'pending'
     },
     roleId: {
       type: DataTypes.INTEGER,
@@ -46,7 +42,7 @@ const User = sequelize.define(
   },
   {
     tableName: 'users',
-    timestamps: false
+    timestamps: true
   }
 )
 
