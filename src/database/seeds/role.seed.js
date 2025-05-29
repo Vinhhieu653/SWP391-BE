@@ -4,7 +4,7 @@ const roles = [
   { name: 'admin', description: 'System administrator' },
   { name: 'nurse', description: 'School nurse' },
   { name: 'student', description: 'Student role' },
-  { name: 'parent', description: 'Parent of a student' }
+  { name: 'guardian', description: 'Guardian of a student' }
 ]
 
 export async function seedRoles() {

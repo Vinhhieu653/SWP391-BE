@@ -15,7 +15,6 @@ import { basicAuth } from './middlewares/authSwagger.js'
 import { notFoundHandler, errorHandler } from './middlewares/api-response/responseUtils.js'
 import User from './models/data/user.model.js'
 import Role from './models/data/role.model.js'
-
 import Blog from './models/data/blog.model.js'
 import { seedRoles } from './database/seeds/role.seed.js'
 import { seedUsers } from './database/seeds/users.seed.js'

@@ -2,8 +2,8 @@ import { loginService } from '../../services/auth/login.service.js'
 
 export const loginController = async (req, res) => {
   try {
-    const { username, password } = req.body
-    const { accessToken, refreshToken, user } = await loginService(username, password)
+    const { email, password } = req.body
+    const { accessToken, refreshToken, user } = await loginService(email, password)
 
     res.status(201).json({
       status: 201,

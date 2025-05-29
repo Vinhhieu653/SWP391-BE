@@ -4,6 +4,7 @@ import argon2 from 'argon2'
 
 const users = [
   {
+    fullname: 'Admin User',
     username: 'admin',
     email: 'admin@example.com',
     password: 'Login123@',
@@ -11,6 +12,7 @@ const users = [
     roleName: 'admin'
   },
   {
+    fullname: 'Nurse One',
     username: 'nurse1',
     email: 'nurse1@example.com',
     password: 'Login123@',
@@ -18,6 +20,7 @@ const users = [
     roleName: 'nurse'
   },
   {
+    fullname: 'Student One',
     username: 'student1',
     email: 'student1@example.com',
     password: 'Login123@',
@@ -25,11 +28,12 @@ const users = [
     roleName: 'student'
   },
   {
-    username: 'parent1',
-    email: 'parent1@example.com',
+    fullname: 'Guardian One',
+    username: 'guardian1',
+    email: 'guardian1@example.com',
     password: 'Login123@',
     phoneNumber: '0911223344',
-    roleName: 'parent'
+    roleName: 'guardian' // đã đổi thành guardian
   }
 ]
 
@@ -45,10 +49,10 @@ export async function seedUsers() {
     const [user, created] = await User.findOrCreate({
       where: { username: u.username },
       defaults: {
+        fullname: u.fullname,
         email: u.email,
         password: passwordHash,
         phoneNumber: u.phoneNumber,
-        status: 'approved',
         roleId: role.id
       }
     })

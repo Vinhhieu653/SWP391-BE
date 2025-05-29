@@ -10,9 +10,9 @@ import {
   REFRESH_TOKEN_EXPIRES_IN
 } from '../../configs/env.config.js'
 
-export const loginService = async (username, password) => {
+export const loginService = async (email, password) => {
   const user = await User.findOne({
-    where: { username },
+    where: { email },
     include: [{ model: Role }]
   })
 
@@ -39,6 +39,7 @@ export const loginService = async (username, password) => {
     user: {
       id: user.id,
       username: user.username,
+      email: user.email,
       role: roleName
     }
   }
