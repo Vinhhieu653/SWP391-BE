@@ -12,6 +12,7 @@ import blogRoutes from './routes/blog/blog.route.js'
 import refreshTokenRouter from './routes/auth/refresh-token.route.js'
 import registerRouter from './routes/auth/register.route.js'
 import uploadRouter from './routes/upload-img/upload-img.route.js'
+import emailRouter from './routes/send-mail/email.route.js'
 import { basicAuth } from './middlewares/authSwagger.js'
 import { notFoundHandler, errorHandler } from './middlewares/api-response/responseUtils.js'
 import User from './models/data/user.model.js'
@@ -54,6 +55,7 @@ app.use('/api/v1/auth', refreshTokenRouter)
 app.use('/api/v1/users', registerRouter)
 app.use('/api/v1/blogs', blogRoutes)
 app.use('/api/v1/upload', uploadRouter)
+app.use('/api/v1', emailRouter)
 
 // Xử lý lỗi
 app.use(notFoundHandler)
