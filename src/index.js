@@ -21,6 +21,7 @@ import Blog from './models/data/blog.model.js'
 import Image from './models/data/image.model.js'
 import { seedRoles } from './database/seeds/role.seed.js'
 import { seedUsers } from './database/seeds/users.seed.js'
+import { seedBlogs } from './database/seeds/blogs.seed.js'
 
 dotenv.config()
 
@@ -73,6 +74,7 @@ async function startServer() {
     //tạo seeds
     await seedRoles()
     await seedUsers()
+    await seedBlogs()
 
     app.listen(PORT, () => {
       console.log(`Server chạy tại http://localhost:${PORT}/api-docs/`)
