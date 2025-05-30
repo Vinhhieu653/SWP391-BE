@@ -52,7 +52,6 @@ app.use('/api/v1/auth', refreshTokenRouter)
 app.use('/api/v1/users', registerRouter)
 app.use('/api/v1/blogs', blogRoutes)
 
-
 // Xử lý lỗi
 app.use(notFoundHandler)
 app.use(errorHandler)

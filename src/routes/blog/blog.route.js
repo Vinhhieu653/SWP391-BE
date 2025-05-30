@@ -1,10 +1,10 @@
 import express from 'express'
 import {
-    createBlogController,
-    getAllBlogsController,
-    getBlogByIdController,
-    updateBlogController,
-    deleteBlogController
+  createBlogController,
+  getAllBlogsController,
+  getBlogByIdController,
+  updateBlogController,
+  deleteBlogController
 } from '../../controllers/blog/blog.controller.js'
 import { authenticateToken, authorizeRoles } from '../../middlewares/auth.middleware.js'
 
@@ -35,7 +35,7 @@ const router = express.Router()
  *                 type: string
  *               author:
  *                 type: string
- *              
+ *
  *     responses:
  *       201:
  *         description: Blog created successfully
@@ -105,7 +105,7 @@ router.get('/:id', getBlogByIdController)
  *                 type: string
  *               content:
  *                 type: string
- *             
+ *
  *     responses:
  *       200:
  *         description: Blog updated successfully

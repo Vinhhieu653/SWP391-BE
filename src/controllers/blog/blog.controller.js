@@ -1,112 +1,112 @@
 import {
-    createBlogService,
-    getAllBlogsService,
-    getBlogByIdService,
-    updateBlogService,
-    deleteBlogService
+  createBlogService,
+  getAllBlogsService,
+  getBlogByIdService,
+  updateBlogService,
+  deleteBlogService
 } from '../../services/blog/blog.service.js'
 
 // [POST] /blogs
 export const createBlogController = async (req, res) => {
-    try {
-        const blog = await createBlogService(req.body)
+  try {
+    const blog = await createBlogService(req.body)
 
-        res.status(201).json({
-            status: 201,
-            success: true,
-            message: 'Blog created successfully',
-            data: blog
-        })
-    } catch (error) {
-        res.status(error.status || 500).json({
-            status: error.status || 500,
-            success: false,
-            message: error.message || 'Server error',
-            data: null
-        })
-    }
+    res.status(201).json({
+      status: 201,
+      success: true,
+      message: 'Blog created successfully',
+      data: blog
+    })
+  } catch (error) {
+    res.status(error.status || 500).json({
+      status: error.status || 500,
+      success: false,
+      message: error.message || 'Server error',
+      data: null
+    })
+  }
 }
 
 // [GET] /blogs
 export const getAllBlogsController = async (req, res) => {
-    try {
-        const blogs = await getAllBlogsService()
+  try {
+    const blogs = await getAllBlogsService()
 
-        res.status(200).json({
-            status: 200,
-            success: true,
-            message: 'Blogs fetched successfully',
-            data: blogs
-        })
-    } catch (error) {
-        res.status(error.status || 500).json({
-            status: error.status || 500,
-            success: false,
-            message: error.message || 'Server error',
-            data: null
-        })
-    }
+    res.status(200).json({
+      status: 200,
+      success: true,
+      message: 'Blogs fetched successfully',
+      data: blogs
+    })
+  } catch (error) {
+    res.status(error.status || 500).json({
+      status: error.status || 500,
+      success: false,
+      message: error.message || 'Server error',
+      data: null
+    })
+  }
 }
 
 // [GET] /blogs/:id
 export const getBlogByIdController = async (req, res) => {
-    try {
-        const blog = await getBlogByIdService(req.params.id)
+  try {
+    const blog = await getBlogByIdService(req.params.id)
 
-        res.status(200).json({
-            status: 200,
-            success: true,
-            message: 'Blog fetched successfully',
-            data: blog
-        })
-    } catch (error) {
-        res.status(error.status || 404).json({
-            status: error.status || 404,
-            success: false,
-            message: error.message || 'Blog not found',
-            data: null
-        })
-    }
+    res.status(200).json({
+      status: 200,
+      success: true,
+      message: 'Blog fetched successfully',
+      data: blog
+    })
+  } catch (error) {
+    res.status(error.status || 404).json({
+      status: error.status || 404,
+      success: false,
+      message: error.message || 'Blog not found',
+      data: null
+    })
+  }
 }
 
 // [PUT] /blogs/:id
 export const updateBlogController = async (req, res) => {
-    try {
-        const blog = await updateBlogService(req.params.id, req.body)
+  try {
+    const blog = await updateBlogService(req.params.id, req.body)
 
-        res.status(200).json({
-            status: 200,
-            success: true,
-            message: 'Blog updated successfully',
-            data: blog
-        })
-    } catch (error) {
-        res.status(error.status || 500).json({
-            status: error.status || 500,
-            success: false,
-            message: error.message || 'Update failed',
-            data: null
-        })
-    }
+    res.status(200).json({
+      status: 200,
+      success: true,
+      message: 'Blog updated successfully',
+      data: blog
+    })
+  } catch (error) {
+    res.status(error.status || 500).json({
+      status: error.status || 500,
+      success: false,
+      message: error.message || 'Update failed',
+      data: null
+    })
+  }
 }
 
 // [DELETE] /blogs/:id
 export const deleteBlogController = async (req, res) => {
-    try {
-        await deleteBlogService(req.params.id)
+  try {
+    await deleteBlogService(req.params.id)
 
-        res.status(200).json({
-            status: 200,
-            success: true,
-            message: 'Blog deleted successfully',
-            data: null
-        })
-    } catch (error) {
-        res.status(error.status || 500).json({
-            status: error.status || 500,
-            success: false,
-            message: error.message || 'Delete failed',
-            data: null
-        })
-    }
+    res.status(200).json({
+      status: 200,
+      success: true,
+      message: 'Blog deleted successfully',
+      data: null
+    })
+  } catch (error) {
+    res.status(error.status || 500).json({
+      status: error.status || 500,
+      success: false,
+      message: error.message || 'Delete failed',
+      data: null
+    })
+  }
 }
