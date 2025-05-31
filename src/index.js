@@ -5,6 +5,9 @@ import cors from 'cors'
 import sequelize from './database/db.js'
 import swaggerUi from 'swagger-ui-express'
 import swaggerSpec from './configs/swagger.config.js'
+import http from 'http'
+import { initSocket } from './configs/socket.config.js'
+import notifyRoute from './routes/notify.route.js'
 import testRoute from './routes/test.route.js'
 import loginRouter from './routes/auth/login.route.js'
 import logoutRouter from './routes/auth/logout.route.js'
@@ -28,6 +31,9 @@ dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 3333
 
+const server = http.createServer(app)
+const io = initSocket(server)
+
 // Middleware chung
 app.use(cors())
 app.use(morgan('dev'))
@@ -45,6 +51,12 @@ app.use(
   })
 )
 
+// Inject io vào req
+app.use((req, res, next) => {
+  req.io = io
+  next()
+})
+
 // Root
 app.get('/', (req, res) => res.send('API is running...'))
 
@@ -57,6 +69,7 @@ app.use('/api/v1/users', registerRouter)
 app.use('/api/v1/blogs', blogRoutes)
 app.use('/api/v1/upload', uploadRouter)
 app.use('/api/v1', emailRouter)
+app.use('/api/v1/notify', notifyRoute)
 
 // Xử lý lỗi
 app.use(notFoundHandler)
@@ -76,7 +89,7 @@ async function startServer() {
     await seedUsers()
     await seedBlogs()
 
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Server chạy tại http://localhost:${PORT}/api-docs/`)
     })
   } catch (err) {
