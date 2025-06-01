@@ -27,13 +27,13 @@ const router = express.Router()
  *             required:
  *               - title
  *               - content
- *               - author
+ *               - userId
  *             properties:
  *               title:
  *                 type: string
  *               content:
  *                 type: string
- *               author:
+ *               userId:
  *                 type: string
  *
  *     responses:
