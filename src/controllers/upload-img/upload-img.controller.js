@@ -1,4 +1,4 @@
-import * as imageService from '../../services/upload-img/image.service.js'
+import * as imageService from '../../services/upload-img/upload-img.service.js'
 
 export const uploadImage = async (req, res) => {
   if (!req.file) return res.status(400).json({ msg: 'No file uploaded' })

@@ -1,5 +1,5 @@
 import { refreshAccessToken } from '../../services/auth/refresh-token.service.js'
-import { apiResponse } from '../../middlewares/api-response/responseUtils.js'
+import { apiResponse } from '../../middlewares/responseUtils.js'
 
 export const refreshTokenController = async (req, res) => {
   const { refreshToken } = req.body
