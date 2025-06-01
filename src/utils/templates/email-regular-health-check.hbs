@@ -1,0 +1,657 @@
+<html lang='vi'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Form Khám Sức Khỏe Định Kỳ</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        color: #374151;
+        line-height: 1.6;
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .form-header {
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        color: white;
+        padding: 32px 24px;
+        text-align: center;
+      }
+
+      .form-header h1 {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+      }
+
+      .form-header p {
+        font-size: 16px;
+        opacity: 0.9;
+      }
+
+      .form-content {
+        padding: 32px 24px;
+      }
+
+      .section {
+        margin-bottom: 32px;
+        padding: 24px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        background: #fafafa;
+      }
+
+      .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 6px;
+        font-size: 14px;
+      }
+
+      .required {
+        color: #ef4444;
+      }
+
+      input[type='text'],
+      input[type='email'],
+      input[type='tel'],
+      input[type='date'],
+      input[type='number'],
+      select,
+      textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        background: white;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #0ea5e9;
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+      }
+
+      .checkbox-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+        margin-top: 8px;
+      }
+
+      .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px;
+        border-radius: 6px;
+        transition: background-color 0.2s;
+      }
+
+      .checkbox-item:hover {
+        background: #f3f4f6;
+      }
+
+      .checkbox-item input[type='checkbox'] {
+        width: auto;
+        margin: 0;
+      }
+
+      .radio-group {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+
+      .radio-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .radio-item input[type='radio'] {
+        width: auto;
+        margin: 0;
+      }
+
+      .health-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 16px;
+      }
+
+      .metric-item {
+        background: white;
+        padding: 16px;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        text-align: center;
+      }
+
+      .metric-item label {
+        font-size: 12px;
+        color: #6b7280;
+        margin-bottom: 4px;
+      }
+
+      .metric-item input {
+        font-size: 16px;
+        font-weight: 600;
+        text-align: center;
+        border: none;
+        background: #f9fafb;
+      }
+
+      .emergency-contact {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 16px;
+      }
+
+      .emergency-contact h4 {
+        color: #dc2626;
+        margin-bottom: 12px;
+        font-size: 16px;
+      }
+
+      .submit-section {
+        background: #f8fafc;
+        padding: 24px;
+        border-radius: 12px;
+        text-align: center;
+        margin-top: 32px;
+      }
+
+      .submit-btn {
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        color: white;
+        padding: 16px 32px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+        margin-right: 12px;
+      }
+
+      .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+      }
+
+      .save-btn {
+        background: #6b7280;
+        color: white;
+        padding: 16px 24px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .save-btn:hover {
+        background: #4b5563;
+      }
+
+      .info-box {
+        background: #dbeafe;
+        border: 1px solid #93c5fd;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 20px;
+      }
+
+      .info-box h4 {
+        color: #1e40af;
+        margin-bottom: 8px;
+        font-size: 14px;
+      }
+
+      .info-box p {
+        font-size: 13px;
+        color: #1e40af;
+        margin: 0;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        body {
+          padding: 10px;
+        }
+
+        .form-content {
+          padding: 24px 16px;
+        }
+
+        .section {
+          padding: 16px;
+        }
+
+        .form-row {
+          grid-template-columns: 1fr;
+          gap: 12px;
+        }
+
+        .health-metrics {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .radio-group,
+        .checkbox-group {
+          grid-template-columns: 1fr;
+        }
+
+        .form-header h1 {
+          font-size: 24px;
+        }
+
+        .submit-section {
+          padding: 20px 16px;
+        }
+
+        .submit-btn,
+        .save-btn {
+          width: 100%;
+          margin: 4px 0;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .health-metrics {
+          grid-template-columns: 1fr;
+        }
+
+        .form-header {
+          padding: 24px 16px;
+        }
+
+        .form-header h1 {
+          font-size: 20px;
+          flex-direction: column;
+          gap: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class='form-container'>
+      <div class='form-header'>
+        <h1>🏥 Phiếu Khám Sức Khỏe Định Kỳ</h1>
+        <p>Trường Tiểu Học ABC - Năm học 2024-2025</p>
+      </div>
+
+      <div class='form-content'>
+        <form id='healthForm'>
+          <!-- Thông tin cá nhân -->
+          <div class='section'>
+            <h3 class='section-title'>👤 Thông Tin Học Sinh</h3>
+
+            <div class='form-row'>
+              <div class='form-group'>
+                <label for='studentName'>Họ và tên <span class='required'>*</span></label>
+                <input type='text' id='studentName' name='studentName' required />
+              </div>
+              <div class='form-group'>
+                <label for='studentId'>Mã số học sinh</label>
+                <input type='text' id='studentId' name='studentId' />
+              </div>
+            </div>
+
+            <div class='form-row'>
+              <div class='form-group'>
+                <label for='dateOfBirth'>Ngày sinh <span class='required'>*</span></label>
+                <input type='date' id='dateOfBirth' name='dateOfBirth' required />
+              </div>
+              <div class='form-group'>
+                <label for='gender'>Giới tính <span class='required'>*</span></label>
+                <select id='gender' name='gender' required>
+                  <option value=''>Chọn giới tính</option>
+                  <option value='male'>Nam</option>
+                  <option value='female'>Nữ</option>
+                </select>
+              </div>
+            </div>
+
+            <div class='form-row'>
+              <div class='form-group'>
+                <label for='class'>Lớp <span class='required'>*</span></label>
+                <select id='class' name='class' required>
+                  <option value=''>Chọn lớp</option>
+                  <option value='1A'>1A</option>
+                  <option value='1B'>1B</option>
+                  <option value='2A'>2A</option>
+                  <option value='2B'>2B</option>
+                  <option value='3A'>3A</option>
+                  <option value='3B'>3B</option>
+                  <option value='4A'>4A</option>
+                  <option value='4B'>4B</option>
+                  <option value='5A'>5A</option>
+                  <option value='5B'>5B</option>
+                </select>
+              </div>
+              <div class='form-group'>
+                <label for='checkupDate'>Ngày khám <span class='required'>*</span></label>
+                <input type='date' id='checkupDate' name='checkupDate' required />
+              </div>
+            </div>
+          </div>
+
+          <!-- Chỉ số sức khỏe -->
+          <div class='section'>
+            <h3 class='section-title'>📏 Chỉ Số Sức Khỏe</h3>
+
+            <div class='health-metrics'>
+              <div class='metric-item'>
+                <label for='height'>Chiều cao (cm)</label>
+                <input type='number' id='height' name='height' placeholder='120' min='0' max='200' step='0.1' />
+              </div>
+              <div class='metric-item'>
+                <label for='weight'>Cân nặng (kg)</label>
+                <input type='number' id='weight' name='weight' placeholder='25.5' min='0' max='100' step='0.1' />
+              </div>
+              <div class='metric-item'>
+                <label for='bmi'>BMI</label>
+                <input type='text' id='bmi' name='bmi' readonly placeholder='Tự động tính' />
+              </div>
+              <div class='metric-item'>
+                <label for='bloodPressure'>Huyết áp</label>
+                <input type='text' id='bloodPressure' name='bloodPressure' placeholder='100/60' />
+              </div>
+            </div>
+          </div>
+
+          <!-- Khám tổng quát -->
+          <div class='section'>
+            <h3 class='section-title'>🔍 Khám Tổng Quát</h3>
+
+            <div class='form-group'>
+              <label>Tình trạng sức khỏe tổng quát</label>
+              <div class='radio-group'>
+                <div class='radio-item'>
+                  <input type='radio' id='healthGood' name='generalHealth' value='good' />
+                  <label for='healthGood'>Tốt</label>
+                </div>
+                <div class='radio-item'>
+                  <input type='radio' id='healthFair' name='generalHealth' value='fair' />
+                  <label for='healthFair'>Khá</label>
+                </div>
+                <div class='radio-item'>
+                  <input type='radio' id='healthPoor' name='generalHealth' value='poor' />
+                  <label for='healthPoor'>Yếu</label>
+                </div>
+              </div>
+            </div>
+
+            <div class='form-row'>
+              <div class='form-group'>
+                <label for='eyesight'>Thị lực</label>
+                <select id='eyesight' name='eyesight'>
+                  <option value=''>Chọn tình trạng</option>
+                  <option value='normal'>Bình thường</option>
+                  <option value='nearsighted'>Cận thị</option>
+                  <option value='farsighted'>Viễn thị</option>
+                  <option value='astigmatism'>Loạn thị</option>
+                </select>
+              </div>
+              <div class='form-group'>
+                <label for='hearing'>Thính lực</label>
+                <select id='hearing' name='hearing'>
+                  <option value=''>Chọn tình trạng</option>
+                  <option value='normal'>Bình thường</option>
+                  <option value='mild_loss'>Giảm nhẹ</option>
+                  <option value='moderate_loss'>Giảm vừa</option>
+                  <option value='severe_loss'>Giảm nặng</option>
+                </select>
+              </div>
+            </div>
+
+            <div class='form-group'>
+              <label>Các vấn đề sức khỏe phát hiện (nếu có)</label>
+              <div class='checkbox-group'>
+                <div class='checkbox-item'>
+                  <input type='checkbox' id='dental' name='healthIssues' value='dental' />
+                  <label for='dental'>Răng miệng</label>
+                </div>
+                <div class='checkbox-item'>
+                  <input type='checkbox' id='respiratory' name='healthIssues' value='respiratory' />
+                  <label for='respiratory'>Hô hấp</label>
+                </div>
+                <div class='checkbox-item'>
+                  <input type='checkbox' id='digestive' name='healthIssues' value='digestive' />
+                  <label for='digestive'>Tiêu hóa</label>
+                </div>
+                <div class='checkbox-item'>
+                  <input type='checkbox' id='skin' name='healthIssues' value='skin' />
+                  <label for='skin'>Da liễu</label>
+                </div>
+                <div class='checkbox-item'>
+                  <input type='checkbox' id='bones' name='healthIssues' value='bones' />
+                  <label for='bones'>Xương khớp</label>
+                </div>
+                <div class='checkbox-item'>
+                  <input type='checkbox' id='heart' name='healthIssues' value='heart' />
+                  <label for='heart'>Tim mạch</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tiền sử bệnh -->
+          <div class='section'>
+            <h3 class='section-title'>📋 Tiền Sử Bệnh</h3>
+
+            <div class='form-group'>
+              <label>Các bệnh đã mắc (nếu có)</label>
+              <div class='checkbox-group'>
+                <div class='checkbox-item'>
+                  <input type='checkbox' id='allergy' name='medicalHistory' value='allergy' />
+                  <label for='allergy'>Dị ứng</label>
+                </div>
+                <div class='checkbox-item'>
+                  <input type='checkbox' id='asthma' name='medicalHistory' value='asthma' />
+                  <label for='asthma'>Hen suyễn</label>
+                </div>
+                <div class='checkbox-item'>
+                  <input type='checkbox' id='diabetes' name='medicalHistory' value='diabetes' />
+                  <label for='diabetes'>Tiểu đường</label>
+                </div>
+                <div class='checkbox-item'>
+                  <input type='checkbox' id='epilepsy' name='medicalHistory' value='epilepsy' />
+                  <label for='epilepsy'>Động kinh</label>
+                </div>
+                <div class='checkbox-item'>
+                  <input type='checkbox' id='heart_disease' name='medicalHistory' value='heart_disease' />
+                  <label for='heart_disease'>Bệnh tim</label>
+                </div>
+                <div class='checkbox-item'>
+                  <input type='checkbox' id='other_chronic' name='medicalHistory' value='other_chronic' />
+                  <label for='other_chronic'>Bệnh mãn tính khác</label>
+                </div>
+              </div>
+            </div>
+
+            <div class='form-group'>
+              <label for='medications'>Thuốc đang sử dụng thường xuyên</label>
+              <textarea
+                id='medications'
+                name='medications'
+                rows='3'
+                placeholder='Ghi rõ tên thuốc, liều lượng và mục đích sử dụng...'
+              ></textarea>
+            </div>
+
+            <div class='form-group'>
+              <label for='allergies'>Dị ứng với thực phẩm/thuốc (nếu có)</label>
+              <textarea
+                id='allergies'
+                name='allergies'
+                rows='2'
+                placeholder='Mô tả chi tiết các chất gây dị ứng...'
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Thông tin phụ huynh -->
+          <div class='section'>
+            <h3 class='section-title'>👨‍👩‍👧‍👦 Thông Tin Phụ Huynh</h3>
+
+            <div class='form-row'>
+              <div class='form-group'>
+                <label for='parentName'>Họ tên phụ huynh <span class='required'>*</span></label>
+                <input type='text' id='parentName' name='parentName' required />
+              </div>
+              <div class='form-group'>
+                <label for='relationship'>Mối quan hệ</label>
+                <select id='relationship' name='relationship'>
+                  <option value='father'>Bố</option>
+                  <option value='mother'>Mẹ</option>
+                  <option value='guardian'>Người giám hộ</option>
+                </select>
+              </div>
+            </div>
+
+            <div class='form-row'>
+              <div class='form-group'>
+                <label for='parentPhone'>Số điện thoại <span class='required'>*</span></label>
+                <input type='tel' id='parentPhone' name='parentPhone' required />
+              </div>
+              <div class='form-group'>
+                <label for='parentEmail'>Email</label>
+                <input type='email' id='parentEmail' name='parentEmail' />
+              </div>
+            </div>
+
+            <div class='emergency-contact'>
+              <h4>🚨 Liên hệ khẩn cấp</h4>
+              <div class='form-row'>
+                <div class='form-group'>
+                  <label for='emergencyName'>Họ tên người liên hệ</label>
+                  <input type='text' id='emergencyName' name='emergencyName' />
+                </div>
+                <div class='form-group'>
+                  <label for='emergencyPhone'>Số điện thoại</label>
+                  <input type='tel' id='emergencyPhone' name='emergencyPhone' />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ghi chú bác sĩ -->
+          <div class='section'>
+            <h3 class='section-title'>👩‍⚕️ Kết Luận Bác Sĩ</h3>
+
+            <div class='info-box'>
+              <h4>Lưu ý</h4>
+              <p>Phần này sẽ được bác sĩ điền sau khi hoàn thành khám</p>
+            </div>
+
+            <div class='form-group'>
+              <label for='doctorNotes'>Ghi chú của bác sĩ</label>
+              <textarea
+                id='doctorNotes'
+                name='doctorNotes'
+                rows='4'
+                placeholder='Kết quả khám, khuyến nghị, theo dõi...'
+              ></textarea>
+            </div>
+
+            <div class='form-row'>
+              <div class='form-group'>
+                <label for='nextCheckup'>Lịch khám tiếp theo</label>
+                <input type='date' id='nextCheckup' name='nextCheckup' />
+              </div>
+              <div class='form-group'>
+                <label for='doctorName'>Bác sĩ khám</label>
+                <input type='text' id='doctorName' name='doctorName' />
+              </div>
+            </div>
+          </div>
+
+          <!-- Nút submit -->
+          <div class='submit-section'>
+            <button type='submit' class='submit-btn'>📋 Hoàn Thành Khám</button>
+            <button type='button' class='save-btn' onclick='saveDraft()'>💾 Lưu Nháp</button>
+            <p style='margin-top: 16px; font-size: 13px; color: #6b7280;'>
+              Vui lòng kiểm tra kỹ thông tin trước khi gửi
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Tự động tính BMI function calculateBMI() { const height = parseFloat(document.getElementById('height').value);
+      const weight = parseFloat(document.getElementById('weight').value); const bmiField =
+      document.getElementById('bmi'); if (height && weight) { const heightInMeters = height / 100; const bmi = (weight /
+      (heightInMeters * heightInMeters)).toFixed(1); bmiField.value = bmi; } else { bmiField.value = ''; } } // Thêm
+      event listeners document.getElementById('height').addEventListener('input', calculateBMI);
+      document.getElementById('weight').addEventListener('input', calculateBMI); // Lưu nháp function saveDraft() {
+      const formData = new FormData(document.getElementById('healthForm')); const data = Object.fromEntries(formData);
+      // Lưu vào memory (thay vì localStorage) window.draftData = data; alert('Đã lưu nháp thành công! 💾'); } // Xử lý
+      submit form document.getElementById('healthForm').addEventListener('submit', function(e) { e.preventDefault();
+      const formData = new FormData(this); const data = Object.fromEntries(formData); // Kiểm tra các trường bắt buộc
+      const requiredFields = ['studentName', 'dateOfBirth', 'gender', 'class', 'checkupDate', 'parentName',
+      'parentPhone']; const missingFields = requiredFields.filter(field => !data[field]); if (missingFields.length > 0)
+      { alert('Vui lòng điền đầy đủ các thông tin bắt buộc!'); return; } // Xử lý dữ liệu form console.log('Dữ liệu khám
+      sức khỏe:', data); alert('Đã gửi phiếu khám sức khỏe thành công! ✅\n\nCảm ơn bạn đã hoàn thành.'); // Reset form
+      this.reset(); }); // Tự động điền ngày khám là hôm nay document.getElementById('checkupDate').valueAsDate = new
+      Date();
+    </script>
+  </body>
+</html>
