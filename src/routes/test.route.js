@@ -23,7 +23,7 @@ router.get('/test', (req, res) => {
 export default router
 
 // import express from 'express'
-// import { apiResponse } from '../middlewares/api-response/responseUtils.js'
+// import { apiResponse } from '../middlewares/responseUtils.js'
 
 // const router = express.Router()
 

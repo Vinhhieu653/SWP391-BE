@@ -35,7 +35,7 @@ const router = express.Router()
  *       500:
  *         description: Server error
  */
-router.get('/', userController.getAllUsers)
+router.get('/', authenticateToken, authorizeRoles('admin'), userController.getAllUsers)
 
 /**
  * @swagger
@@ -60,7 +60,7 @@ router.get('/', userController.getAllUsers)
  *       404:
  *         description: User not found
  */
-router.get('/:id', userController.getUserById)
+router.get('/:id', authenticateToken, authorizeRoles('admin'), userController.getUserById)
 
 /**
  * @swagger
@@ -131,7 +131,7 @@ router.post('/register', authenticateToken, authorizeRoles('admin'), userControl
 
 /**
  * @swagger
- * /api/v1/users/{id}:
+ * /api/v1/users/edit/{id}:
  *   put:
  *     summary: Update user info (username, fullname, email, phoneNumber)
  *     tags: [Users]
@@ -202,7 +202,7 @@ router.post('/register', authenticateToken, authorizeRoles('admin'), userControl
  *                   type: string
  *                   example: Internal server error
  */
-router.put('/:id', authenticateToken, authorizeRoles('admin'), userController.update)
+router.put('/edit/:id', authenticateToken, authorizeRoles('admin'), userController.update)
 
 /**
  * @swagger

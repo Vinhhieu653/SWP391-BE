@@ -1,14 +1,16 @@
 import express from 'express'
 import {
-    createBlogController,
-    getAllBlogsController,
-    getBlogByIdController,
-    updateBlogController,
-    deleteBlogController
+  createBlogController,
+  getAllBlogsController,
+  getBlogByIdController,
+  updateBlogController,
+  deleteBlogController
 } from '../../controllers/blog/blog.controller.js'
 import { authenticateToken, authorizeRoles } from '../../middlewares/auth.middleware.js'
+import multer from 'multer'
 
 const router = express.Router()
+const upload = multer({ dest: 'uploads/' })
 
 /**
  * @swagger
@@ -21,30 +23,37 @@ const router = express.Router()
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
  *               - title
  *               - content
- *               - author
+ *               - userId
  *             properties:
  *               title:
  *                 type: string
  *               content:
  *                 type: string
- *               author:
+ *               userId:
  *                 type: string
- *              
+ *               image:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       201:
  *         description: Blog created successfully
  *       400:
  *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
  *       500:
  *         description: Server error
  */
-router.post('/', authenticateToken, authorizeRoles('nurse'), createBlogController)
+
+router.post('/', authenticateToken, authorizeRoles('nurse', 'admin'), upload.single('image'), createBlogController)
 
 /**
  * @swagger
@@ -97,7 +106,7 @@ router.get('/:id', getBlogByIdController)
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -105,14 +114,22 @@ router.get('/:id', getBlogByIdController)
  *                 type: string
  *               content:
  *                 type: string
- *             
+ *               author:
+ *                 type: string
+ *               image:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       200:
  *         description: Blog updated successfully
+ *       400:
+ *         description: Bad request
  *       404:
  *         description: Blog not found
+ *       500:
+ *         description: Server error
  */
-router.put('/:id', authenticateToken, authorizeRoles('nurse'), updateBlogController)
+router.put('/:id', authenticateToken, authorizeRoles('nurse', 'admin'), upload.single('image'), updateBlogController)
 
 /**
  * @swagger
@@ -135,6 +152,6 @@ router.put('/:id', authenticateToken, authorizeRoles('nurse'), updateBlogControl
  *       404:
  *         description: Blog not found
  */
-router.delete('/:id', authenticateToken, authorizeRoles('nurse'), deleteBlogController)
+router.delete('/:id', authenticateToken, authorizeRoles('nurse', 'admin'), deleteBlogController)
 
 export default router

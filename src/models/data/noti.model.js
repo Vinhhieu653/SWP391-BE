@@ -1,10 +1,10 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '../../database/db.js'
 
-const Blog = sequelize.define(
-  'Blog',
+const Notification = sequelize.define(
+  'Notification',
   {
-    id: {
+    notiId: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true
@@ -13,27 +13,31 @@ const Blog = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false
     },
-    content: {
+    mess: {
       type: DataTypes.TEXT,
       allowNull: false
+    },
+    isRead: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     },
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    image: {
-      type: DataTypes.STRING,
-      allowNull: true
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
     },
-    author: {
-      type: DataTypes.STRING,
-      allowNull: true // hoặc false tùy mày
+    updatedAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
     }
   },
   {
-    tableName: 'blogs',
+    tableName: 'noti',
     timestamps: true
   }
 )
 
-export default Blog
+export default Notification
