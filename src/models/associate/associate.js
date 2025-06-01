@@ -21,97 +21,97 @@ import Evidence from '../data/evidence.model.js'
 
 // Thiết lập associations ở đây
 function applyAssociations() {
-    // User ↔ Role
-    User.belongsTo(Role, { foreignKey: 'roleId' })
-    Role.hasMany(User, { foreignKey: 'roleId' })
+  // User ↔ Role
+  User.belongsTo(Role, { foreignKey: 'roleId' })
+  Role.hasMany(User, { foreignKey: 'roleId' })
 
-    // User ↔ Blog
-    User.hasMany(Blog, { foreignKey: 'userId' })
-    Blog.belongsTo(User, { foreignKey: 'userId' })
+  // User ↔ Blog
+  User.hasMany(Blog, { foreignKey: 'userId' })
+  Blog.belongsTo(User, { foreignKey: 'userId' })
 
-    // User ↔ Notification
-    User.hasMany(Notification, { foreignKey: 'userId' })
-    Notification.belongsTo(User, { foreignKey: 'userId' })
+  // User ↔ Notification
+  User.hasMany(Notification, { foreignKey: 'userId' })
+  Notification.belongsTo(User, { foreignKey: 'userId' })
 
-    // User ↔ Guardian (Many-to-Many thông qua GuardianUser)
-    User.belongsToMany(Guardian, {
-        through: GuardianUser,
-        foreignKey: 'userId',
-        otherKey: 'obId',
-    })
-    Guardian.belongsToMany(User, {
-        through: GuardianUser,
-        foreignKey: 'obId',
-        otherKey: 'userId',
-    })
+  // User ↔ Guardian (Many-to-Many thông qua GuardianUser)
+  User.belongsToMany(Guardian, {
+    through: GuardianUser,
+    foreignKey: 'userId',
+    otherKey: 'obId'
+  })
+  Guardian.belongsToMany(User, {
+    through: GuardianUser,
+    foreignKey: 'obId',
+    otherKey: 'userId'
+  })
 
-    // User ↔ Event (Many-to-Many thông qua UserEvent)
-    User.belongsToMany(Event, {
-        through: UserEvent,
-        foreignKey: 'userId',
-        otherKey: 'eventId',
-    })
-    Event.belongsToMany(User, {
-        through: UserEvent,
-        foreignKey: 'eventId',
-        otherKey: 'userId',
-    })
+  // User ↔ Event (Many-to-Many thông qua UserEvent)
+  User.belongsToMany(Event, {
+    through: UserEvent,
+    foreignKey: 'userId',
+    otherKey: 'eventId'
+  })
+  Event.belongsToMany(User, {
+    through: UserEvent,
+    foreignKey: 'eventId',
+    otherKey: 'userId'
+  })
 
-    // User ↔ Medical_Record
-    User.hasOne(MedicalRecord, { foreignKey: 'userId' });
-    MedicalRecord.belongsTo(User, { foreignKey: 'userId' });
+  // User ↔ Medical_Record
+  User.hasOne(MedicalRecord, { foreignKey: 'userId' })
+  MedicalRecord.belongsTo(User, { foreignKey: 'userId' })
 
-    //Medical_Record ↔ HistoryOtherMedical
-    MedicalRecord.hasMany(HistoryOtherMedical, { foreignKey: 'MR_ID' });
-    HistoryOtherMedical.belongsTo(MedicalRecord, { foreignKey: 'MR_ID' });
+  //Medical_Record ↔ HistoryOtherMedical
+  MedicalRecord.hasMany(HistoryOtherMedical, { foreignKey: 'MR_ID' })
+  HistoryOtherMedical.belongsTo(MedicalRecord, { foreignKey: 'MR_ID' })
 
-    //medicalRecord ↔ Outpatient
-    MedicalRecord.hasMany(OutpatientMedication, { foreignKey: 'MR_ID' });
-    OutpatientMedication.belongsTo(MedicalRecord, { foreignKey: 'MR_ID' });
+  //medicalRecord ↔ Outpatient
+  MedicalRecord.hasMany(OutpatientMedication, { foreignKey: 'MR_ID' })
+  OutpatientMedication.belongsTo(MedicalRecord, { foreignKey: 'MR_ID' })
 
-    //outpatient ↔ medicationSent
-    OutpatientMedication.hasMany(MedicalSent, { foreignKey: 'OM_ID' });
-    MedicalSent.belongsTo(OutpatientMedication, { foreignKey: 'OM_ID' });
+  //outpatient ↔ medicationSent
+  OutpatientMedication.hasMany(MedicalSent, { foreignKey: 'OM_ID' })
+  MedicalSent.belongsTo(OutpatientMedication, { foreignKey: 'OM_ID' })
 
-    //event ↔ healthCheck
-    Event.hasMany(HealthCheck, { foreignKey: 'Event_ID' });
-    HealthCheck.belongsTo(Event, { foreignKey: 'Event_ID' });
+  //event ↔ healthCheck
+  Event.hasMany(HealthCheck, { foreignKey: 'Event_ID' })
+  HealthCheck.belongsTo(Event, { foreignKey: 'Event_ID' })
 
-    //HistoryCheck ↔ HealthCheck
-    HealthCheck.hasMany(HistoryCheck, { foreignKey: 'HC_ID' });
-    HistoryCheck.belongsTo(HealthCheck, { foreignKey: 'HC_ID' });
+  //HistoryCheck ↔ HealthCheck
+  HealthCheck.hasMany(HistoryCheck, { foreignKey: 'HC_ID' })
+  HistoryCheck.belongsTo(HealthCheck, { foreignKey: 'HC_ID' })
 
-    //FormCheck ↔ HealthCheck
-    HealthCheck.hasOne(FormCheck, { foreignKey: 'HC_ID' });
-    FormCheck.belongsTo(HealthCheck, { foreignKey: 'HC_ID' });
+  //FormCheck ↔ HealthCheck
+  HealthCheck.hasOne(FormCheck, { foreignKey: 'HC_ID' })
+  FormCheck.belongsTo(HealthCheck, { foreignKey: 'HC_ID' })
 
-    //historyCheck ↔ medicalRecord
-    MedicalRecord.hasMany(HistoryCheck, { foreignKey: 'MR_ID' });
-    HistoryCheck.belongsTo(MedicalRecord, { foreignKey: 'MR_ID' });
+  //historyCheck ↔ medicalRecord
+  MedicalRecord.hasMany(HistoryCheck, { foreignKey: 'MR_ID' })
+  HistoryCheck.belongsTo(MedicalRecord, { foreignKey: 'MR_ID' })
 
-    //otherMedical ↔ event
-    Event.hasMany(OtherMedical, { foreignKey: 'Event_ID' });
-    OtherMedical.belongsTo(Event, { foreignKey: 'Event_ID' });
+  //otherMedical ↔ event
+  Event.hasMany(OtherMedical, { foreignKey: 'Event_ID' })
+  OtherMedical.belongsTo(Event, { foreignKey: 'Event_ID' })
 
-    //otherMedical ↔ historyOtherMedical
-    OtherMedical.hasMany(HistoryOtherMedical, { foreignKey: 'OrtherM_ID' });
-    HistoryOtherMedical.belongsTo(OtherMedical, { foreignKey: 'OrtherM_ID' });
+  //otherMedical ↔ historyOtherMedical
+  OtherMedical.hasMany(HistoryOtherMedical, { foreignKey: 'OrtherM_ID' })
+  HistoryOtherMedical.belongsTo(OtherMedical, { foreignKey: 'OrtherM_ID' })
 
-    //vaccineEvent ↔ event
-    Event.hasMany(VaccineEvent, { foreignKey: 'Event_ID' });
-    VaccineEvent.belongsTo(Event, { foreignKey: 'Event_ID' });
+  //vaccineEvent ↔ event
+  Event.hasMany(VaccineEvent, { foreignKey: 'Event_ID' })
+  VaccineEvent.belongsTo(Event, { foreignKey: 'Event_ID' })
 
-    //vaccineHistory ↔ vaccineEvent
-    VaccineEvent.hasMany(VaccineHistory, { foreignKey: 'VE_ID' });
-    VaccineHistory.belongsTo(VaccineEvent, { foreignKey: 'VE_ID' });
+  //vaccineHistory ↔ vaccineEvent
+  VaccineEvent.hasMany(VaccineHistory, { foreignKey: 'VE_ID' })
+  VaccineHistory.belongsTo(VaccineEvent, { foreignKey: 'VE_ID' })
 
-    //vaccineHistory ↔ medicalRecord
-    MedicalRecord.hasMany(VaccineHistory, { foreignKey: 'MR_ID' });
-    VaccineHistory.belongsTo(MedicalRecord, { foreignKey: 'MR_ID' });
+  //vaccineHistory ↔ medicalRecord
+  MedicalRecord.hasMany(VaccineHistory, { foreignKey: 'MR_ID' })
+  VaccineHistory.belongsTo(MedicalRecord, { foreignKey: 'MR_ID' })
 
-    //evidence ↔ vaccineHistory
-    VaccineHistory.hasMany(Evidence, { foreignKey: 'VH_ID' });
-    Evidence.belongsTo(VaccineHistory, { foreignKey: 'VH_ID' });
+  //evidence ↔ vaccineHistory
+  VaccineHistory.hasMany(Evidence, { foreignKey: 'VH_ID' })
+  Evidence.belongsTo(VaccineHistory, { foreignKey: 'VH_ID' })
 }
 
 export default applyAssociations

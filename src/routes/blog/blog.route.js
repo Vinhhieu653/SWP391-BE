@@ -45,6 +45,10 @@ const upload = multer({ dest: 'uploads/' })
  *         description: Blog created successfully
  *       400:
  *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
  *       500:
  *         description: Server error
  */

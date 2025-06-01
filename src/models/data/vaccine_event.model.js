@@ -1,24 +1,28 @@
 // models/VaccineEvent.js
 
-import { DataTypes } from 'sequelize';
-import sequelize from '../../database/db.js';
+import { DataTypes } from 'sequelize'
+import sequelize from '../../database/db.js'
 
-const VaccineEvent = sequelize.define('VaccineEvent', {
+const VaccineEvent = sequelize.define(
+  'VaccineEvent',
+  {
     VE_ID: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
     },
     Even_ID: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
+      type: DataTypes.INTEGER,
+      allowNull: false
     },
     follow_up: {
-        type: DataTypes.TEXT,
-    },
-}, {
+      type: DataTypes.TEXT
+    }
+  },
+  {
     tableName: 'Vaccine_event',
-    timestamps: false,
-});
+    timestamps: false
+  }
+)
 
-export default VaccineEvent;
+export default VaccineEvent

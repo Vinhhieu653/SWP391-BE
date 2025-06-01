@@ -21,6 +21,7 @@ export const createBlogController = async (req, res) => {
 
     const blog = await createBlogService({
       ...req.body,
+      userId: req.user.id,
       image: imageUrl
     })
 

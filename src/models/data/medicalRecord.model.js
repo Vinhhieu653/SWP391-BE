@@ -1,22 +1,26 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '../../database/db.js'
 
-const MedicalRecord = sequelize.define('Medical_Record', {
+const MedicalRecord = sequelize.define(
+  'Medical_Record',
+  {
     ID: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
     },
     userId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
+      type: DataTypes.INTEGER,
+      allowNull: false
     },
     Type: {
-        type: DataTypes.STRING,
-    },
-}, {
+      type: DataTypes.STRING
+    }
+  },
+  {
     tableName: 'Medical_Record',
-    timestamps: false,
-});
+    timestamps: false
+  }
+)
 
-export default MedicalRecord;
+export default MedicalRecord

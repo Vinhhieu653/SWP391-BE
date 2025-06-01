@@ -24,6 +24,10 @@ const Blog = sequelize.define(
     image: {
       type: DataTypes.STRING,
       allowNull: true
+    },
+    author: {
+      type: DataTypes.STRING,
+      allowNull: true // hoặc false tùy mày
     }
   },
   {
