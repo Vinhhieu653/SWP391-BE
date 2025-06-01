@@ -1,5 +1,5 @@
 import { validationResult } from 'express-validator'
-import { apiResponse } from '../../middlewares/api-response/responseUtils.js'
+import { apiResponse } from '../../middlewares/responseUtils.js'
 import logoutService from '../../services/auth/logout.service.js'
 
 const logoutController = async (req, res) => {

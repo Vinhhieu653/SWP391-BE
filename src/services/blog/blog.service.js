@@ -24,10 +24,14 @@ export const getBlogByIdService = async (id) => {
 }
 
 // Cập nhật blog
-export const updateBlogService = async (id, updateData) => {
+export const updateBlogService = async (id, updateData, imageFile) => {
   const blog = await Blog.findByPk(id)
-
   if (!blog) throw { status: 404, message: 'Blog not found' }
+
+  if (imageFile) {
+    const imageUrl = `/uploads/${imageFile.filename}`
+    updateData.image = imageUrl
+  }
 
   await blog.update(updateData)
 
