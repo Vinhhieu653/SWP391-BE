@@ -53,7 +53,7 @@ const upload = multer({ dest: 'uploads/' })
  *         description: Server error
  */
 
-router.post('/', authenticateToken, authorizeRoles('nurse'), upload.single('image'), createBlogController)
+router.post('/', authenticateToken, authorizeRoles('nurse', 'admin'), upload.single('image'), createBlogController)
 
 /**
  * @swagger
@@ -129,7 +129,7 @@ router.get('/:id', getBlogByIdController)
  *       500:
  *         description: Server error
  */
-router.put('/:id', authenticateToken, authorizeRoles('nurse'), upload.single('image'), updateBlogController)
+router.put('/:id', authenticateToken, authorizeRoles('nurse', 'admin'), upload.single('image'), updateBlogController)
 
 /**
  * @swagger
@@ -152,6 +152,6 @@ router.put('/:id', authenticateToken, authorizeRoles('nurse'), upload.single('im
  *       404:
  *         description: Blog not found
  */
-router.delete('/:id', authenticateToken, authorizeRoles('nurse'), deleteBlogController)
+router.delete('/:id', authenticateToken, authorizeRoles('nurse', 'admin'), deleteBlogController)
 
 export default router

@@ -33,8 +33,16 @@ const users = [
     email: 'guardian1@example.com',
     password: 'Login123@',
     phoneNumber: '0911223344',
-    roleName: 'guardian' // đã đổi thành guardian
-  }
+    roleName: 'guardian'
+  },
+  {
+    fullname: 'Nurse two',
+    username: 'nurse2',
+    email: 'nurse2@example.com',
+    password: 'Login123@',
+    phoneNumber: '0987654321',
+    roleName: 'nurse'
+  },
 ]
 
 export async function seedUsers() {
