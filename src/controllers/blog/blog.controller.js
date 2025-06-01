@@ -12,7 +12,6 @@ import cloudinary from '../../utils/cloudinary.js'
 export const createBlogController = async (req, res) => {
   try {
     let imageUrl = null
-
     if (req.file) {
       // up cloudinary ở đây, ví dụ:
       const result = await cloudinary.uploader.upload(req.file.path)
@@ -21,7 +20,7 @@ export const createBlogController = async (req, res) => {
 
     const blog = await createBlogService({
       ...req.body,
-      userId: req.user.id,
+      userId: req.user.userId,
       image: imageUrl
     })
 
