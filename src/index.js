@@ -20,6 +20,7 @@ import Blog from './models/data/blog.model.js'
 import Image from './models/data/image.model.js'
 import { seedRoles } from './database/seeds/role.seed.js'
 import { seedUsers } from './database/seeds/users.seed.js'
+import applyAssociations from './models/associate/associate.js'
 
 dotenv.config()
 
@@ -64,6 +65,8 @@ async function startServer() {
   try {
     await sequelize.authenticate()
     console.log('PostgreSQL connected ✅')
+
+    applyAssociations()
 
     // Tạo bảng
     await sequelize.sync({ alter: true })

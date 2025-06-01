@@ -1,4 +1,3 @@
-// models/blog.model.js
 import { DataTypes } from 'sequelize'
 import sequelize from '../../database/db.js'
 
@@ -18,8 +17,8 @@ const Blog = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: false
     },
-    author: {
-      type: DataTypes.STRING,
+    userId: {
+      type: DataTypes.INTEGER,
       allowNull: false
     },
     createdAt: {

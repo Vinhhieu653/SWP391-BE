@@ -2,6 +2,9 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '../../database/db.js'
 import Role from './role.model.js'
+import Blog from './blog.model.js'
+import Notification from './noti.model.js'
+import GuardianUser from './guardian_user.model.js'
 
 const User = sequelize.define(
   'User',
@@ -13,19 +16,19 @@ const User = sequelize.define(
     },
     username: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     fullname: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     phoneNumber: {
       type: DataTypes.STRING,
@@ -37,17 +40,14 @@ const User = sequelize.define(
         model: Role,
         key: 'id'
       },
-      allowNull: false
+      allowNull: true
     }
   },
   {
     tableName: 'users',
-    timestamps: true
+    timestamps: false
   }
 )
 
-// tạo quan hệ
-User.belongsTo(Role, { foreignKey: 'roleId' })
-Role.hasMany(User, { foreignKey: 'roleId' })
 
 export default User
