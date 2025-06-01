@@ -202,7 +202,7 @@ router.post('/register', authenticateToken, authorizeRoles('admin'), userControl
  *                   type: string
  *                   example: Internal server error
  */
-router.put('/:id', authenticateToken, authorizeRoles('admin'), userController.update)
+router.put('/edit/:id', authenticateToken, authorizeRoles('admin'), userController.update)
 
 /**
  * @swagger

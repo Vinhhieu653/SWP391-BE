@@ -1,30 +1,34 @@
 // models/OtherMedical.js
 
-import { DataTypes } from 'sequelize';
-import sequelize from '../../database/db.js';
+import { DataTypes } from 'sequelize'
+import sequelize from '../../database/db.js'
 
-const OtherMedical = sequelize.define('OtherMedical', {
+const OtherMedical = sequelize.define(
+  'OtherMedical',
+  {
     OrtherM_ID: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
     },
     Event_ID: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
+      type: DataTypes.INTEGER,
+      allowNull: false
     },
     Decription: {
-        type: DataTypes.TEXT,
+      type: DataTypes.TEXT
     },
     Image: {
-        type: DataTypes.TEXT,
+      type: DataTypes.TEXT
     },
     Is_calLOb: {
-        type: DataTypes.BOOLEAN,
-    },
-}, {
+      type: DataTypes.BOOLEAN
+    }
+  },
+  {
     tableName: 'Other_medical',
-    timestamps: false,
-});
+    timestamps: false
+  }
+)
 
-export default OtherMedical;
+export default OtherMedical

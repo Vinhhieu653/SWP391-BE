@@ -13,4 +13,4 @@ socket.on('connect_error', (err) => {
 socket.on('notify', (data) => {
   console.log('Received notify:', data)
 })
-// node test-client.js
+// node test-socket.js

@@ -1,29 +1,33 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '../../database/db.js'
 
-const HistoryOtherMedical = sequelize.define('History_Other_medical', {
+const HistoryOtherMedical = sequelize.define(
+  'History_Other_medical',
+  {
     ID: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
     },
     OrtherM_ID: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
+      type: DataTypes.INTEGER,
+      allowNull: false
     },
     MR_ID: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
+      type: DataTypes.INTEGER,
+      allowNull: false
     },
     Date_create: {
-        type: DataTypes.DATE,
+      type: DataTypes.DATE
     },
     Creater_by: {
-        type: DataTypes.STRING,
-    },
-}, {
+      type: DataTypes.STRING
+    }
+  },
+  {
     tableName: 'History_Other_medical',
-    timestamps: false,
-});
+    timestamps: false
+  }
+)
 
-export default HistoryOtherMedical;
+export default HistoryOtherMedical
