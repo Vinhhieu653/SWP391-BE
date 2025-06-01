@@ -6,10 +6,23 @@ import {
   deleteBlogService
 } from '../../services/blog/blog.service.js'
 
+import cloudinary from '../../utils/cloudinary.js'
+
 // [POST] /blogs
 export const createBlogController = async (req, res) => {
   try {
-    const blog = await createBlogService(req.body)
+    let imageUrl = null
+
+    if (req.file) {
+      // up cloudinary ở đây, ví dụ:
+      const result = await cloudinary.uploader.upload(req.file.path)
+      imageUrl = result.secure_url
+    }
+
+    const blog = await createBlogService({
+      ...req.body,
+      image: imageUrl
+    })
 
     res.status(201).json({
       status: 201,
@@ -72,7 +85,14 @@ export const getBlogByIdController = async (req, res) => {
 // [PUT] /blogs/:id
 export const updateBlogController = async (req, res) => {
   try {
-    const blog = await updateBlogService(req.params.id, req.body)
+    const { id } = req.params
+    const updateData = req.body
+    const imageFile = req.file
+
+    console.log('updateData:', updateData)
+    console.log('imageFile:', imageFile)
+
+    const blog = await updateBlogService(id, updateData, imageFile)
 
     res.status(200).json({
       status: 200,

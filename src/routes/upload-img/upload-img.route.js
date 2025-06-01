@@ -1,6 +1,6 @@
 import express from 'express'
 import upload from '../../middlewares/cloudinaryUpload.js'
-import { uploadImage } from '../../controllers/upload-img/image.controller.js'
+import { uploadImage } from '../../controllers/upload-img/upload-img.controller.js'
 
 const router = express.Router()
 
