@@ -12,8 +12,7 @@ export const loginController = async (req, res) => {
       data: {
         accessToken,
         refreshToken,
-        user,
-        email
+        user
       }
     })
   } catch (error) {
