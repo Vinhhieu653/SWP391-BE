@@ -42,7 +42,7 @@ const users = [
     password: 'Login123@',
     phoneNumber: '0987654321',
     roleName: 'nurse'
-  },
+  }
 ]
 
 export async function seedUsers() {
