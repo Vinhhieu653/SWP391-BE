@@ -24,14 +24,6 @@ const Notification = sequelize.define(
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
     }
   },
   {
