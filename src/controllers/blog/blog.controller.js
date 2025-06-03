@@ -20,7 +20,6 @@ export const createBlogController = async (req, res) => {
 
     const blog = await createBlogService({
       ...req.body,
-      userId: req.user.userId,
       image: imageUrl
     })
 
@@ -113,13 +112,13 @@ export const updateBlogController = async (req, res) => {
 // [DELETE] /blogs/:id
 export const deleteBlogController = async (req, res) => {
   try {
-    await deleteBlogService(req.params.id)
+    const deletedBlog = await deleteBlogService(req.params.id)
 
     res.status(200).json({
       status: 200,
       success: true,
       message: 'Blog deleted successfully',
-      data: null
+      data: deletedBlog
     })
   } catch (error) {
     res.status(error.status || 500).json({
@@ -130,3 +129,4 @@ export const deleteBlogController = async (req, res) => {
     })
   }
 }
+

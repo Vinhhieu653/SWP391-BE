@@ -1,5 +1,4 @@
 import Blog from '../../models/data/blog.model.js'
-import User from '../../models/data/user.model.js' // bạn cần import model User để tìm user
 
 const blogs = [
   {
@@ -24,20 +23,12 @@ const blogs = [
 
 export async function seedBlogs() {
   for (const blog of blogs) {
-    // tìm user theo name hoặc email giống author
-    const user = await User.findOne({ where: { username: blog.author } })
-
-    if (!user) {
-      console.warn(`❌ Không tìm thấy user tên: ${blog.author}, bỏ qua blog này.`)
-      continue
-    }
-
     const [instance, created] = await Blog.findOrCreate({
       where: { title: blog.title },
       defaults: {
         content: blog.content,
-        userId: user.id,
-        image: blog.image
+        image: blog.image,
+        author: blog.author
       }
     })
 

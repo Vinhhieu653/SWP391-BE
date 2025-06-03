@@ -25,9 +25,6 @@ function applyAssociations() {
   User.belongsTo(Role, { foreignKey: 'roleId' })
   Role.hasMany(User, { foreignKey: 'roleId' })
 
-  // User ↔ Blog
-  User.hasMany(Blog, { foreignKey: 'userId' })
-  Blog.belongsTo(User, { foreignKey: 'userId' })
 
   // User ↔ Notification
   User.hasMany(Notification, { foreignKey: 'userId' })
