@@ -129,4 +129,3 @@ export const deleteBlogController = async (req, res) => {
     })
   }
 }
-
