@@ -17,6 +17,10 @@ const Blog = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: false
     },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     image: {
       type: DataTypes.STRING,
       allowNull: true
