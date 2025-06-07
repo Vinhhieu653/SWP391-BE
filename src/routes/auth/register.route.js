@@ -79,6 +79,7 @@ router.get('/:id', authenticateToken, authorizeRoles('admin'), userController.ge
  *               - username
  *               - email
  *               - password
+ *               - roleId
  *             properties:
  *               fullname:
  *                 type: string
@@ -95,6 +96,9 @@ router.get('/:id', authenticateToken, authorizeRoles('admin'), userController.ge
  *               phoneNumber:
  *                 type: string
  *                 example: "0123456789"
+ *               roleId:
+ *                 type: integer
+ *                 example: 1
  *     responses:
  *       201:
  *         description: Registration successful
