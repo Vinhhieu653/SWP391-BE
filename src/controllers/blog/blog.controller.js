@@ -86,13 +86,14 @@ export const getBlogByIdController = async (req, res) => {
 export const updateBlogController = async (req, res) => {
   try {
     const { id } = req.params
-    const updateData = req.body
-    const imageFile = req.file
+    const updateData = { ...req.body }
 
-    console.log('updateData:', updateData)
-    console.log('imageFile:', imageFile)
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path)
+      updateData.image = result.secure_url
+    }
 
-    const blog = await updateBlogService(id, updateData, imageFile)
+    const blog = await updateBlogService(id, updateData)
 
     res.status(200).json({
       status: 200,
@@ -109,6 +110,7 @@ export const updateBlogController = async (req, res) => {
     })
   }
 }
+
 
 // [DELETE] /blogs/:id
 export const deleteBlogController = async (req, res) => {
