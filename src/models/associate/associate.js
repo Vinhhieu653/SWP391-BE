@@ -82,8 +82,17 @@ function applyAssociations() {
   HistoryCheck.belongsTo(HealthCheck, { foreignKey: 'HC_ID' })
 
   //FormCheck ↔ HealthCheck
-  HealthCheck.hasOne(FormCheck, { foreignKey: 'HC_ID' })
+  HealthCheck.hasMany(FormCheck, { foreignKey: 'HC_ID' })
   FormCheck.belongsTo(HealthCheck, { foreignKey: 'HC_ID' })
+
+
+  User.hasMany(FormCheck, { foreignKey: 'Student_ID' })
+  FormCheck.belongsTo(User, { foreignKey: 'Student_ID' })
+
+
+  FormCheck.hasOne(MedicalSent, { foreignKey: 'Form_ID' })
+  MedicalSent.belongsTo(FormCheck, { foreignKey: 'Form_ID' })
+
 
   //historyCheck ↔ medicalRecord
   MedicalRecord.hasMany(HistoryCheck, { foreignKey: 'MR_ID' })

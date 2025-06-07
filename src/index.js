@@ -16,6 +16,7 @@ import refreshTokenRouter from './routes/auth/refresh-token.route.js'
 import registerRouter from './routes/auth/register.route.js'
 import uploadRouter from './routes/upload-img/upload-img.route.js'
 import emailRouter from './routes/send-mail/email.route.js'
+import HealthCheckRouter from './routes/health-check/health-check.route.js'
 import { basicAuth } from './middlewares/authSwagger.js'
 import { notFoundHandler, errorHandler } from './middlewares/responseUtils.js'
 import User from './models/data/user.model.js'
@@ -26,6 +27,7 @@ import { seedRoles } from './database/seeds/role.seed.js'
 import { seedUsers } from './database/seeds/users.seed.js'
 import { seedBlogs } from './database/seeds/blogs.seed.js'
 import applyAssociations from './models/associate/associate.js'
+
 
 dotenv.config()
 
@@ -71,6 +73,7 @@ app.use('/api/v1/blogs', blogRoutes)
 app.use('/api/v1/upload', uploadRouter)
 app.use('/api/v1', emailRouter)
 app.use('/api/v1/notify', notifyRoute)
+app.use('/api/v1/health-check', HealthCheckRouter)
 
 // Xử lý lỗi
 app.use(notFoundHandler)
