@@ -28,7 +28,6 @@ import { seedUsers } from './database/seeds/users.seed.js'
 import { seedBlogs } from './database/seeds/blogs.seed.js'
 import applyAssociations from './models/associate/associate.js'
 
-
 dotenv.config()
 
 const app = express()

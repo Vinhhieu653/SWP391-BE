@@ -2,27 +2,31 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '../../database/db.js'
 
-const Guardian = sequelize.define('Guardian', {
-  obId: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
+const Guardian = sequelize.define(
+  'Guardian',
+  {
+    obId: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    phoneNumber: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    roleInFamily: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    isCallFirst: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    }
   },
-  phoneNumber: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  roleInFamily: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  isCallFirst: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false
+  {
+    tableName: 'guardians',
+    timestamps: false
   }
-}, {
-  tableName: 'guardians',
-  timestamps: false
-})
+)
 
 export default Guardian
