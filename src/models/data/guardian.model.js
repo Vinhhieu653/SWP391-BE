@@ -1,6 +1,6 @@
+// models/guardian.model.js
 import { DataTypes } from 'sequelize'
 import sequelize from '../../database/db.js'
-import GuardianUser from './guardian_user.model.js'
 
 const Guardian = sequelize.define(
   'Guardian',
