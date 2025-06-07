@@ -40,7 +40,9 @@ export const loginService = async (email, password) => {
       id: user.id,
       username: user.username,
       email: user.email,
-      role: roleName
+      role: roleName,
+      fullname: user.fullname,
+      phone: user.phoneNumber
     }
   }
 }

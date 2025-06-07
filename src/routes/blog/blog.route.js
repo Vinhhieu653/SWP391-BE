@@ -29,13 +29,14 @@ const upload = multer({ dest: 'uploads/' })
  *             required:
  *               - title
  *               - content
- *               - userId
+ *               - author
+ *               - image
  *             properties:
  *               title:
  *                 type: string
  *               content:
  *                 type: string
- *               userId:
+ *               author:
  *                 type: string
  *               image:
  *                 type: string

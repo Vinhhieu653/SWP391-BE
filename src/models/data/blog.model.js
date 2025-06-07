@@ -27,7 +27,7 @@ const Blog = sequelize.define(
     },
     author: {
       type: DataTypes.STRING,
-      allowNull: true // hoặc false tùy mày
+      allowNull: true
     }
   },
   {
