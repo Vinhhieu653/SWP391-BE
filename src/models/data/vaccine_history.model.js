@@ -11,7 +11,7 @@ const VaccineHistory = sequelize.define(
       primaryKey: true,
       autoIncrement: true
     },
-    VE_ID: {
+    Event_ID: {
       type: DataTypes.INTEGER,
       allowNull: false
     },

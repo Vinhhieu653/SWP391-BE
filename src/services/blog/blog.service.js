@@ -45,4 +45,5 @@ export const deleteBlogService = async (id) => {
   if (!blog) throw { status: 404, message: 'Blog not found' }
 
   await blog.destroy()
+  return blog
 }
