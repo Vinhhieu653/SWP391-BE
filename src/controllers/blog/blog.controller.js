@@ -113,13 +113,13 @@ export const updateBlogController = async (req, res) => {
 // [DELETE] /blogs/:id
 export const deleteBlogController = async (req, res) => {
   try {
-    const deletedBlog = await deleteBlogService(req.params.id)
+    await deleteBlogService(req.params.id)
 
     res.status(200).json({
       status: 200,
       success: true,
       message: 'Blog deleted successfully',
-      data: deletedBlog
+      data: null
     })
   } catch (error) {
     res.status(error.status || 500).json({
