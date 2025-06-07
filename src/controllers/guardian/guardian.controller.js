@@ -2,6 +2,7 @@ import * as guardianService from '../../services/guardian/guardian.service.js'
 
 export const createGuardianWithStudents = async (req, res) => {
   try {
+    console.log('Creating guardian with students:', req.body)
     const result = await guardianService.createGuardianWithStudents(req.body)
     res.status(201).json(result)
   } catch (error) {
