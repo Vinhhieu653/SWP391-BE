@@ -79,9 +79,7 @@ const router = express.Router()
  *                         email:
  *                           type: string
  *                         password:
- *                           type: string
- *                         phoneNumber:
- *                           type: string
+ *                           type: string                   
  *     responses:
  *       201:
  *         description: Tạo phụ huynh và học sinh thành công
@@ -92,6 +90,7 @@ const router = express.Router()
  *       500:
  *         description: Lỗi server
  */
+
 
 router.post('/', authenticateToken, authorizeRoles('admin'), createGuardianWithStudents)
 
@@ -203,5 +202,6 @@ router.delete('/:id', authenticateToken, authorizeRoles('admin'), deleteGuardian
  *         description: Không tìm thấy
  */
 router.get('/:userId/students', getStudentsByUserId)
+
 
 export default router
