@@ -1,5 +1,4 @@
-// models/HealthCheck.js
-
+// models/health_check.model.js
 import { DataTypes } from 'sequelize'
 import sequelize from '../../database/db.js'
 

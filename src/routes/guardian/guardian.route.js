@@ -93,7 +93,6 @@ const router = express.Router()
  *         description: Lỗi server
  */
 
-
 router.post('/', authenticateToken, authorizeRoles('admin'), createGuardianWithStudents)
 
 /**
@@ -204,6 +203,5 @@ router.delete('/:id', authenticateToken, authorizeRoles('admin'), deleteGuardian
  *         description: Không tìm thấy
  */
 router.get('/:userId/students', getStudentsByUserId)
-
 
 export default router

@@ -68,13 +68,16 @@ export const getAllGuardians = async () => {
   const result = await Promise.all(
     guardians.map(async (guardian) => {
       const guardianUser = await User.findByPk(guardian.userId, {
-        attributes: ['id','username','fullname','email','phoneNumber']
+        attributes: ['id', 'username', 'fullname', 'email', 'phoneNumber']
       })
 
       const links = await GuardianUser.findAll({ where: { obId: guardian.obId } })
-      const studentIds = links.map(l => l.userId)
+      const studentIds = links.map((l) => l.userId)
       const students = studentIds.length
-        ? await User.findAll({ where: { id: studentIds }, attributes: ['id','username','fullname','email','phoneNumber'] })
+        ? await User.findAll({
+            where: { id: studentIds },
+            attributes: ['id', 'username', 'fullname', 'email', 'phoneNumber']
+          })
         : []
 
       return {
@@ -98,14 +101,17 @@ export const getGuardianById = async (obId) => {
 
   // Guardian user info
   const guardianUser = await User.findByPk(guardian.userId, {
-    attributes: ['id','username','fullname','email','phoneNumber']
+    attributes: ['id', 'username', 'fullname', 'email', 'phoneNumber']
   })
 
   // Students
   const links = await GuardianUser.findAll({ where: { obId } })
-  const studentIds = links.map(l => l.userId)
+  const studentIds = links.map((l) => l.userId)
   const students = studentIds.length
-    ? await User.findAll({ where: { id: studentIds }, attributes: ['id','username','fullname','email','phoneNumber'] })
+    ? await User.findAll({
+        where: { id: studentIds },
+        attributes: ['id', 'username', 'fullname', 'email', 'phoneNumber']
+      })
     : []
 
   return {
@@ -181,7 +187,7 @@ export const getStudentsByUserId = async (userId) => {
 
   // Lấy danh sách liên kết giữa guardian và học sinh
   const links = await GuardianUser.findAll({ where: { obId: guardian.obId } })
-  const studentIds = links.map(link => link.userId)
+  const studentIds = links.map((link) => link.userId)
 
   // Truy vấn các học sinh tương ứng
   const students = studentIds.length

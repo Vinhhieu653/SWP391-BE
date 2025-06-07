@@ -111,7 +111,6 @@ export const updateBlogController = async (req, res) => {
   }
 }
 
-
 // [DELETE] /blogs/:id
 export const deleteBlogController = async (req, res) => {
   try {

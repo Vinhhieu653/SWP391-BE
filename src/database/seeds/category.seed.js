@@ -2,9 +2,9 @@
 import Category from '../../models/data/category.model.js'
 
 const categories = [
-  {Category_id: 1, Name: 'Dinh dưỡng', User_ID: 1 },
-  {Category_id: 2, Name: 'Sức khỏe học đường', User_ID: 1 },
-  {Category_id: 3, Name: 'Tư vấn bác sĩ', User_ID: 1 }
+  { Category_id: 1, Name: 'Dinh dưỡng', User_ID: 1 },
+  { Category_id: 2, Name: 'Sức khỏe học đường', User_ID: 1 },
+  { Category_id: 3, Name: 'Tư vấn bác sĩ', User_ID: 1 }
 ]
 
 export async function seedCategories() {
