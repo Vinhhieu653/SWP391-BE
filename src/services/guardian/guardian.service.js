@@ -46,7 +46,7 @@ export const createGuardianWithStudents = async ({ guardian }) => {
       email: student.email,
       password: student.password,
       phoneNumber: student.phoneNumber || null,
-      roleId: 3 // Student role
+      roleId: 3
     });
 
     await GuardianUser.create({
@@ -92,6 +92,38 @@ export const getGuardianById = async (obId) => {
     fullname: guardianUser.fullname,
     students
   }
+}
+
+// Get all guardians with their user info and associated students
+export const getAllGuardians = async () => {
+  const guardians = await Guardian.findAll()
+  if (!guardians || !guardians.length) return []
+
+  const guardianData = await Promise.all(
+    guardians.map(async (guardian) => {
+      const user = await User.findByPk(guardian.userId, {
+        attributes: ['id', 'username', 'fullname', 'email', 'phoneNumber']
+      })
+
+      // Get associated students
+      const links = await GuardianUser.findAll({ where: { obId: guardian.obId } })
+      const studentIds = links.map((l) => l.userId)
+      const students = studentIds.length
+        ? await User.findAll({
+            where: { id: studentIds },
+            attributes: ['id', 'username', 'fullname', 'email', 'phoneNumber']
+          })
+        : []
+
+      return {
+        ...guardian.dataValues,
+        fullname: user.fullname,
+        students
+      }
+    })
+  )
+
+  return guardianData
 }
 
 // Update guardian record and its user info
