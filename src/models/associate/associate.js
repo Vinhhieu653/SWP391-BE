@@ -45,6 +45,10 @@ function applyAssociations() {
     otherKey: 'userId'
   })
 
+  
+  
+
+
   // User ↔ Event (Many-to-Many thông qua UserEvent)
   User.belongsToMany(Event, {
     through: UserEvent,

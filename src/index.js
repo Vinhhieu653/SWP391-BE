@@ -17,6 +17,7 @@ import refreshTokenRouter from './routes/auth/refresh-token.route.js'
 import registerRouter from './routes/auth/register.route.js'
 import uploadRouter from './routes/upload-img/upload-img.route.js'
 import emailRouter from './routes/send-mail/email.route.js'
+import guardianRouter from './routes/guardian/guardian.route.js'
 import { basicAuth } from './middlewares/authSwagger.js'
 import { notFoundHandler, errorHandler } from './middlewares/responseUtils.js'
 import User from './models/data/user.model.js'
@@ -75,6 +76,7 @@ app.use('/api/v1/upload', uploadRouter)
 app.use('/api/v1', emailRouter)
 app.use('/api/v1/notify', notifyRoute)
 app.use('/api/v1/categories', categoryRouter)
+app.use('/api/v1/guardians', guardianRouter)
 
 // Xử lý lỗi
 app.use(notFoundHandler)

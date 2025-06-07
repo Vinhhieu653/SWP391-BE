@@ -21,6 +21,14 @@ const Guardian = sequelize.define(
     isCallFirst: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'users',
+        key: 'id'
+      },
+      allowNull: false
     }
   },
   {
