@@ -1,7 +1,6 @@
+// models/guardian_user.model.js
 import { DataTypes } from 'sequelize'
 import sequelize from '../../database/db.js'
-import User from './user.model.js'
-import Guardian from './guardian.model.js'
 
 const GuardianUser = sequelize.define(
   'GuardianUser',
@@ -13,11 +12,7 @@ const GuardianUser = sequelize.define(
     },
     obId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Guardian,
-        key: 'obId'
-      }
+      allowNull: false
     },
     userId: {
       type: DataTypes.INTEGER,

@@ -9,6 +9,10 @@ const Blog = sequelize.define(
       primaryKey: true,
       autoIncrement: true
     },
+    Category_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     title: {
       type: DataTypes.STRING,
       allowNull: false
@@ -23,11 +27,11 @@ const Blog = sequelize.define(
     },
     image: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: false
     },
     author: {
       type: DataTypes.STRING,
-      allowNull: true // hoặc false tùy mày
+      allowNull: false
     }
   },
   {

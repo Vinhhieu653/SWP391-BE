@@ -15,9 +15,9 @@ import HealthCheck from '../data/health_check.model.js'
 import HistoryCheck from '../data/history_check.model.js'
 import FormCheck from '../data/form_check.model.js'
 import OtherMedical from '../data/other_medical.model.js'
-import VaccineEvent from '../data/vaccine_event.model.js'
 import VaccineHistory from '../data/vaccine_history.model.js'
 import Evidence from '../data/evidence.model.js'
+import Category from '../data/category.model.js'
 
 // Thiết lập associations ở đây
 function applyAssociations() {
@@ -82,28 +82,30 @@ function applyAssociations() {
   HistoryCheck.belongsTo(HealthCheck, { foreignKey: 'HC_ID' })
 
   //FormCheck ↔ HealthCheck
-  HealthCheck.hasOne(FormCheck, { foreignKey: 'HC_ID' })
+  HealthCheck.hasMany(FormCheck, { foreignKey: 'HC_ID' })
   FormCheck.belongsTo(HealthCheck, { foreignKey: 'HC_ID' })
+
+  User.hasMany(FormCheck, { foreignKey: 'Student_ID' })
+  FormCheck.belongsTo(User, { foreignKey: 'Student_ID', as: 'Student' })
+
+  //FormCheck ↔ GuardianUser
+  FormCheck.belongsTo(GuardianUser, { foreignKey: 'GuardianUserId' })
+  GuardianUser.hasMany(FormCheck, { foreignKey: 'GuardianUserId' })
+
+  FormCheck.hasOne(MedicalSent, { foreignKey: 'Form_ID' })
+  MedicalSent.belongsTo(FormCheck, { foreignKey: 'Form_ID' })
 
   //historyCheck ↔ medicalRecord
   MedicalRecord.hasMany(HistoryCheck, { foreignKey: 'MR_ID' })
   HistoryCheck.belongsTo(MedicalRecord, { foreignKey: 'MR_ID' })
 
-  //otherMedical ↔ event
-  Event.hasMany(OtherMedical, { foreignKey: 'Event_ID' })
-  OtherMedical.belongsTo(Event, { foreignKey: 'Event_ID' })
-
   //otherMedical ↔ historyOtherMedical
   OtherMedical.hasMany(HistoryOtherMedical, { foreignKey: 'OrtherM_ID' })
   HistoryOtherMedical.belongsTo(OtherMedical, { foreignKey: 'OrtherM_ID' })
 
-  //vaccineEvent ↔ event
-  Event.hasMany(VaccineEvent, { foreignKey: 'Event_ID' })
-  VaccineEvent.belongsTo(Event, { foreignKey: 'Event_ID' })
-
-  //vaccineHistory ↔ vaccineEvent
-  VaccineEvent.hasMany(VaccineHistory, { foreignKey: 'VE_ID' })
-  VaccineHistory.belongsTo(VaccineEvent, { foreignKey: 'VE_ID' })
+  //vaccineHistory ↔ Event
+  Event.hasMany(VaccineHistory, { foreignKey: 'Event_ID' })
+  VaccineHistory.belongsTo(Event, { foreignKey: 'Event_ID' })
 
   //vaccineHistory ↔ medicalRecord
   MedicalRecord.hasMany(VaccineHistory, { foreignKey: 'MR_ID' })
@@ -112,6 +114,10 @@ function applyAssociations() {
   //evidence ↔ vaccineHistory
   VaccineHistory.hasMany(Evidence, { foreignKey: 'VH_ID' })
   Evidence.belongsTo(VaccineHistory, { foreignKey: 'VH_ID' })
+
+  //category ↔ blog
+  Category.hasMany(Blog, { foreignKey: 'Category_id' })
+  Blog.belongsTo(Category, { foreignKey: 'Category_id' })
 }
 
 export default applyAssociations

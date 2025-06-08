@@ -16,7 +16,7 @@ const upload = multer({ dest: 'uploads/' })
  * @swagger
  * /api/v1/blogs:
  *   post:
- *     summary: Create a new blog post
+ *     summary: Create a new blog post123
  *     tags: [Blog]
  *     security:
  *       - bearerAuth: []
@@ -29,17 +29,21 @@ const upload = multer({ dest: 'uploads/' })
  *             required:
  *               - title
  *               - content
- *               - userId
+ *               - author
+ *               - image
+ *               - Category_id
  *             properties:
  *               title:
  *                 type: string
  *               content:
  *                 type: string
- *               userId:
+ *               author:
  *                 type: string
  *               image:
  *                 type: string
  *                 format: binary
+ *               Category_id:
+ *                 type: integer
  *     responses:
  *       201:
  *         description: Blog created successfully
@@ -53,7 +57,7 @@ const upload = multer({ dest: 'uploads/' })
  *         description: Server error
  */
 
-router.post('/', authenticateToken, authorizeRoles('nurse', 'admin'), upload.single('image'), createBlogController)
+router.post('/', authenticateToken, authorizeRoles('admin'), upload.single('image'), createBlogController)
 
 /**
  * @swagger
@@ -119,6 +123,8 @@ router.get('/:id', getBlogByIdController)
  *               image:
  *                 type: string
  *                 format: binary
+ *               Category_id:
+ *                 type: integer
  *     responses:
  *       200:
  *         description: Blog updated successfully
@@ -129,7 +135,7 @@ router.get('/:id', getBlogByIdController)
  *       500:
  *         description: Server error
  */
-router.put('/:id', authenticateToken, authorizeRoles('nurse', 'admin'), upload.single('image'), updateBlogController)
+router.put('/:id', authenticateToken, authorizeRoles('admin'), upload.single('image'), updateBlogController)
 
 /**
  * @swagger
@@ -152,6 +158,6 @@ router.put('/:id', authenticateToken, authorizeRoles('nurse', 'admin'), upload.s
  *       404:
  *         description: Blog not found
  */
-router.delete('/:id', authenticateToken, authorizeRoles('nurse', 'admin'), deleteBlogController)
+router.delete('/:id', authenticateToken, authorizeRoles('admin'), deleteBlogController)
 
 export default router

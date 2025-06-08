@@ -11,11 +11,15 @@ import notifyRoute from './routes/notify.route.js'
 import testRoute from './routes/test.route.js'
 import loginRouter from './routes/auth/login.route.js'
 import logoutRouter from './routes/auth/logout.route.js'
-import blogRoutes from './routes/blog/blog.route.js'
+import blogRouter from './routes/blog/blog.route.js'
+import categoryRouter from './routes/blog/category.route.js'
 import refreshTokenRouter from './routes/auth/refresh-token.route.js'
 import registerRouter from './routes/auth/register.route.js'
 import uploadRouter from './routes/upload-img/upload-img.route.js'
 import emailRouter from './routes/send-mail/email.route.js'
+import otherMedicalRouter from './routes/Other_medical/Other_medical.router.js'
+import guardianRouter from './routes/guardian/guardian.route.js'
+import healthCheckRouter from './routes/health-check/health-check.route.js'
 import { basicAuth } from './middlewares/authSwagger.js'
 import { notFoundHandler, errorHandler } from './middlewares/responseUtils.js'
 import User from './models/data/user.model.js'
@@ -25,6 +29,8 @@ import Image from './models/data/image.model.js'
 import { seedRoles } from './database/seeds/role.seed.js'
 import { seedUsers } from './database/seeds/users.seed.js'
 import { seedBlogs } from './database/seeds/blogs.seed.js'
+import { seedCategories } from './database/seeds/category.seed.js'
+
 import applyAssociations from './models/associate/associate.js'
 
 dotenv.config()
@@ -67,10 +73,14 @@ app.use('/api/v1/auth', loginRouter)
 app.use('/api/v1/auth', logoutRouter)
 app.use('/api/v1/auth', refreshTokenRouter)
 app.use('/api/v1/users', registerRouter)
-app.use('/api/v1/blogs', blogRoutes)
+app.use('/api/v1/blogs', blogRouter)
 app.use('/api/v1/upload', uploadRouter)
 app.use('/api/v1', emailRouter)
 app.use('/api/v1/notify', notifyRoute)
+app.use('/api/v1/other-medical', otherMedicalRouter)
+app.use('/api/v1/categories', categoryRouter)
+app.use('/api/v1/guardians', guardianRouter)
+app.use('/api/v1/health-check', healthCheckRouter)
 
 // Xử lý lỗi
 app.use(notFoundHandler)
@@ -83,13 +93,13 @@ async function startServer() {
     console.log('PostgreSQL connected ✅')
 
     applyAssociations()
-
     // Tạo bảng
     await sequelize.sync({ alter: true })
 
     //tạo seeds
     await seedRoles()
     await seedUsers()
+    await seedCategories()
     await seedBlogs()
 
     server.listen(PORT, () => {
