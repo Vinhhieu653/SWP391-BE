@@ -20,7 +20,7 @@ const FormCheck = sequelize.define(
     },
     Height: DataTypes.INTEGER,
     Weight: DataTypes.FLOAT,
-    Blood_Pressure: DataTypes.FLOAT,
+    Blood_Pressure: DataTypes.STRING,
     Vision_Left: DataTypes.FLOAT,
     Vision_Right: DataTypes.FLOAT,
     Dental_Status: DataTypes.STRING,

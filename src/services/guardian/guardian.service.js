@@ -6,18 +6,18 @@ import * as registerService from '../auth/register.service.js'
 // Create guardian with associated student users
 export const createGuardianWithStudents = async ({ guardian }) => {
   if (!guardian || !Array.isArray(guardian.students)) {
-    const error = new Error('Missing guardian or students data');
-    error.status = 400;
-    throw error;
+    const error = new Error('Missing guardian or students data')
+    error.status = 400
+    throw error
   }
 
-  const { students, ...guardianData } = guardian;
+  const { students, ...guardianData } = guardian
 
   // Check unique username/email
-  const existingUsername = await User.findOne({ where: { username: guardianData.username } });
-  if (existingUsername) throw Object.assign(new Error('Guardian username already taken'), { status: 400 });
-  const existingEmail = await User.findOne({ where: { email: guardianData.email } });
-  if (existingEmail) throw Object.assign(new Error('Guardian email already taken'), { status: 400 });
+  const existingUsername = await User.findOne({ where: { username: guardianData.username } })
+  if (existingUsername) throw Object.assign(new Error('Guardian username already taken'), { status: 400 })
+  const existingEmail = await User.findOne({ where: { email: guardianData.email } })
+  if (existingEmail) throw Object.assign(new Error('Guardian email already taken'), { status: 400 })
 
   // Register guardian user
   const guardianUser = await registerService.registerUser({
@@ -27,7 +27,7 @@ export const createGuardianWithStudents = async ({ guardian }) => {
     password: guardianData.password,
     phoneNumber: guardianData.phoneNumber,
     roleId: 4 // Guardian role
-  });
+  })
 
   // Create Guardian record
   const guardianRecord = await Guardian.create({
@@ -35,10 +35,10 @@ export const createGuardianWithStudents = async ({ guardian }) => {
     roleInFamily: guardianData.roleInFamily,
     isCallFirst: guardianData.isCallFirst,
     userId: guardianUser.id
-  });
+  })
 
   // Register students and link
-  const createdStudents = [];
+  const createdStudents = []
   for (const student of students) {
     const studentUser = await registerService.registerUser({
       fullname: student.fullname,
@@ -47,21 +47,21 @@ export const createGuardianWithStudents = async ({ guardian }) => {
       password: student.password,
       phoneNumber: student.phoneNumber || null,
       roleId: 3
-    });
+    })
 
     await GuardianUser.create({
       obId: guardianRecord.obId,
       userId: studentUser.id
-    });
+    })
 
-    createdStudents.push(studentUser);
+    createdStudents.push(studentUser)
   }
 
   return {
     message: 'Guardian and students registered successfully',
     data: { guardian: guardianUser, students: createdStudents }
-  };
-};
+  }
+}
 
 // Get one guardian by obId including guardian info and student list
 export const getGuardianById = async (obId) => {

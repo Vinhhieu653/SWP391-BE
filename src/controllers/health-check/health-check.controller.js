@@ -44,3 +44,37 @@ export async function sendResult(req, res) {
     return res.status(500).json({ success: false, message: e.message || 'Internal Server Error' })
   }
 }
+
+// controller
+export async function confirmForm(req, res) {
+  try {
+    const { formId } = req.params
+    await srv.confirmForm(+formId)
+    return res.json({ success: true, message: 'Phụ huynh đã xác nhận form' })
+  } catch (e) {
+    console.error(e)
+    return res.status(500).json({ success: false, message: e.message || 'Internal Server Error' })
+  }
+}
+
+// controller
+export async function getStudentsByEvent(req, res) {
+  try {
+    const students = await srv.getStudentsByEvent(+req.params.id)
+    return res.json({ success: true, data: students })
+  } catch (e) {
+    console.error(e)
+    return res.status(500).json({ success: false, message: e.message || 'Internal Server Error' })
+  }
+}
+
+// controller
+export async function getFormDetail(req, res) {
+  try {
+    const form = await srv.getFormDetail(+req.params.formId)
+    return res.json({ success: true, data: form })
+  } catch (e) {
+    console.error(e)
+    return res.status(500).json({ success: false, message: e.message || 'Internal Server Error' })
+  }
+}
