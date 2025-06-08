@@ -1,3 +1,4 @@
+// models/medical_sent.model.js
 import { DataTypes } from 'sequelize'
 import sequelize from '../../database/db.js'
 
@@ -9,7 +10,7 @@ const MedicalSent = sequelize.define(
       primaryKey: true,
       autoIncrement: true
     },
-    OM_ID: {
+    Form_ID: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
@@ -20,10 +21,12 @@ const MedicalSent = sequelize.define(
       type: DataTypes.TEXT
     },
     Date_sent: {
-      type: DataTypes.DATE
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
     },
     Is_confirm: {
-      type: DataTypes.BOOLEAN
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   },
   {

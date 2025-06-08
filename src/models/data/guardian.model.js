@@ -1,6 +1,6 @@
+// models/guardian.model.js
 import { DataTypes } from 'sequelize'
 import sequelize from '../../database/db.js'
-import GuardianUser from './guardian_user.model.js'
 
 const Guardian = sequelize.define(
   'Guardian',
@@ -21,6 +21,14 @@ const Guardian = sequelize.define(
     isCallFirst: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'users',
+        key: 'id'
+      },
+      allowNull: false
     }
   },
   {

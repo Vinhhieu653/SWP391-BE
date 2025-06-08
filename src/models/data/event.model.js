@@ -19,7 +19,7 @@ const Event = sequelize.define(
     type: {
       type: DataTypes.STRING,
       allowNull: false,
-      field: 'Type'
+      field: 'Type' // eg: 'health_check', 'vaccine', etc
     }
   },
   {
