@@ -13,9 +13,14 @@ const MedicalRecord = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    Type: {
-      type: DataTypes.STRING
-    }
+    class:{
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    historyHealth: {
+      type: DataTypes.TEXT,
+      allowNull: false
+    },
   },
   {
     tableName: 'Medical_Record',
