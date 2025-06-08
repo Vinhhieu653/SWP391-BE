@@ -5,6 +5,7 @@ import User from '../../models/data/user.model.js'
 import FormCheck from '../../models/data/form_check.model.js'
 import HealthCheck from '../../models/data/health_check.model.js'
 import MedicalSent from '../../models/data/medical_sent.model.js'
+import Guardian from '../../models/data/guardian.model.js'
 
 export async function createHealthCheck({ title, description, dateEvent, schoolYear }) {
   if (!dateEvent) throw new Error('dateEvent là bắt buộc')
@@ -24,7 +25,7 @@ export async function createHealthCheck({ title, description, dateEvent, schoolY
 
 export async function sendConfirmForms(eventId) {
   const students = await User.findAll({
-    where: { roleId: 3 } // giả sử 3 là id role của học sinh
+    where: { roleId: 1 } // giả sử 1 là id role của học sinh
   })
   if (!students.length) throw new Error('Không có học sinh trong đợt khám')
 
@@ -102,4 +103,40 @@ export async function sendResult(eventId) {
       Image_prescription: null
     })
   }
+}
+
+// service
+export async function confirmForm(formId) {
+  const form = await FormCheck.findByPk(formId)
+  if (!form) throw new Error('Không tìm thấy form')
+  form.Is_confirmed_by_guardian = true
+  await form.save()
+}
+
+// service
+export async function getStudentsByEvent(eventId) {
+  const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
+  if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
+
+  const forms = await FormCheck.findAll({
+    where: { HC_ID: healthCheck.HC_ID },
+    include: [
+      {
+        model: User,
+        as: 'Student',
+        include: [{ model: Guardian }]
+      }
+    ]
+  })
+
+  return forms // ← QUAN TRỌNG
+}
+
+// service
+export async function getFormDetail(formId) {
+  const form = await FormCheck.findByPk(formId, {
+    include: [{ model: User, as: 'Student' }]
+  })
+  if (!form) throw new Error('Không tìm thấy form')
+  return form
 }
