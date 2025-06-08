@@ -3,7 +3,13 @@ import * as ctrl from '../../controllers/health-check/health-check.controller.js
 
 const router = Router()
 
-// 1. Tạo đợt khám
+/**
+ * @swagger
+ * tags:
+ *   - name: HealthCheck
+ *     description: API quản lý khám sức khỏe định kỳ
+ */
+
 /**
  * @swagger
  * /api/v1/health-check:
@@ -16,6 +22,9 @@ const router = Router()
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - dateEvent
+ *               - schoolYear
  *             properties:
  *               title:
  *                 type: string
@@ -23,19 +32,19 @@ const router = Router()
  *               description:
  *                 type: string
  *                 example: "Đợt khám cho học sinh khối 1"
- *               date:
+ *               dateEvent:
  *                 type: string
  *                 format: date
  *                 example: "2025-07-15"
- *             required:
- *               - date
+ *               schoolYear:
+ *                 type: string
+ *                 example: "2025-2026"
  *     responses:
  *       200:
  *         description: Đã tạo đợt khám
  */
 router.post('/', ctrl.createHealthCheck)
 
-// 2. Gửi form xác nhận cho PH
 /**
  * @swagger
  * /api/v1/health-check/{id}/send-confirm:
@@ -49,14 +58,12 @@ router.post('/', ctrl.createHealthCheck)
  *         required: true
  *         schema:
  *           type: integer
- *           example: 1
  *     responses:
  *       200:
  *         description: Đã gửi form xác nhận
  */
 router.post('/:id/send-confirm', ctrl.sendConfirmForms)
 
-// 4. Y tá submit kết quả
 /**
  * @swagger
  * /api/v1/health-check/{id}/submit-result:
@@ -70,13 +77,16 @@ router.post('/:id/send-confirm', ctrl.sendConfirmForms)
  *         required: true
  *         schema:
  *           type: integer
- *           example: 1
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - student_id
+ *               - result
+ *               - status
  *             properties:
  *               student_id:
  *                 type: integer
@@ -99,17 +109,12 @@ router.post('/:id/send-confirm', ctrl.sendConfirmForms)
  *               note:
  *                 type: string
  *                 example: "Ổn"
- *             required:
- *               - student_id
- *               - result
- *               - status
  *     responses:
  *       200:
  *         description: Đã lưu kết quả
  */
 router.post('/:id/submit-result', ctrl.submitResult)
 
-// 5. Gửi kết quả về PH
 /**
  * @swagger
  * /api/v1/health-check/{id}/send-result:
@@ -123,7 +128,6 @@ router.post('/:id/submit-result', ctrl.submitResult)
  *         required: true
  *         schema:
  *           type: integer
- *           example: 1
  *     responses:
  *       200:
  *         description: Đã gửi kết quả về phụ huynh
