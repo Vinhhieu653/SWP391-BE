@@ -28,7 +28,7 @@ const upload = multer({ dest: 'uploads/' })
  *             type: object
  *             properties:
  *               MR_ID:
- *                 type: string            
+ *                 type: string
  *               Decription:
  *                 type: string
  *               Image:
@@ -50,13 +50,7 @@ const upload = multer({ dest: 'uploads/' })
  *       500:
  *         description: Server error
  */
-router.post(
-  '/',
-  authenticateToken,
-  authorizeRoles('nurse', 'admin'),
-  upload.single('Image'),
-  createOtherMedical
-)
+router.post('/', authenticateToken, authorizeRoles('nurse', 'admin'), upload.single('Image'), createOtherMedical)
 
 /**
  * @swagger
@@ -134,13 +128,7 @@ router.get('/:id', getOtherMedicalById)
  *       500:
  *         description: Server error
  */
-router.put(
-  '/:id',
-  authenticateToken,
-  authorizeRoles('nurse', 'admin'),
-  upload.single('Image'),
-  updateOtherMedical
-)
+router.put('/:id', authenticateToken, authorizeRoles('nurse', 'admin'), upload.single('Image'), updateOtherMedical)
 
 /**
  * @swagger
@@ -163,11 +151,6 @@ router.put(
  *       404:
  *         description: Not found
  */
-router.delete(
-  '/:id',
-  authenticateToken,
-  authorizeRoles('nurse', 'admin'),
-  deleteOtherMedical
-)
+router.delete('/:id', authenticateToken, authorizeRoles('nurse', 'admin'), deleteOtherMedical)
 
 export default router
