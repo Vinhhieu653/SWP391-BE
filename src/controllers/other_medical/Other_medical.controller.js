@@ -66,19 +66,28 @@ export const updateOtherMedical = async (req, res) => {
       imageUrl = result.secure_url
     }
 
-    const data = imageUrl ? { ...req.body, Image: imageUrl } : req.body
-    const updated = await OtherMedicalService.updateOtherMedicalService(req.params.id, data)
-    res.json(updated)
-  } catch (error) {
-    res.status(error.status || 500).json({ message: error.message || 'Internal server error' })
-  }
-}
+        const data = imageUrl ? { ...req.body, Image: imageUrl } : req.body;
+        const updated = await OtherMedicalService.updateOtherMedicalService(req.params.id, data);
+        res.status(200).json({
+         status: 200,
+         success: true,
+         message: 'update successfully',
+         data: updated
+         })
+    } catch (error) {
+        res.status(error.status || 500).json({ message: error.message || "Internal server error" });
+    }
+};
 
 export const deleteOtherMedical = async (req, res) => {
-  try {
-    await OtherMedicalService.deleteOtherMedicalService(req.params.id)
-    res.status(204).send()
-  } catch (error) {
-    res.status(error.status || 500).json({ message: error.message || 'Internal server error' })
-  }
-}
+    try {
+        await OtherMedicalService.deleteOtherMedicalService(req.params.id);
+        res.status(200).json({
+         status: 200,
+         success: true,
+         message: 'delete successfully'
+         })
+    } catch (error) {
+        res.status(error.status || 500).json({ message: error.message || "Internal server error" });
+    }
+};
