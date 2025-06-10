@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import * as ctrl from '../../controllers/health-check/health-check.controller.js'
-
+import { authenticateToken, authorizeRoles } from '../../middlewares/auth.middleware.js'
 const router = Router()
 
 /**
@@ -43,7 +43,7 @@ const router = Router()
  *       200:
  *         description: Đã tạo đợt khám
  */
-router.post('/', ctrl.createHealthCheck)
+router.post('/', authenticateToken, authorizeRoles('nurse'), ctrl.createHealthCheck)
 
 /**
  * @swagger
@@ -62,7 +62,7 @@ router.post('/', ctrl.createHealthCheck)
  *       200:
  *         description: Đã gửi form xác nhận
  */
-router.post('/:id/send-confirm', ctrl.sendConfirmForms)
+router.post('/:id/send-confirm', authenticateToken, authorizeRoles('nurse'), ctrl.sendConfirmForms)
 
 /**
  * @swagger
@@ -125,7 +125,7 @@ router.post('/:id/send-confirm', ctrl.sendConfirmForms)
  *       200:
  *         description: Đã lưu kết quả
  */
-router.post('/:id/submit-result', ctrl.submitResult)
+router.post('/:id/submit-result', authenticateToken, authorizeRoles('nurse'), ctrl.submitResult)
 
 /**
  * @swagger
@@ -144,14 +144,7 @@ router.post('/:id/submit-result', ctrl.submitResult)
  *       200:
  *         description: Đã gửi kết quả về phụ huynh
  */
-router.post('/:id/send-result', ctrl.sendResult)
-
-/**
- * @swagger
- * tags:
- *   - name: HealthCheck
- *     description: API quản lý khám sức khỏe định kỳ
- */
+router.post('/:id/send-result', authenticateToken, authorizeRoles('nurse'), ctrl.sendResult)
 
 /**
  * @swagger
@@ -320,8 +313,8 @@ router.post('/:id/send-result', ctrl.sendResult)
  */
 
 // src/routes/health-check/index.js
-router.patch('/form/:formId/confirm', ctrl.confirmForm)
-router.get('/:id/students', ctrl.getStudentsByEvent)
-router.get('/form/:formId', ctrl.getFormDetail)
+router.patch('/form/:formId/confirm', authenticateToken, authorizeRoles('nurse'), ctrl.confirmForm)
+router.get('/:id/students', authenticateToken, authorizeRoles('nurse'), ctrl.getStudentsByEvent)
+router.get('/form/:formId', authenticateToken, authorizeRoles('nurse'), ctrl.getFormDetail)
 
 export default router
