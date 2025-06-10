@@ -87,7 +87,7 @@ export const deleteOtherMedicalService = async (id) => {
   const otherMedical = await OtherMedical.findByPk(id)
   if (!otherMedical) throw { status: 404, message: 'Other medical record not found' }
 
-  await HistoryOtherMedical.destroy({ where: { OrtherM_ID: id } });
+  await HistoryOtherMedical.destroy({ where: { OrtherM_ID: id } })
 
   await otherMedical.destroy()
 }
