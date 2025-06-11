@@ -60,3 +60,36 @@ export const getStudentsByUserId = async (req, res) => {
     res.status(error.status || 500).json({ message: error.message })
   }
 }
+
+export const addStudentToGuardian = async (req, res) => {
+  try {
+    const { id_ob } = req.params
+    const result = await guardianService.addStudentByGuardianId(id_ob, req.body)
+    res.status(201).json(result)
+  } catch (error) {
+    console.error(error)
+    res.status(error.status || 500).json({ message: error.message })
+  }
+}
+
+export const updateStudentByGuardian = async (req, res) => {
+  try {
+    const { guardianId, studentId } = req.params
+    const result = await guardianService.updateStudentByGuardianId(guardianId, studentId, req.body)
+    res.status(200).json(result)
+  } catch (error) {
+    console.error(error)
+    res.status(error.status || 500).json({ message: error.message })
+  }
+}
+
+export const deleteStudentByGuardian = async (req, res) => {
+  try {
+    const { guardianId, studentId } = req.params
+    const result = await guardianService.deleteStudentByGuardianId(guardianId, studentId)
+    res.status(200).json(result)
+  } catch (error) {
+    console.error(error)
+    res.status(error.status || 500).json({ message: error.message })
+  }
+}
