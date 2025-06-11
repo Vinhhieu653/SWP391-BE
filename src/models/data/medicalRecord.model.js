@@ -13,8 +13,32 @@ const MedicalRecord = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    Type: {
+    height: {
+      type: DataTypes.FLOAT,
+      allowNull: true
+    },
+    weight: {
+      type: DataTypes.FLOAT,
+      allowNull: true
+    },
+    bloodType: {
       type: DataTypes.STRING
+    },
+    vaccines: {
+      type: DataTypes.JSONB,
+      allowNull: true
+    },
+    chronicDiseases: {
+      type: DataTypes.JSONB,
+      allowNull: true
+    },
+    allergies: {
+      type: DataTypes.JSONB,
+      allowNull: true
+    },
+    pastIllnesses: {
+      type: DataTypes.JSONB,
+      allowNull: true
     }
   },
   {

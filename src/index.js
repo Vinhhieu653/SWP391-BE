@@ -14,6 +14,7 @@ import logoutRouter from './routes/auth/logout.route.js'
 import blogRouter from './routes/blog/blog.route.js'
 import categoryRouter from './routes/blog/category.route.js'
 import refreshTokenRouter from './routes/auth/refresh-token.route.js'
+import medicalRecordRouter from './routes/medical-record/medical-record.route.js'
 import registerRouter from './routes/auth/register.route.js'
 import uploadRouter from './routes/upload-img/upload-img.route.js'
 import emailRouter from './routes/send-mail/email.route.js'
@@ -77,7 +78,7 @@ app.use('/api/v1', emailRouter)
 app.use('/api/v1/notify', notifyRoute)
 app.use('/api/v1/categories', categoryRouter)
 app.use('/api/v1/guardians', guardianRouter)
-
+app.use('/api/v1/medical-records', medicalRecordRouter);
 // Xử lý lỗi
 app.use(notFoundHandler)
 app.use(errorHandler)
