@@ -1,5 +1,3 @@
-// models/OtherMedical.js
-
 import { DataTypes } from 'sequelize'
 import sequelize from '../../database/db.js'
 
@@ -11,11 +9,10 @@ const OtherMedical = sequelize.define(
       primaryKey: true,
       autoIncrement: true
     },
-    Event_ID: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
     Decription: {
+      type: DataTypes.TEXT
+    },
+    Handle: {
       type: DataTypes.TEXT
     },
     Image: {

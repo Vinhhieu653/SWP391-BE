@@ -18,7 +18,9 @@ import medicalRecordRouter from './routes/medical-record/medical-record.route.js
 import registerRouter from './routes/auth/register.route.js'
 import uploadRouter from './routes/upload-img/upload-img.route.js'
 import emailRouter from './routes/send-mail/email.route.js'
+import otherMedicalRouter from './routes/Other_medical/Other_medical.router.js'
 import guardianRouter from './routes/guardian/guardian.route.js'
+import healthCheckRouter from './routes/health-check/health-check.route.js'
 import { basicAuth } from './middlewares/authSwagger.js'
 import { notFoundHandler, errorHandler } from './middlewares/responseUtils.js'
 import User from './models/data/user.model.js'
@@ -29,8 +31,8 @@ import { seedRoles } from './database/seeds/role.seed.js'
 import { seedUsers } from './database/seeds/users.seed.js'
 import { seedBlogs } from './database/seeds/blogs.seed.js'
 import { seedCategories } from './database/seeds/category.seed.js'
-
 import applyAssociations from './models/associate/associate.js'
+// import { seedMedicalRecords } from './database/seeds/medical-record.seed.js'
 
 dotenv.config()
 
@@ -76,8 +78,10 @@ app.use('/api/v1/blogs', blogRouter)
 app.use('/api/v1/upload', uploadRouter)
 app.use('/api/v1', emailRouter)
 app.use('/api/v1/notify', notifyRoute)
+app.use('/api/v1/other-medical', otherMedicalRouter)
 app.use('/api/v1/categories', categoryRouter)
 app.use('/api/v1/guardians', guardianRouter)
+app.use('/api/v1/health-check', healthCheckRouter)
 app.use('/api/v1/medical-records', medicalRecordRouter);
 // Xử lý lỗi
 app.use(notFoundHandler)
@@ -90,7 +94,6 @@ async function startServer() {
     console.log('PostgreSQL connected ✅')
 
     applyAssociations()
-
     // Tạo bảng
     await sequelize.sync({ alter: true })
 
@@ -99,6 +102,7 @@ async function startServer() {
     await seedUsers()
     await seedCategories()
     await seedBlogs()
+    // await seedMedicalRecords()
 
     server.listen(PORT, () => {
       console.log(`Server chạy tại http://localhost:${PORT}/api-docs/`)

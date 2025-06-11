@@ -5,7 +5,10 @@ import {
   getGuardianById,
   updateGuardian,
   deleteGuardian,
-  getStudentsByUserId
+  getStudentsByUserId,
+  addStudentToGuardian,
+  updateStudentByGuardian,
+  deleteStudentByGuardian
 } from '../../controllers/guardian/guardian.controller.js'
 
 import { authenticateToken, authorizeRoles } from '../../middlewares/auth.middleware.js'
@@ -79,7 +82,7 @@ const router = express.Router()
  *                         email:
  *                           type: string
  *                         password:
- *                           type: string                   
+ *                           type: string
  *     responses:
  *       201:
  *         description: Tạo phụ huynh và học sinh thành công
@@ -90,7 +93,6 @@ const router = express.Router()
  *       500:
  *         description: Lỗi server
  */
-
 
 router.post('/', authenticateToken, authorizeRoles('admin'), createGuardianWithStudents)
 
@@ -203,5 +205,119 @@ router.delete('/:id', authenticateToken, authorizeRoles('admin'), deleteGuardian
  */
 router.get('/:userId/students', getStudentsByUserId)
 
+/**
+ * @swagger
+ * /api/v1/guardians/{id_ob}/add-student:
+ *   post:
+ *     summary: Thêm học sinh mới cho phụ huynh
+ *     tags: [Guardian]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id_ob
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - fullname
+ *               - username
+ *               - email
+ *               - password
+ *             properties:
+ *               fullname:
+ *                 type: string
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               phoneNumber:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Thêm học sinh thành công
+ *       404:
+ *         description: Không tìm thấy phụ huynh
+ *       400:
+ *         description: Dữ liệu không hợp lệ
+ */
+router.post('/:id_ob/add-student', authenticateToken, authorizeRoles('admin'), addStudentToGuardian)
+
+/**
+ * @swagger
+ * /api/v1/guardians/{guardianId}/student/{studentId}:
+ *   put:
+ *     summary: Cập nhật học sinh của phụ huynh
+ *     tags: [Guardian]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: guardianId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: path
+ *         name: studentId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullname:
+ *                 type: string
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               phoneNumber:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Cập nhật học sinh thành công
+ *       404:
+ *         description: Không tìm thấy
+ */
+router.put('/:guardianId/student/:studentId', authenticateToken, authorizeRoles('admin'), updateStudentByGuardian)
+
+/**
+ * @swagger
+ * /api/v1/guardians/{guardianId}/student/{studentId}:
+ *   delete:
+ *     summary: Xoá học sinh của phụ huynh
+ *     tags: [Guardian]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: guardianId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: path
+ *         name: studentId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Xoá học sinh thành công
+ *       404:
+ *         description: Không tìm thấy
+ */
+router.delete('/:guardianId/student/:studentId', authenticateToken, authorizeRoles('admin'), deleteStudentByGuardian)
 
 export default router

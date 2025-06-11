@@ -1,4 +1,3 @@
-// models/event.model.js
 import { DataTypes } from 'sequelize'
 import sequelize from '../../database/db.js'
 
@@ -8,23 +7,20 @@ const Event = sequelize.define(
     eventId: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true,
-      field: 'Event_ID'
+      autoIncrement: true
     },
     dateEvent: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      field: 'Date_event'
+      type: DataTypes.DATEONLY,
+      allowNull: false
     },
     type: {
       type: DataTypes.STRING,
-      allowNull: false,
-      field: 'Type' // eg: 'health_check', 'vaccine', etc
+      allowNull: false
     }
   },
   {
-    tableName: 'event',
-    timestamps: false
+    tableName: 'Event',
+    timestamps: true
   }
 )
 
