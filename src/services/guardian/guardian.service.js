@@ -209,7 +209,6 @@ export const getStudentsByUserId = async (userId) => {
 }
 
 export const addStudentByGuardianId = async (obId, studentData) => {
-
   const guardian = await Guardian.findOne({ where: { obId } })
   if (!guardian) {
     throw Object.assign(new Error('Guardian not found'), { status: 404 })
@@ -220,14 +219,13 @@ export const addStudentByGuardianId = async (obId, studentData) => {
   const existingEmail = await User.findOne({ where: { email: studentData.email } })
   if (existingEmail) throw Object.assign(new Error('Student email already taken'), { status: 400 })
 
-
   const studentUser = await registerService.registerUser({
     fullname: studentData.fullname,
     username: studentData.username,
     email: studentData.email,
     password: studentData.password,
     phoneNumber: studentData.phoneNumber || null,
-    roleId: 3 
+    roleId: 3
   })
 
   await GuardianUser.create({
@@ -256,8 +254,8 @@ export const updateStudentByGuardianId = async (obId, studentId, studentData) =>
   }
 
   // Check if student belongs to guardian
-  const link = await GuardianUser.findOne({ 
-    where: { obId: guardian.obId, userId: studentId } 
+  const link = await GuardianUser.findOne({
+    where: { obId: guardian.obId, userId: studentId }
   })
   if (!link) {
     throw Object.assign(new Error('Student not found for this guardian'), { status: 404 })
@@ -307,8 +305,8 @@ export const deleteStudentByGuardianId = async (obId, studentId) => {
   }
 
   // Check if student belongs to guardian
-  const link = await GuardianUser.findOne({ 
-    where: { obId: guardian.obId, userId: studentId } 
+  const link = await GuardianUser.findOne({
+    where: { obId: guardian.obId, userId: studentId }
   })
   if (!link) {
     throw Object.assign(new Error('Student not found for this guardian'), { status: 404 })
