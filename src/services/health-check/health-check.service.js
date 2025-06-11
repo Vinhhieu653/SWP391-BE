@@ -1,5 +1,3 @@
-// src/services/health-check/health-check.service.js
-
 import Event from '../../models/data/event.model.js'
 import User from '../../models/data/user.model.js'
 import FormCheck from '../../models/data/form_check.model.js'
@@ -7,20 +5,72 @@ import HealthCheck from '../../models/data/health_check.model.js'
 import MedicalSent from '../../models/data/medical_sent.model.js'
 import Guardian from '../../models/data/guardian.model.js'
 
-export async function createHealthCheck({ title, description, dateEvent, schoolYear }) {
+export async function createHealthCheck({ title, description, dateEvent, schoolYear, type }) {
   if (!dateEvent) throw new Error('dateEvent là bắt buộc')
   if (!schoolYear) throw new Error('schoolYear là bắt buộc')
+  if (!type) throw new Error('type là bắt buộc')
 
-  // Tạo Event trước
-  const event = await Event.create({ title, description, dateEvent, type: 'health_check' })
+  const event = await Event.create({ dateEvent, type })
 
-  // Tạo HealthCheck liên kết với Event_ID và School_year
-  await HealthCheck.create({
+  const healthCheck = await HealthCheck.create({
     Event_ID: event.eventId,
-    School_year: schoolYear
+    School_year: schoolYear,
+    title,
+    description
   })
 
-  return event
+  return {
+    eventId: event.eventId,
+    dateEvent,
+    type,
+    title,
+    description,
+    schoolYear
+  }
+}
+
+export async function getAllHealthChecks() {
+  return await HealthCheck.findAll({
+    include: {
+      model: Event,
+      attributes: ['eventId', 'dateEvent', 'type']
+    },
+    order: [['createdAt', 'DESC']]
+  })
+}
+
+export async function updateHealthCheck(id, data) {
+  const healthCheck = await HealthCheck.findByPk(id, { include: Event })
+  if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
+
+  await healthCheck.update({
+    title: data.title,
+    description: data.description,
+    School_year: data.schoolYear
+  })
+
+  await healthCheck.Event.update({
+    dateEvent: data.dateEvent,
+    type: data.type
+  })
+
+  return {
+    eventId: healthCheck.Event.eventId,
+    dateEvent: healthCheck.Event.dateEvent,
+    type: healthCheck.Event.type,
+    title: healthCheck.title,
+    description: healthCheck.description,
+    schoolYear: healthCheck.School_year
+  }
+}
+
+export async function deleteHealthCheck(id) {
+  const healthCheck = await HealthCheck.findByPk(id)
+  if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
+
+  const eventId = healthCheck.Event_ID
+  await healthCheck.destroy()
+  await Event.destroy({ where: { eventId } })
 }
 
 export async function sendConfirmForms(eventId) {

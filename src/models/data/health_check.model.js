@@ -1,4 +1,3 @@
-// models/health_check.model.js
 import { DataTypes } from 'sequelize'
 import sequelize from '../../database/db.js'
 
@@ -17,11 +16,19 @@ const HealthCheck = sequelize.define(
     School_year: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false
     }
   },
   {
     tableName: 'Health_check',
-    timestamps: false
+    timestamps: true
   }
 )
 

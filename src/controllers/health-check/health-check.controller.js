@@ -2,7 +2,6 @@ import * as srv from '../../services/health-check/health-check.service.js'
 
 export async function createHealthCheck(req, res) {
   try {
-    // chắc chắn req.body có dateEvent
     if (!req.body.dateEvent) {
       return res.status(400).json({ success: false, message: 'dateEvent là bắt buộc' })
     }
@@ -11,6 +10,35 @@ export async function createHealthCheck(req, res) {
   } catch (e) {
     console.error(e)
     return res.status(500).json({ success: false, message: e.message || 'Internal Server Error' })
+  }
+}
+
+export const getHealthChecks = async (req, res) => {
+  try {
+    const result = await srv.getAllHealthChecks()
+    res.status(200).json({ message: 'Lấy thành công', data: result })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+}
+
+export const updateHealthCheck = async (req, res) => {
+  try {
+    const { id } = req.query
+    const result = await srv.updateHealthCheck(id, req.body)
+    res.status(200).json({ message: 'Cập nhật thành công', data: result })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+}
+
+export const deleteHealthCheck = async (req, res) => {
+  try {
+    const { id } = req.query
+    await srv.deleteHealthCheck(id)
+    res.status(200).json({ message: 'Xoá thành công' })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
   }
 }
 
