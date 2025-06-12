@@ -39,6 +39,26 @@ export async function getAllHealthChecks() {
   })
 }
 
+export async function getHealthCheckById(id) {
+  const hc = await HealthCheck.findByPk(id, {
+    include: {
+      model: Event,
+      attributes: ['eventId', 'dateEvent', 'type']
+    }
+  })
+
+  if (!hc) throw new Error('Không tìm thấy đợt khám')
+
+  return {
+    eventId: hc.Event.eventId,
+    dateEvent: hc.Event.dateEvent,
+    type: hc.Event.type,
+    title: hc.title,
+    description: hc.description,
+    schoolYear: hc.School_year
+  }
+}
+
 export async function updateHealthCheck(id, data) {
   const healthCheck = await HealthCheck.findByPk(id, { include: Event })
   if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
