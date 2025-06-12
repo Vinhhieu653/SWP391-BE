@@ -82,7 +82,7 @@ app.use('/api/v1/other-medical', otherMedicalRouter)
 app.use('/api/v1/categories', categoryRouter)
 app.use('/api/v1/guardians', guardianRouter)
 app.use('/api/v1/health-check', healthCheckRouter)
-app.use('/api/v1/medical-records', medicalRecordRouter);
+app.use('/api/v1/medical-records', medicalRecordRouter)
 // Xử lý lỗi
 app.use(notFoundHandler)
 app.use(errorHandler)
