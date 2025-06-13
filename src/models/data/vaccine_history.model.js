@@ -27,7 +27,11 @@ const VaccineHistory = sequelize.define(
     },
     Date_injection: {
       type: DataTypes.DATE
-    }
+    },
+    Is_confirmed: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
   },
   {
     tableName: 'Vaccine_History',
