@@ -21,12 +21,9 @@ import emailRouter from './routes/send-mail/email.route.js'
 import otherMedicalRouter from './routes/Other_medical/Other_medical.router.js'
 import guardianRouter from './routes/guardian/guardian.route.js'
 import healthCheckRouter from './routes/health-check/health-check.route.js'
+import vaccineRouter from './routes/vaccince/Vaccine.router.js'
 import { basicAuth } from './middlewares/authSwagger.js'
 import { notFoundHandler, errorHandler } from './middlewares/responseUtils.js'
-import User from './models/data/user.model.js'
-import Role from './models/data/role.model.js'
-import Blog from './models/data/blog.model.js'
-import Image from './models/data/image.model.js'
 import { seedRoles } from './database/seeds/role.seed.js'
 import { seedUsers } from './database/seeds/users.seed.js'
 import { seedBlogs } from './database/seeds/blogs.seed.js'
@@ -82,6 +79,8 @@ app.use('/api/v1/other-medical', otherMedicalRouter)
 app.use('/api/v1/categories', categoryRouter)
 app.use('/api/v1/guardians', guardianRouter)
 app.use('/api/v1/health-check', healthCheckRouter)
+app.use('/api/v1/vaccine', vaccineRouter)
+
 app.use('/api/v1/medical-records', medicalRecordRouter)
 // Xử lý lỗi
 app.use(notFoundHandler)

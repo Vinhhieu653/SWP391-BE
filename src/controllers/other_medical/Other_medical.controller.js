@@ -1,6 +1,5 @@
 import * as OtherMedicalService from '../../services/Other_medical/Other_medical.service.js'
 import cloudinary from '../../utils/cloudinary.js'
-import * as MedicalRecordService from '../../services/Medicail_record/Medical_record.service.js'
 
 export const createOtherMedical = async (req, res) => {
   try {
