@@ -15,18 +15,16 @@ export const createVaccineHistoryService = async (data) => {
     type: 'vaccine'
   })
 
-  let mrIds = data.MR_ID;
+  let mrIds = data.MR_ID
 
   if (!mrIds) {
-   
-    const medicalRecords = await MedicalRecord.findAll({ attributes: ['ID'] });
-    mrIds = medicalRecords.map(record => record.ID);
+    const medicalRecords = await MedicalRecord.findAll({ attributes: ['ID'] })
+    mrIds = medicalRecords.map((record) => record.ID)
   } else {
-  
-    mrIds = Array.isArray(mrIds) ? mrIds : [mrIds];
+    mrIds = Array.isArray(mrIds) ? mrIds : [mrIds]
   }
 
-  const vaccineHistories = [];
+  const vaccineHistories = []
 
   for (const mrId of mrIds) {
     const vaccineHistory = await VaccineHistory.create({
@@ -36,17 +34,17 @@ export const createVaccineHistoryService = async (data) => {
     });
     vaccineHistories.push(vaccineHistory);
 
-    
 
-    const medicalRecord = await MedicalRecord.findByPk(mrId);
+
+    const medicalRecord = await MedicalRecord.findByPk(mrId)
     if (medicalRecord) {
       const guardianUsers = await GuardianUser.findAll({
         where: { userId: medicalRecord.userId }
-      }); 
-       const userEvent = await UserEvent.create({
-      eventId: event.eventId,
-      userId:  medicalRecord.userId
-    });
+      });
+      const userEvent = await UserEvent.create({
+        eventId: event.eventId,
+        userId: medicalRecord.userId
+      });
       await Promise.all(guardianUsers.map(async (guardianUser) => {
         const guardian = await Guardian.findByPk(guardianUser.obId);
         if (guardian) {
@@ -63,66 +61,68 @@ export const createVaccineHistoryService = async (data) => {
   return {
     event,
     vaccineHistories
-  };
-};
+  }
+}
 
 export const createVaccineHistoryWithEvidenceService = async (data, imageFile) => {
-  let mrIds = data.MR_ID;
+  let mrIds = data.MR_ID
 
   if (!mrIds) {
-    const medicalRecords = await MedicalRecord.findAll({ attributes: ['ID'] });
-    mrIds = medicalRecords.map(record => record.ID);
+    const medicalRecords = await MedicalRecord.findAll({ attributes: ['ID'] })
+    mrIds = medicalRecords.map((record) => record.ID)
   } else {
-    mrIds = Array.isArray(mrIds) ? mrIds : [mrIds];
+    mrIds = Array.isArray(mrIds) ? mrIds : [mrIds]
   }
 
-  const results = [];
+  const results = []
 
   for (const mrId of mrIds) {
     const vaccineHistory = await VaccineHistory.create({
       ...data,
       MR_ID: mrId,
       Date_injection: data.Date_injection || new Date()
-    });
+    })
 
     if (imageFile) {
-      const result = await cloudinary.uploader.upload(imageFile.path);
+      const result = await cloudinary.uploader.upload(imageFile.path)
       await Evidence.create({
         VH_ID: vaccineHistory.VH_ID,
         Image: result.secure_url
-      });
+      })
     }
 
-    const medicalRecord = await MedicalRecord.findByPk(mrId);
+    const medicalRecord = await MedicalRecord.findByPk(mrId)
     if (medicalRecord) {
       const guardianUsers = await GuardianUser.findAll({
         where: { userId: medicalRecord.userId }
-      });
+      })
 
-      await Promise.all(guardianUsers.map(async (guardianUser) => {
-        const guardian = await Guardian.findByPk(guardianUser.obId);
-        if (guardian) {
-          await Notification.create({
-            title: 'New Vaccine Record with Evidence',
-            mess: `A new vaccine record with evidence has been created for your dependent`,
-            userId: guardian.userId
-          });
-        }
-      }));
+      await Promise.all(
+        guardianUsers.map(async (guardianUser) => {
+          const guardian = await Guardian.findByPk(guardianUser.obId)
+          if (guardian) {
+            await Notification.create({
+              title: 'New Vaccine Record with Evidence',
+              mess: `A new vaccine record with evidence has been created for your dependent`,
+              userId: guardian.userId
+            })
+          }
+        })
+      )
     }
 
-    const completeRecord = await VaccineHistory.findByPk(vaccineHistory.VH_ID);
+    const completeRecord = await VaccineHistory.findByPk(vaccineHistory.VH_ID)
     const evidence = await Evidence.findOne({
       where: { VH_ID: vaccineHistory.VH_ID }
-    });
+    })
 
     results.push({
       ...completeRecord.dataValues,
       evidence: evidence || null
-    });
+    })
   }
 
-  return results;
+  return results
 }
 
 export const getAllVaccineHistoryService = async () => {
@@ -130,17 +130,19 @@ export const getAllVaccineHistoryService = async () => {
     order: [['Date_injection', 'DESC']]
   })
 
-  const result = await Promise.all(records.map(async (record) => {
-    const medicalRecord = await MedicalRecord.findByPk(record.MR_ID)
-    if (medicalRecord) {
-      record.dataValues.MedicalRecord = medicalRecord
-      const user = await User.findByPk(medicalRecord.userId, {
-        attributes: ['fullname']
-      })
-      record.dataValues.PatientName = user ? user.fullname : null
-    }
-    return record
-  }))
+  const result = await Promise.all(
+    records.map(async (record) => {
+      const medicalRecord = await MedicalRecord.findByPk(record.MR_ID)
+      if (medicalRecord) {
+        record.dataValues.MedicalRecord = medicalRecord
+        const user = await User.findByPk(medicalRecord.userId, {
+          attributes: ['fullname']
+        })
+        record.dataValues.PatientName = user ? user.fullname : null
+      }
+      return record
+    })
+  )
 
   return result
 }
@@ -237,32 +239,33 @@ export const deleteVaccineHistoryService = async (id) => {
 export const getStudentsByEventIdService = async (eventId) => {
   const vaccineHistories = await VaccineHistory.findAll({
     where: { Event_ID: eventId }
-  });
+  })
 
-  const result = await Promise.all(vaccineHistories.map(async (history) => {
-    const medicalRecord = await MedicalRecord.findByPk(history.MR_ID);
-    if (!medicalRecord) return null;
+  const result = await Promise.all(
+    vaccineHistories.map(async (history) => {
+      const medicalRecord = await MedicalRecord.findByPk(history.MR_ID)
+      if (!medicalRecord) return null
 
-    const student = await User.findByPk(medicalRecord.userId, {
-      attributes: ['id', 'fullname']
-    });
+      const student = await User.findByPk(medicalRecord.userId, {
+        attributes: ['id', 'fullname']
+      })
 
-    if (!student) return null;
+      if (!student) return null
 
-    return {
-      studentId: student.id,
-      fullname: student.fullname,
-      class: medicalRecord.class, 
-      vaccineHistory: {
-        id: history.VH_ID,
-        vaccine_name: history.Vaccine_name,
-        vaccine_type: history.Vaccince_type, 
-        date_injection: history.Date_injection
-      }
-    };
-  }));
+      return {
+        studentId: student.id,
+        fullname: student.fullname,
+        class: medicalRecord.class,
+        vaccineHistory: {
+          id: history.VH_ID,
+          vaccine_name: history.Vaccine_name,
+          vaccine_type: history.Vaccince_type,
+          date_injection: history.Date_injection
+        }
+      };
+    }));
   const filteredResult = result.filter(item => item !== null);
-  
+
   return {
     eventId,
     totalStudents: filteredResult.length,

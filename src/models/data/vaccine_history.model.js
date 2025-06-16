@@ -33,7 +33,7 @@ const VaccineHistory = sequelize.define(
     },
     Status: {
       type: DataTypes.STRING,
-      defaultValue: 'Chờ xác nhận' 
+      defaultValue: 'Chờ xác nhận'
     },
   },
   {
