@@ -4,6 +4,10 @@ import FormCheck from '../../models/data/form_check.model.js'
 import HealthCheck from '../../models/data/health_check.model.js'
 import MedicalSent from '../../models/data/medical_sent.model.js'
 import Guardian from '../../models/data/guardian.model.js'
+import UserEvent from '../../models/data/user_event.model.js'
+import Notification from '../../models/data/noti.model.js'
+import MedicalRecord from '../../models/data/medicalRecord.model.js'
+import HistoryCheck from '../../models/data/history_check.model.js'
 
 export async function createHealthCheck({ title, description, dateEvent, schoolYear, type }) {
   if (!dateEvent) throw new Error('dateEvent là bắt buộc')
@@ -18,6 +22,27 @@ export async function createHealthCheck({ title, description, dateEvent, schoolY
     title,
     description
   })
+
+  // lấy danh sách học sinh
+  const students = await User.findAll({ where: { roleId: 1 } })
+
+  // tạo UserEvent + Notification
+  const userEvents = []
+  const notiList = []
+
+  for (const s of students) {
+    userEvents.push({ eventId: event.eventId, userId: s.id })
+
+    notiList.push({
+      userId: s.id,
+      title: 'Thông báo khám sức khỏe',
+      mess: `Đã tạo đợt khám sức khỏe năm học ${schoolYear}. Vui lòng xác nhận thông tin.`,
+      isRead: false
+    })
+  }
+
+  await UserEvent.bulkCreate(userEvents)
+  await Notification.bulkCreate(notiList)
 
   return {
     eventId: event.eventId,
@@ -37,6 +62,26 @@ export async function getAllHealthChecks() {
     },
     order: [['createdAt', 'DESC']]
   })
+}
+
+export async function getHealthCheckById(id) {
+  const hc = await HealthCheck.findByPk(id, {
+    include: {
+      model: Event,
+      attributes: ['eventId', 'dateEvent', 'type']
+    }
+  })
+
+  if (!hc) throw new Error('Không tìm thấy đợt khám')
+
+  return {
+    eventId: hc.Event.eventId,
+    dateEvent: hc.Event.dateEvent,
+    type: hc.Event.type,
+    title: hc.title,
+    description: hc.description,
+    schoolYear: hc.School_year
+  }
 }
 
 export async function updateHealthCheck(id, data) {
@@ -75,22 +120,38 @@ export async function deleteHealthCheck(id) {
 
 export async function sendConfirmForms(eventId) {
   const students = await User.findAll({
-    where: { roleId: 1 } // giả sử 1 là id role của học sinh
+    where: { roleId: 1 }, // học sinh
+    include: [{ model: Guardian }]
   })
   if (!students.length) throw new Error('Không có học sinh trong đợt khám')
 
-  // Tạo form cho từng học sinh thuộc event
   const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
   if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
 
-  const forms = students.map((s) => ({
-    HC_ID: healthCheck.HC_ID,
-    Student_ID: s.id
-    // các field khác để default null hoặc bỏ qua
-  }))
+  const forms = await FormCheck.bulkCreate(
+    students.map((s) => ({
+      HC_ID: healthCheck.HC_ID,
+      Student_ID: s.id
+    })),
+    { returning: true }
+  )
 
-  await FormCheck.bulkCreate(forms)
-  // Todo: gửi email/notification cho phụ huynh
+  // Gửi noti cho phụ huynh
+  for (let i = 0; i < students.length; i++) {
+    const student = students[i]
+    const guardian = student.Guardian
+
+    if (guardian) {
+      await Notification.create({
+        userId: guardian.id,
+        title: 'Xác nhận thông tin khám sức khỏe',
+        mess: `Vui lòng xác nhận form khám sức khỏe của học sinh ${student.fullName || 'con bạn'}`,
+        isRead: false
+      })
+    }
+  }
+
+  return { createdForms: forms.length }
 }
 
 export async function submitResult(
@@ -144,7 +205,7 @@ export async function sendResult(eventId) {
   const forms = await FormCheck.findAll({ where: { HC_ID: healthCheck.HC_ID } })
 
   for (const form of forms) {
-    // giả sử gửi kết quả (gửi notification/email)
+    // Gửi kết quả
     await MedicalSent.create({
       Form_ID: form.Form_ID,
       Sent_by: 'system',
@@ -152,7 +213,24 @@ export async function sendResult(eventId) {
       Is_confirm: false,
       Image_prescription: null
     })
+
+    // Tìm medical record
+    const mr = await MedicalRecord.findOne({ where: { userId: form.Student_ID } })
+    if (!mr) continue
+
+    // Ghi history check
+    await HistoryCheck.create({
+      MR_ID: mr.ID,
+      HC_ID: healthCheck.HC_ID,
+      Date_create: new Date()
+    })
   }
+  await Notification.create({
+    userId: guardian.id,
+    title: 'Kết quả khám sức khỏe',
+    mess: `Đã có kết quả khám sức khỏe của ${student.fullName}`,
+    isRead: false
+  })
 }
 
 // service

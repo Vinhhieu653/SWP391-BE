@@ -46,20 +46,20 @@ export const getMedicalRecordById = async (id) => {
 
 // Tạo mới hồ sơ y tế
 export const createMedicalRecord = async (data) => {
-  return await MedicalRecord.create(data);
-};
+  return await MedicalRecord.create(data)
+}
 
 // Cập nhật hồ sơ y tế
 export const updateMedicalRecord = async (id, data) => {
-  const record = await MedicalRecord.findByPk(id);
-  if (!record) return null;
-  return await record.update(data);
-};
+  const record = await MedicalRecord.findByPk(id)
+  if (!record) return null
+  return await record.update(data)
+}
 
 // Xóa hồ sơ y tế
 export const deleteMedicalRecord = async (id) => {
-  const record = await MedicalRecord.findByPk(id);
-  if (!record) return null;
-  await record.destroy();
-  return true;
-};
+  const record = await MedicalRecord.findByPk(id)
+  if (!record) return null
+  await record.destroy()
+  return true
+}

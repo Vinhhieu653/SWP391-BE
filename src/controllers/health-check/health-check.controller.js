@@ -22,6 +22,16 @@ export const getHealthChecks = async (req, res) => {
   }
 }
 
+export const getHealthCheckById = async (req, res) => {
+  try {
+    const { id } = req.params
+    const data = await srv.getHealthCheckById(id)
+    res.json({ success: true, data })
+  } catch (err) {
+    res.status(404).json({ success: false, message: err.message })
+  }
+}
+
 export const updateHealthCheck = async (req, res) => {
   try {
     const { id } = req.query

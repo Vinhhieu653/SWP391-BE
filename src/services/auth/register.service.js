@@ -2,7 +2,7 @@ import User from '../../models/data/user.model.js'
 import Role from '../../models/data/role.model.js'
 import argon2 from 'argon2'
 
-export async function registerUser({ fullname, username, email, password, phoneNumber }) {
+export async function registerUser({ fullname, username, email, password, phoneNumber, roleId }) {
   if (!fullname || !username || !email || !password) {
     throw new Error('Missing required fields')
   }
@@ -10,8 +10,12 @@ export async function registerUser({ fullname, username, email, password, phoneN
   const existUser = await User.findOne({ where: { username } })
   if (existUser) throw new Error('Username taken')
 
-  const role = await Role.findOne({ where: { name: 'nurse' } })
-  if (!role) throw new Error('Role not found')
+  let finalRoleId = roleId
+  if (!finalRoleId) {
+    const role = await Role.findOne({ where: { name: 'nurse' } })
+    if (!role) throw new Error('Role not found')
+    finalRoleId = role.id
+  }
 
   const existEmail = await User.findOne({ where: { email } })
   if (existEmail) throw new Error('Email taken')
@@ -24,7 +28,7 @@ export async function registerUser({ fullname, username, email, password, phoneN
     email,
     password: hashedPassword,
     phoneNumber,
-    roleId: role.id
+    roleId: finalRoleId
   })
 
   return newUser

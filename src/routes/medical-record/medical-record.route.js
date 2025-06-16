@@ -1,14 +1,14 @@
-import express from 'express';
+import express from 'express'
 import {
   createMedicalRecord,
   getAllMedicalRecords,
   getMedicalRecordById,
   updateMedicalRecord,
   deleteMedicalRecord
-} from '../../controllers/medical-record/medical-record.controler.js';
-import { authenticateToken, authorizeRoles } from '../../middlewares/auth.middleware.js';
+} from '../../controllers/medical-record/medical-record.controler.js'
+import { authenticateToken, authorizeRoles } from '../../middlewares/auth.middleware.js'
 
-const router = express.Router();
+const router = express.Router()
 
 /**
  * @swagger
@@ -27,7 +27,7 @@ const router = express.Router();
  *       200:
  *         description: Danh sách hồ sơ y tế
  */
-router.get('/', getAllMedicalRecords);
+router.get('/', getAllMedicalRecords)
 
 /**
  * @swagger
@@ -47,7 +47,7 @@ router.get('/', getAllMedicalRecords);
  *       404:
  *         description: Không tìm thấy
  */
-router.get('/:id', getMedicalRecordById);
+router.get('/:id', getMedicalRecordById)
 
 /**
  * @swagger
@@ -122,7 +122,7 @@ router.get('/:id', getMedicalRecordById);
  *         description: Dữ liệu không hợp lệ
  */
 
-router.post('/', authenticateToken, authorizeRoles('guardian','nurse'), createMedicalRecord);
+router.post('/', authenticateToken, authorizeRoles('guardian', 'nurse'), createMedicalRecord)
 
 /**
  * @swagger
@@ -195,7 +195,7 @@ router.post('/', authenticateToken, authorizeRoles('guardian','nurse'), createMe
  *         description: Không tìm thấy
  */
 
-router.put('/:id', authenticateToken, authorizeRoles('guardian','nurse'), updateMedicalRecord);
+router.put('/:id', authenticateToken, authorizeRoles('guardian', 'nurse'), updateMedicalRecord)
 
 /**
  * @swagger
@@ -217,6 +217,6 @@ router.put('/:id', authenticateToken, authorizeRoles('guardian','nurse'), update
  *       404:
  *         description: Không tìm thấy
  */
-router.delete('/:id', authenticateToken, authorizeRoles('guardian','nurse'), deleteMedicalRecord);
+router.delete('/:id', authenticateToken, authorizeRoles('guardian', 'nurse'), deleteMedicalRecord)
 
-export default router;
+export default router
