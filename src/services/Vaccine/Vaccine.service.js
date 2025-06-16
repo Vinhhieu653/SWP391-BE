@@ -36,18 +36,23 @@ export const createVaccineHistoryService = async (data) => {
     });
     vaccineHistories.push(vaccineHistory);
 
+    
+
     const medicalRecord = await MedicalRecord.findByPk(mrId);
     if (medicalRecord) {
       const guardianUsers = await GuardianUser.findAll({
         where: { userId: medicalRecord.userId }
-      });
-
+      }); 
+       const userEvent = await UserEvent.create({
+      eventId: event.eventId,
+      userId:  medicalRecord.userId
+    });
       await Promise.all(guardianUsers.map(async (guardianUser) => {
         const guardian = await Guardian.findByPk(guardianUser.obId);
         if (guardian) {
           await Notification.create({
-            title: 'New Vaccine Record',
-            mess: `A new vaccine record has been created for your dependent`,
+            title: 'Con bạn có lịch tiêm chủng mới',
+            mess: `Bấm vao để xem chi tiết lịch tiêm chủng cho con bạn`,
             userId: guardian.userId
           });
         }
@@ -189,7 +194,7 @@ export const updateVaccineHistoryService = async (id, updateData) => {
   return await getVaccineHistoryByIdService(id)
 }
 
-export const confirmVaccineHistoryService = async (id) => {
+export const confirmVaccineHistoryService = async (id, isConfirmed) => {
   const record = await VaccineHistory.findByPk(id)
   if (!record) {
     throw { status: 404, message: 'Vaccine history record not found' }
@@ -200,12 +205,22 @@ export const confirmVaccineHistoryService = async (id) => {
     throw { status: 404, message: 'Medical record not found' }
   }
 
-  await UserEvent.create({
-    eventId: record.Event_ID,
-    userId: medicalRecord.userId
-  })
+  let statusUpdate = {}
+  if (isConfirmed === true || isConfirmed === 'true') {
+    statusUpdate.Status = 'Cho phép tiêm'
+  } else {
+    statusUpdate.Status = 'Không cho phép tiêm'
+  }
 
-  await record.update({ Is_confirmed: true })
+  await record.update(statusUpdate)
+
+  if (isConfirmed === true || isConfirmed === 'true') {
+    await UserEvent.create({
+      eventId: record.Event_ID,
+      userId: medicalRecord.userId
+    })
+  }
+
   return await getVaccineHistoryByIdService(id)
 }
 
@@ -241,9 +256,8 @@ export const getStudentsByEventIdService = async (eventId) => {
       vaccineHistory: {
         id: history.VH_ID,
         vaccine_name: history.Vaccine_name,
-        vaccine_type: history.Vaccince_type,
-        date_injection: history.Date_injection,
-        is_confirmed: history.Is_confirmed
+        vaccine_type: history.Vaccince_type, 
+        date_injection: history.Date_injection
       }
     };
   }));
@@ -252,7 +266,133 @@ export const getStudentsByEventIdService = async (eventId) => {
   return {
     eventId,
     totalStudents: filteredResult.length,
-    confirmedCount: filteredResult.filter(item => item.vaccineHistory.is_confirmed).length,
     students: filteredResult
   };
 }
+
+/**
+ * Cập nhật trạng thái và note cho nhiều bản ghi vaccine history.
+ * @param {Array<{ VH_ID: number, status: string, note_affter_injection: string }>} updates
+ */
+export const updateVaccineStatusByMRIdService = async (updates) => {
+  if (!Array.isArray(updates) || updates.length === 0) {
+    throw { status: 400, message: 'Input must be a non-empty array of update objects' }
+  }
+
+  // Lấy tất cả VH_ID cần cập nhật
+  const vhIdList = updates.map(item => item.VH_ID);
+
+  // Lấy tất cả bản ghi cần cập nhật
+  const records = await VaccineHistory.findAll({ where: { VH_ID: vhIdList } });
+  if (records.length !== vhIdList.length) {
+    throw { status: 404, message: 'Some VH_IDs do not exist in vaccine history' }
+  }
+
+  // Kiểm tra trạng thái cho từng bản ghi
+  const notAllowed = records.filter(r => r.Status !== 'Cho phép tiêm');
+  if (notAllowed.length > 0) {
+    throw { status: 400, message: 'Chỉ được phép cập nhật khi tất cả trạng thái là "Cho phép tiêm"' }
+  }
+
+  // Cập nhật từng bản ghi theo từng object trong updates
+  await Promise.all(
+    updates.map(item =>
+      VaccineHistory.update(
+        {
+          Status: item.status,
+          note_affter_injection: item.note_affter_injection
+        },
+        { where: { VH_ID: item.VH_ID } }
+      )
+    )
+  );
+
+  return await VaccineHistory.findAll({ where: { VH_ID: vhIdList } });
+}
+
+export const getAllVaccineTypesService = async () => {
+  const types = await VaccineHistory.findAll({
+    attributes: [
+      [VaccineHistory.sequelize.fn('DISTINCT', VaccineHistory.sequelize.col('Vaccine_name')), 'Vaccine_name']
+    ],
+    raw: true
+  })
+  return types
+    .map(item => item.Vaccine_name)
+    .filter(type => !!type)
+}
+
+export const getVaccineHistoryByVaccineNameService = async (vaccineName) => {
+  const records = await VaccineHistory.findAll({
+    where: { Vaccine_name: vaccineName },
+    order: [['Date_injection', 'DESC']]
+  })
+
+  const result = await Promise.all(records.map(async (record) => {
+    const medicalRecord = await MedicalRecord.findByPk(record.MR_ID)
+    if (medicalRecord) {
+      record.dataValues.MedicalRecord = medicalRecord
+      const user = await User.findByPk(medicalRecord.userId, {
+        attributes: ['fullname']
+      })
+      record.dataValues.PatientName = user ? user.fullname : null
+    }
+    return record
+  }))
+
+  return result
+}
+
+export const getVaccineHistoryByGuardianUserIdService = async (guardianUserId) => {
+  const guardian = await Guardian.findOne({ where: { userId: guardianUserId } })
+  if (!guardian) {
+    return {
+      totalVaccine: 0,
+      totalNeedConfirm: 0,
+      histories: []
+    }
+  }
+
+  const guardianUsers = await GuardianUser.findAll({
+    where: { obId: guardian.obId },
+  })
+
+  if (!guardianUsers.length) {
+    return {
+      totalVaccine: 0,
+      totalNeedConfirm: 0,
+      histories: []
+    }
+  }
+
+  const obIds = guardianUsers.map(gu => gu.userId)
+
+  const medicalRecords = await MedicalRecord.findAll({
+    where: { userId: obIds }
+  })
+
+  let totalVaccine = 0
+  let totalNeedConfirm = 0
+
+  const allHistories = await Promise.all(medicalRecords.map(async (mr) => {
+    const user = await User.findByPk(mr.userId, { attributes: ['id', 'fullname'] })
+    const vaccineHistory = await VaccineHistory.findAll({
+      where: { MR_ID: mr.ID },
+      order: [['Date_injection', 'DESC']]
+    })
+    totalVaccine += vaccineHistory.filter(vh => vh.Status === 'Đã tiêm').length
+    totalNeedConfirm += vaccineHistory.filter(vh => vh.Status === 'Chờ xác nhận').length
+    return {
+      totalVaccine,
+      totalNeedConfirm,
+      medicalRecord: mr,
+      user: user ? { id: user.id, fullname: user.fullname } : null,
+      vaccineHistory
+    }
+  }))
+
+  return {
+    histories: allHistories
+  }
+}
+
