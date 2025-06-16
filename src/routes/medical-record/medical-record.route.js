@@ -81,21 +81,9 @@ router.get('/:id', getMedicalRecordById);
  *               weight:
  *                 type: number
  *                 example: 30
- *               vaccines:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     name:
- *                       type: string
- *                       example: "BCG"
- *                     date:
- *                       type: string
- *                       format: date
- *                       example: "2018-06-01"
- *                     status:
- *                       type: string
- *                       example: "Đã tiêm"
+ *               class:
+ *                 type: string
+ *                 example: "Lớp 1A"
  *               chronicDiseases:
  *                 type: array
  *                 items:
@@ -166,21 +154,9 @@ router.post('/', authenticateToken, authorizeRoles('guardian','nurse'), createMe
  *               weight:
  *                 type: number
  *                 example: 35
- *               vaccines:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     name:
- *                       type: string
- *                       example: "BCG"
- *                     date:
- *                       type: string
- *                       format: date
- *                       example: "2018-06-01"
- *                     status:
- *                       type: string
- *                       example: "Đã tiêm"
+ *               class:
+ *                 type: string
+ *                 example: "Lớp 1A"
  *               chronicDiseases:
  *                 type: array
  *                 items:

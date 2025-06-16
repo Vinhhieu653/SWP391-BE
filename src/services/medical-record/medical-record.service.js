@@ -1,13 +1,47 @@
 import MedicalRecord from '../../models/data/medicalRecord.model.js';
+import User from '../../models/data/user.model.js';
 
-// Lấy tất cả hồ sơ y tế
+
 export const getAllMedicalRecords = async () => {
-  return await MedicalRecord.findAll();
+  const records = await MedicalRecord.findAll({
+    include: {
+      model: User,
+      attributes: ['fullname'],
+    },
+  });
+
+  // Trả về fullName nằm ngoài cùng
+  return records.map(record => {
+    const plain = record.get({ plain: true }); // bỏ các phương thức sequelize
+    const fullname = plain.User?.fullname || null;
+    delete plain.User; // xoá key User
+
+    return {
+      ...plain,
+      fullname,
+    };
+  });
 };
 
 // Lấy hồ sơ y tế theo ID
 export const getMedicalRecordById = async (id) => {
-  return await MedicalRecord.findByPk(id);
+  const record = await MedicalRecord.findByPk(id, {
+    include: {
+      model: User,
+      attributes: ['fullname'],
+    }
+  });
+
+  if (!record) return null;
+
+  const plain = record.get({ plain: true });
+  const fullname = plain.User?.fullname || null;
+  delete plain.User;
+
+  return {
+    ...plain,
+    fullname,
+  };
 };
 
 // Tạo mới hồ sơ y tế
