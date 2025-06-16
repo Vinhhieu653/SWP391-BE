@@ -13,6 +13,10 @@ const MedicalRecord = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    class: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     height: {
       type: DataTypes.FLOAT,
       allowNull: true
