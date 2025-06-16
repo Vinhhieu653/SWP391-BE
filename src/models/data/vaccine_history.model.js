@@ -31,7 +31,7 @@ const VaccineHistory = sequelize.define(
     Is_confirmed: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
-    },
+    }
   },
   {
     tableName: 'Vaccine_History',

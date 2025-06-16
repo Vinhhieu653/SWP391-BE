@@ -16,10 +16,7 @@ export const createVaccineHistory = async (req, res) => {
 export const createVaccineWithEvidence = async (req, res) => {
   try {
     // Now returns array of records with evidence
-    const results = await VaccineService.createVaccineHistoryWithEvidenceService(
-      req.body,
-      req.file
-    )
+    const results = await VaccineService.createVaccineHistoryWithEvidenceService(req.body, req.file)
     res.status(201).json({
       message: 'Vaccine histories with evidence created successfully',
       data: results
