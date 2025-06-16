@@ -10,7 +10,11 @@ import {
   updateVaccineHistory,
   confirmVaccineHistory,
   deleteVaccineHistory,
-  getStudentsByEventId
+  getStudentsByEventId,
+  updateVaccineStatusByMRId,
+  getAllVaccineTypes,
+  getVaccineHistoryByVaccineName,
+  getVaccineHistoryByGuardianUserId
 } from '../../controllers/Vaccine/Vaccince.controller.js'
 
 const router = express.Router()
@@ -169,59 +173,47 @@ const upload = multer({ dest: 'uploads/' })
  *       200:
  *         description: Danh sách lịch sử tiêm chủng
  *
- * /api/v1/vaccine/{id}/confirm:
+ * /api/v1/vaccine/vaccine-history/status:
  *   put:
- *     summary: Xác nhận lịch sử tiêm chủng
+ *     summary: Cập nhật trạng thái tiêm chủng cho nhiều VH_ID
  *     tags: [Vaccine]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               updates:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     VH_ID:
+ *                       type: integer
+ *                     status:
+ *                       type: string
+ *                       example: Đã tiêm
+ *                     note_affter_injection:
+ *                       type: string
+ *                       example: "Không có phản ứng phụ"
+ *                 description: Danh sách cập nhật trạng thái và note cho từng VH_ID
  *     responses:
  *       200:
- *         description: Xác nhận thành công
- *
- * /api/v1/vaccine/event/{eventId}/students:
- *   get:
- *     summary: Lấy danh sách học sinh và trạng thái xác nhận theo Event ID
- *     tags: [Vaccine]
- *     parameters:
- *       - in: path
- *         name: eventId
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Thành công
+ *         description: Cập nhật trạng thái thành công
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 eventId:
- *                   type: integer
- *                 totalStudents:
- *                   type: integer
- *                 confirmedCount:
- *                   type: integer
- *                 students:
+ *                 message:
+ *                   type: string
+ *                 data:
  *                   type: array
  *                   items:
- *                     type: object
- *                     properties:
- *                       studentId:
- *                         type: integer
- *                       fullname:
- *                         type: string
- *                       class:
- *                         type: string
- *                       vaccineHistory:
- *                         type: object
+ *                     $ref: '#/components/schemas/VaccineHistory'
  */
 
 router.post('/', authenticateToken, authorizeRoles('nurse'), createVaccineHistory)
@@ -233,11 +225,15 @@ router.post(
   createVaccineWithEvidence
 )
 router.get('/', getAllVaccineHistory)
+router.get('/types', getAllVaccineTypes)
 router.get('/medical-record/:mrId', getVaccineHistoryByMRId)
 router.get('/event/:eventId/students', getStudentsByEventId)
 router.get('/:id', getVaccineHistoryById)
 router.put('/:id', authenticateToken, updateVaccineHistory)
 router.put('/:id/confirm', authenticateToken, confirmVaccineHistory)
+router.put('/vaccine-history/status', authenticateToken, updateVaccineStatusByMRId)
 router.delete('/:id', authenticateToken, authorizeRoles('admin'), deleteVaccineHistory)
+router.get('/by-name/:vaccineName', getVaccineHistoryByVaccineName)
+router.get('/guardian/:guardianUserId', getVaccineHistoryByGuardianUserId)
 
 export default router
