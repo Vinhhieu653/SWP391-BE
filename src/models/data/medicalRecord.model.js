@@ -4,7 +4,7 @@ import sequelize from '../../database/db.js'
 const MedicalRecord = sequelize.define(
   'Medical_Record',
   {
-    ID: {
+    MR_ID: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true
@@ -28,8 +28,8 @@ const MedicalRecord = sequelize.define(
     bloodType: {
       type: DataTypes.STRING
     },
-    vaccines: {
-      type: DataTypes.JSONB,
+    class: {
+      type: DataTypes.STRING,
       allowNull: true
     },
     chronicDiseases: {
