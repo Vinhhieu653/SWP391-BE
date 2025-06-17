@@ -4,7 +4,8 @@ import {
   getAllMedicalRecords,
   getMedicalRecordById,
   updateMedicalRecord,
-  deleteMedicalRecord
+  deleteMedicalRecord,
+  getMedicalRecordsByGuardian
 } from '../../controllers/medical-record/medical-record.controler.js'
 import { authenticateToken, authorizeRoles } from '../../middlewares/auth.middleware.js'
 
@@ -16,6 +17,24 @@ const router = express.Router()
  *   name: MedicalRecord
  *   description: API quản lý hồ sơ y tế
  */
+
+/**
+ * @swagger
+ * /api/v1/medical-records/by-guardian:
+ *   get:
+ *     summary: Lấy danh sách hồ sơ y tế của các học sinh mà guardian này giám hộ
+ *     tags: [MedicalRecord]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Danh sách hồ sơ y tế của con
+ *       401:
+ *         description: Không xác thực
+ */
+router.get('/by-guardian', authenticateToken, authorizeRoles('guardian'), getMedicalRecordsByGuardian);
+
+
 
 /**
  * @swagger

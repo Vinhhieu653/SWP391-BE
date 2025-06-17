@@ -1,6 +1,9 @@
 import MedicalSent from '../../models/data/medical_sent.model.js';
 import OutpatientMedication from '../../models/data/outpatient_medication.model.js';
 import MedicalRecord from '../../models/data/medicalRecord.model.js';
+import GuardianUser from '../../models/data/guardian_user.model.js';
+import User from '../../models/data/user.model.js';
+import Guardian from '../../models/data/guardian.model.js';
 
 // Tạo mới MedicalSent và liên kết OutpatientMedication
 export const createMedicalSentService = async (data, creator_by = 'system') => {
@@ -97,4 +100,33 @@ export const deleteMedicalSentService = async (id) => {
 
   await record.destroy();
   return { message: 'Deleted successfully' };
+};
+
+
+export const getMedicalSentsByGuardianUserIdService = async (guardianUserId) => {
+  // B1: Lấy dòng Guardian theo ID
+const guardianLink = await Guardian.findOne({ where: { userId: guardianUserId } });
+  if (!guardianLink) throw { status: 404, message: 'Không tìm thấy liên kết phụ huynh-học sinh' };
+
+  const obId = guardianLink.obId;
+
+  // B2: Tìm tất cả học sinh (userId) có chung obId này
+  const relatedGuardianUsers = await GuardianUser.findAll({
+    where: { obId }
+  });
+
+  const studentUserIds = relatedGuardianUsers.map(g => g.userId);
+
+  console.log('studentUserIds:', studentUserIds);
+
+  if (studentUserIds.length === 0) return [];
+
+  // B3: Lấy các đơn thuốc (MedicalSent) của các học sinh đó
+  const medicalSents = await MedicalSent.findAll({
+    where: {
+      User_ID: studentUserIds
+    }
+  });
+
+  return medicalSents;
 };
