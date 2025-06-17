@@ -4,7 +4,8 @@ import {
     getMedicalSentById,
     createMedicalSent,
     updateMedicalSent,
-    deleteMedicalSent
+    deleteMedicalSent,
+  getMedicalSentsByGuardian
 } from '../../controllers/medical-sent/medical-sent.controller.js';
 import { authenticateToken, authorizeRoles } from '../../middlewares/auth.middleware.js';
 
@@ -16,6 +17,23 @@ const router = express.Router();
  *   name: MedicalSent
  *   description: API quản lý đơn thuốc đã gửi
  */
+
+
+/**
+ * @swagger
+ * /api/v1/medical-sents/by-guardian:
+ *   get:
+ *     summary: Lấy danh sách toa thuốc của các học sinh mà guardian này giám hộ
+ *     tags: [MedicalSent]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Danh sách toa thuốc của con
+ *       401:
+ *         description: Không xác thực
+ */
+router.get('/by-guardian', authenticateToken, authorizeRoles('guardian'), getMedicalSentsByGuardian);
 
 /**
  * @swagger
@@ -48,6 +66,7 @@ router.get('/', getAllMedicalSents)
  *         description: Không tìm thấy
  */
 router.get('/:id', getMedicalSentById)
+
 
 /**
  * @swagger

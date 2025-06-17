@@ -35,15 +35,24 @@ function applyAssociations() {
 
   // User ↔ Guardian (Many-to-Many thông qua GuardianUser)
   User.belongsToMany(Guardian, {
-    through: GuardianUser,
-    foreignKey: 'userId',
-    otherKey: 'obId'
-  })
-  Guardian.belongsToMany(User, {
-    through: GuardianUser,
-    foreignKey: 'obId',
-    otherKey: 'userId'
-  })
+  through: GuardianUser,
+  foreignKey: 'userId',
+  otherKey: 'obId'
+})
+
+Guardian.belongsToMany(User, {
+  through: GuardianUser,
+  foreignKey: 'obId',
+  otherKey: 'userId'
+})
+
+// GuardianUser có thể include được User và Guardian
+GuardianUser.belongsTo(User, { foreignKey: 'userId' })
+GuardianUser.belongsTo(Guardian, { foreignKey: 'obId' })
+
+// Optional: nếu muốn truy ngược từ User hoặc Guardian
+User.hasMany(GuardianUser, { foreignKey: 'userId' })
+Guardian.hasMany(GuardianUser, { foreignKey: 'obId' })
 
   // User ↔ Event (Many-to-Many thông qua UserEvent)
   User.belongsToMany(Event, {
