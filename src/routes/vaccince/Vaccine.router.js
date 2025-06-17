@@ -138,6 +138,7 @@ const upload = multer({ dest: 'uploads/' })
  *     security:
  *       - bearerAuth: []
  *     requestBody:
+ *       required: true
  *       content:
  *         multipart/form-data:
  *           schema:
@@ -146,6 +147,9 @@ const upload = multer({ dest: 'uploads/' })
  *               - MR_ID
  *               - evidence
  *             properties:
+ *               MR_ID:
+ *                 type: integer
+ *                 description: ID hồ sơ y tế
  *               Vaccine_name:
  *                 type: string
  *               Vaccince_type:
@@ -158,6 +162,15 @@ const upload = multer({ dest: 'uploads/' })
  *     responses:
  *       201:
  *         description: Tạo thành công với bằng chứng
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/VaccineHistory'
  *
  * /api/v1/vaccine/medical-record/{mrId}:
  *   get:
@@ -212,8 +225,6 @@ const upload = multer({ dest: 'uploads/' })
  *                   type: string
  *                 data:
  *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/VaccineHistory'
  */
 
 router.post('/', authenticateToken, authorizeRoles('nurse'), createVaccineHistory)
