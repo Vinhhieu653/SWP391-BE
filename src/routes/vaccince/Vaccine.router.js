@@ -156,6 +156,9 @@ const upload = multer({ dest: 'uploads/' })
  *                 type: string
  *               Date_injection:
  *                 type: string
+ *                 format: date-time
+ *               note_affter_injection:
+ *                type: string
  *               evidence:
  *                 type: string
  *                 format: binary
