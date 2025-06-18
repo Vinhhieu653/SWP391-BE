@@ -8,8 +8,10 @@ import {
   getMedicalSentsByGuardian
 } from '../../controllers/medical-sent/medical-sent.controller.js';
 import { authenticateToken, authorizeRoles } from '../../middlewares/auth.middleware.js';
+import multer from 'multer'
 
 const router = express.Router();
+const upload = multer({ dest: 'uploads/' })
 
 /**
  * @swagger
@@ -79,7 +81,7 @@ router.get('/:id', getMedicalSentById)
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -89,7 +91,7 @@ router.get('/:id', getMedicalSentById)
  *             properties:
  *               userId:
  *                 type: integer
- *                 example: 5
+ *                 example: 3
  *               guardianPhone:
  *                 type: string
  *                 example: "0901234567"
@@ -98,7 +100,7 @@ router.get('/:id', getMedicalSentById)
  *                 example: "4A3"
  *               prescriptionImage:
  *                 type: string
- *                 example: "https://via.placeholder.com/400x300"
+ *                 format: binary
  *               medications:
  *                 type: string
  *                 example: "Paracetamol 500mg x2 viên, Amoxicillin 250mg x3 viên"
@@ -117,7 +119,8 @@ router.get('/:id', getMedicalSentById)
  *       400:
  *         description: Dữ liệu không hợp lệ
  */
-router.post('/', authenticateToken, authorizeRoles('guardian', 'nurse'), createMedicalSent)
+
+router.post('/', authenticateToken, authorizeRoles('guardian', 'nurse'), upload.single('prescriptionImage'), createMedicalSent)
 
 /**
  * @swagger
@@ -151,7 +154,7 @@ router.post('/', authenticateToken, authorizeRoles('guardian', 'nurse'), createM
  *                 example: "4A3"
  *               prescriptionImage:
  *                 type: string
- *                 example: "https://via.placeholder.com/400x300"
+ *                 format: binary
  *               medications:
  *                 type: string
  *                 example: "Paracetamol 500mg x2 viên, Amoxicillin 250mg x3 viên"
@@ -171,7 +174,7 @@ router.post('/', authenticateToken, authorizeRoles('guardian', 'nurse'), createM
  *         description: Không tìm thấy
  */
 
-router.put('/:id', authenticateToken, authorizeRoles('guardian', 'nurse'), updateMedicalSent)
+router.put('/:id', authenticateToken, authorizeRoles('guardian', 'nurse') , upload.single('prescriptionImage'), updateMedicalSent)
 
 /**
  * @swagger

@@ -4,6 +4,7 @@ import MedicalRecord from '../../models/data/medicalRecord.model.js';
 import GuardianUser from '../../models/data/guardian_user.model.js';
 import User from '../../models/data/user.model.js';
 import Guardian from '../../models/data/guardian.model.js';
+import Notification from '../../models/data/noti.model.js';
 
 // Tạo mới MedicalSent và liên kết OutpatientMedication
 export const createMedicalSentService = async (data, creator_by = 'system') => {
@@ -44,6 +45,20 @@ export const createMedicalSentService = async (data, creator_by = 'system') => {
   Notes: notes,
   Created_at: new Date()
 });
+
+// 4. Gửi thông báo cho tất cả nurse
+  const nurseUsers = await User.findAll({
+    where: { roleId: 2 } // thay 2 bằng roleId thực tế của nurse nếu khác
+  });
+
+  await Promise.all(nurseUsers.map(async (nurse) => {
+    await Notification.create({
+      title: 'Có đơn thuốc mới từ phụ huynh',
+      mess: `Vui lòng kiểm tra đơn thuốc vừa được gửi để xử lý.`,
+      userId: nurse.id
+    });
+  }));
+
 
   const { Form_ID, Outpatient_medication, OM_ID, ...cleaned } = medicalSent.get({ plain: true });
   return cleaned;

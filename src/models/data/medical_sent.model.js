@@ -24,7 +24,7 @@ const MedicalSent = sequelize.define(
       allowNull: true
     },
     Image_prescription: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: true
     },
     Medications: {
