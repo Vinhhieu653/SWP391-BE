@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import * as authController from '../../controllers/auth/auth.controller.js'
+import * as authController from '../../controllers/auth/password.controller.js'
 import { authenticateToken } from '../../middlewares/auth.middleware.js'
 
 const router = Router()
@@ -38,5 +38,27 @@ const router = Router()
  */
 
 router.post('/change-password', authenticateToken, authController.changePassword)
+
+/**
+ * @swagger
+ * /api/v1/auth/send-random-password:
+ *   post:
+ *     summary: Gửi mật khẩu ngẫu nhiên đến email phụ huynh và đổi mật khẩu luôn
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           example:
+ *             email: hieudvse172738@fpt.edu.vn
+ *     responses:
+ *       200:
+ *         description: Gửi email và đổi mật khẩu thành công
+ *       404:
+ *         description: Không tìm thấy người dùng
+ *       500:
+ *         description: Lỗi server
+ */
+router.post('/send-random-password', authenticateToken, authController.sendRandomPassword)
 
 export default router

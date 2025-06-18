@@ -51,3 +51,18 @@ export const sendMail = async ({ to, subject, html, template, context }) => {
   }
   throw new Error('Phải truyền html hoặc template')
 }
+
+// Thêm hàm này vào cuối file email service
+export const sendRandomPasswordMail = async ({ to, studentName, password, actionLink }) => {
+  return transporter.sendMail({
+    from: process.env.EMAIL_FROM,
+    to,
+    subject: 'Mật khẩu mới cho tài khoản y tế học đường',
+    template: 'password-email',
+    context: {
+      studentName,
+      password,
+      actionLink
+    }
+  })
+}
