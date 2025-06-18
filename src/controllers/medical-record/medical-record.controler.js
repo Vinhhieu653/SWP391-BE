@@ -56,12 +56,12 @@ export const deleteMedicalRecord = async (req, res) => {
 // Lấy các hồ sơ y tế của học sinh do 1 guardian quản lý
 export const getMedicalRecordsByGuardian = async (req, res) => {
   try {
-    const guardianUserId = req.user?.userId;
-    if (!guardianUserId) return res.status(401).json({ message: 'Unauthorized' });
+    const guardianUserId = req.user?.userId
+    if (!guardianUserId) return res.status(401).json({ message: 'Unauthorized' })
 
-    const records = await medicalRecordService.getMedicalRecordsByGuardianUserIdService(guardianUserId);
-    res.status(200).json(records);
+    const records = await medicalRecordService.getMedicalRecordsByGuardianUserIdService(guardianUserId)
+    res.status(200).json(records)
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message })
   }
-};
+}

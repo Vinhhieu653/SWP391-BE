@@ -31,7 +31,6 @@ import { seedBlogs } from './database/seeds/blogs.seed.js'
 import { seedCategories } from './database/seeds/category.seed.js'
 import applyAssociations from './models/associate/associate.js'
 
-
 dotenv.config()
 
 const app = express()
@@ -83,7 +82,7 @@ app.use('/api/v1/health-check', healthCheckRouter)
 app.use('/api/v1/vaccine', vaccineRouter)
 
 app.use('/api/v1/medical-records', medicalRecordRouter)
-app.use('/api/v1/medical-sents', medicalSentRouter);
+app.use('/api/v1/medical-sents', medicalSentRouter)
 // Xử lý lỗi
 app.use(notFoundHandler)
 app.use(errorHandler)

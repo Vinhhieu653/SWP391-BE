@@ -26,7 +26,7 @@ const HistoryOtherMedical = sequelize.define(
   },
   {
     tableName: 'History_Other_medical',
-    timestamps: false
+    timestamps: true
   }
 )
 
