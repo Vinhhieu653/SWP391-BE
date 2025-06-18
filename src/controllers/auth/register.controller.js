@@ -3,7 +3,7 @@ import * as registerService from '../../services/auth/register.service.js'
 export async function register(req, res) {
   try {
     await registerService.registerUser(req.body)
-    res.status(201).json({ message: 'Registered successfully, waiting for approval' })
+    res.status(201).json({ message: 'Registered successfully' })
   } catch (err) {
     res.status(400).json({ message: err.message })
   }
