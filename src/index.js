@@ -11,6 +11,7 @@ import notifyRoute from './routes/notify.route.js'
 import testRoute from './routes/test.route.js'
 import loginRouter from './routes/auth/login.route.js'
 import logoutRouter from './routes/auth/logout.route.js'
+import changePasswordRouter from './routes/auth/auth.route.js'
 import blogRouter from './routes/blog/blog.route.js'
 import categoryRouter from './routes/blog/category.route.js'
 import refreshTokenRouter from './routes/auth/refresh-token.route.js'
@@ -70,6 +71,7 @@ app.use(testRoute)
 app.use('/api/v1/auth', loginRouter)
 app.use('/api/v1/auth', logoutRouter)
 app.use('/api/v1/auth', refreshTokenRouter)
+app.use('/api/v1/auth', changePasswordRouter)
 app.use('/api/v1/users', registerRouter)
 app.use('/api/v1/blogs', blogRouter)
 app.use('/api/v1/upload', uploadRouter)
@@ -80,7 +82,6 @@ app.use('/api/v1/categories', categoryRouter)
 app.use('/api/v1/guardians', guardianRouter)
 app.use('/api/v1/health-check', healthCheckRouter)
 app.use('/api/v1/vaccine', vaccineRouter)
-
 app.use('/api/v1/medical-records', medicalRecordRouter)
 app.use('/api/v1/medical-sents', medicalSentRouter)
 // Xử lý lỗi

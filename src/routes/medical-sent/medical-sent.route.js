@@ -6,11 +6,11 @@ import {
   updateMedicalSent,
   deleteMedicalSent,
   getMedicalSentsByGuardian
-} from '../../controllers/medical-sent/medical-sent.controller.js';
-import { authenticateToken, authorizeRoles } from '../../middlewares/auth.middleware.js';
+} from '../../controllers/medical-sent/medical-sent.controller.js'
+import { authenticateToken, authorizeRoles } from '../../middlewares/auth.middleware.js'
 import multer from 'multer'
 
-const router = express.Router();
+const router = express.Router()
 const upload = multer({ dest: 'uploads/' })
 
 /**
@@ -118,7 +118,13 @@ router.get('/:id', getMedicalSentById)
  *         description: Dữ liệu không hợp lệ
  */
 
-router.post('/', authenticateToken, authorizeRoles('guardian', 'nurse'), upload.single('prescriptionImage'), createMedicalSent)
+router.post(
+  '/',
+  authenticateToken,
+  authorizeRoles('guardian', 'nurse'),
+  upload.single('prescriptionImage'),
+  createMedicalSent
+)
 
 /**
  * @swagger
@@ -172,7 +178,13 @@ router.post('/', authenticateToken, authorizeRoles('guardian', 'nurse'), upload.
  *         description: Không tìm thấy
  */
 
-router.put('/:id', authenticateToken, authorizeRoles('guardian', 'nurse') , upload.single('prescriptionImage'), updateMedicalSent)
+router.put(
+  '/:id',
+  authenticateToken,
+  authorizeRoles('guardian', 'nurse'),
+  upload.single('prescriptionImage'),
+  updateMedicalSent
+)
 
 /**
  * @swagger
