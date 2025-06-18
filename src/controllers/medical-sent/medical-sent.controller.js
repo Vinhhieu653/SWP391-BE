@@ -56,16 +56,16 @@ export const deleteMedicalSent = async (req, res) => {
 // Lấy các toa thuốc của học sinh do 1 guardian quản lý
 export const getMedicalSentsByGuardian = async (req, res, next) => {
   try {
-    console.log('res.user:', req.user);
-    const guardianUserId = req.user?.userId;
+    console.log('res.user:', req.user)
+    const guardianUserId = req.user?.userId
 
     if (!guardianUserId) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: 'Unauthorized' })
     }
 
-    const results = await medicalSentService.getMedicalSentsByGuardianUserIdService(guardianUserId);
-    res.status(200).json(results);
+    const results = await medicalSentService.getMedicalSentsByGuardianUserIdService(guardianUserId)
+    res.status(200).json(results)
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}

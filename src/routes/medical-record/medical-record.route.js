@@ -32,9 +32,7 @@ const router = express.Router()
  *       401:
  *         description: Không xác thực
  */
-router.get('/by-guardian', authenticateToken, authorizeRoles('guardian'), getMedicalRecordsByGuardian);
-
-
+router.get('/by-guardian', authenticateToken, authorizeRoles('guardian'), getMedicalRecordsByGuardian)
 
 /**
  * @swagger
