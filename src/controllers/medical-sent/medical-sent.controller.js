@@ -25,61 +25,60 @@ export const getMedicalSentById = async (req, res) => {
 // Tạo mới đơn thuốc đã gửi
 export const createMedicalSent = async (req, res) => {
   try {
-    let imageUrl = null;
+    let imageUrl = null
     if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path);
-      imageUrl = result.secure_url;
+      const result = await cloudinary.uploader.upload(req.file.path)
+      imageUrl = result.secure_url
     }
 
     const formData = {
       ...req.body,
-      prescriptionImage: imageUrl,
-    };
+      prescriptionImage: imageUrl
+    }
 
-    const newRecord = await medicalSentService.createMedicalSentService(formData);
+    const newRecord = await medicalSentService.createMedicalSentService(formData)
 
-    res.status(201).json(newRecord);
+    res.status(201).json(newRecord)
   } catch (error) {
     res.status(error.status || 400).json({
       status: error.status || 400,
-      message: error.message || 'Lỗi tạo đơn thuốc',
-    });
+      message: error.message || 'Lỗi tạo đơn thuốc'
+    })
   }
-};
+}
 
 // Cập nhật đơn thuốc đã gửi
 export const updateMedicalSent = async (req, res) => {
   try {
-    let imageUrl = null;
+    let imageUrl = null
 
     if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path);
-      imageUrl = result.secure_url;
+      const result = await cloudinary.uploader.upload(req.file.path)
+      imageUrl = result.secure_url
     }
 
     const formData = {
-      ...req.body,
-    };
+      ...req.body
+    }
 
     if (imageUrl) {
-      formData.prescriptionImage = imageUrl;
+      formData.prescriptionImage = imageUrl
     }
 
-    const updated = await medicalSentService.updateMedicalSentService(req.params.id, formData);
+    const updated = await medicalSentService.updateMedicalSentService(req.params.id, formData)
 
     if (!updated) {
-      return res.status(404).json({ message: 'Đơn thuốc không tồn tại' });
+      return res.status(404).json({ message: 'Đơn thuốc không tồn tại' })
     }
 
-    res.status(200).json(updated);
+    res.status(200).json(updated)
   } catch (error) {
     res.status(error.status || 400).json({
       status: error.status || 400,
-      message: error.message || 'Lỗi cập nhật đơn thuốc',
-    });
+      message: error.message || 'Lỗi cập nhật đơn thuốc'
+    })
   }
-};
-
+}
 
 // Xóa đơn thuốc đã gửi
 export const deleteMedicalSent = async (req, res) => {
