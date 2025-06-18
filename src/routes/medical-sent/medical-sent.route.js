@@ -1,10 +1,10 @@
 import express from 'express'
 import {
   getAllMedicalSents,
-    getMedicalSentById,
-    createMedicalSent,
-    updateMedicalSent,
-    deleteMedicalSent,
+  getMedicalSentById,
+  createMedicalSent,
+  updateMedicalSent,
+  deleteMedicalSent,
   getMedicalSentsByGuardian
 } from '../../controllers/medical-sent/medical-sent.controller.js';
 import { authenticateToken, authorizeRoles } from '../../middlewares/auth.middleware.js';
@@ -20,7 +20,6 @@ const upload = multer({ dest: 'uploads/' })
  *   description: API quản lý đơn thuốc đã gửi
  */
 
-
 /**
  * @swagger
  * /api/v1/medical-sents/by-guardian:
@@ -35,7 +34,7 @@ const upload = multer({ dest: 'uploads/' })
  *       401:
  *         description: Không xác thực
  */
-router.get('/by-guardian', authenticateToken, authorizeRoles('guardian'), getMedicalSentsByGuardian);
+router.get('/by-guardian', authenticateToken, authorizeRoles('guardian'), getMedicalSentsByGuardian)
 
 /**
  * @swagger
@@ -68,7 +67,6 @@ router.get('/', getAllMedicalSents)
  *         description: Không tìm thấy
  */
 router.get('/:id', getMedicalSentById)
-
 
 /**
  * @swagger

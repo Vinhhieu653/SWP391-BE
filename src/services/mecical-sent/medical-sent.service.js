@@ -1,9 +1,9 @@
-import MedicalSent from '../../models/data/medical_sent.model.js';
-import OutpatientMedication from '../../models/data/outpatient_medication.model.js';
-import MedicalRecord from '../../models/data/medicalRecord.model.js';
-import GuardianUser from '../../models/data/guardian_user.model.js';
-import User from '../../models/data/user.model.js';
-import Guardian from '../../models/data/guardian.model.js';
+import MedicalSent from '../../models/data/medical_sent.model.js'
+import OutpatientMedication from '../../models/data/outpatient_medication.model.js'
+import MedicalRecord from '../../models/data/medicalRecord.model.js'
+import GuardianUser from '../../models/data/guardian_user.model.js'
+import User from '../../models/data/user.model.js'
+import Guardian from '../../models/data/guardian.model.js'
 import Notification from '../../models/data/noti.model.js';
 
 // Tạo mới MedicalSent và liên kết OutpatientMedication
@@ -17,20 +17,20 @@ export const createMedicalSentService = async (data, creator_by = 'system') => {
     deliveryTime,
     status,
     notes
-  } = data;
+  } = data
 
-  if (!userId) throw { status: 400, message: 'userId is required' };
+  if (!userId) throw { status: 400, message: 'userId is required' }
 
   // 1. Tìm MedicalRecord theo userId
-  const medicalRecord = await MedicalRecord.findOne({ where: { userId: userId } });
-  if (!medicalRecord) throw { status: 404, message: 'Medical record not found for this user' };
+  const medicalRecord = await MedicalRecord.findOne({ where: { userId: userId } })
+  if (!medicalRecord) throw { status: 404, message: 'Medical record not found for this user' }
 
-  const MR_ID = medicalRecord.MR_ID;
+  const MR_ID = medicalRecord.MR_ID
 
   // 2. Tìm hoặc tạo OutpatientMedication theo MR_ID
-  let outpatient = await OutpatientMedication.findOne({ where: { MR_ID: MR_ID } });
+  let outpatient = await OutpatientMedication.findOne({ where: { MR_ID: MR_ID } })
   if (!outpatient) {
-    outpatient = await OutpatientMedication.create({ MR_ID: MR_ID });
+    outpatient = await OutpatientMedication.create({ MR_ID: MR_ID })
   }
 
   // 3. Tạo bản ghi MedicalSent
@@ -60,9 +60,9 @@ export const createMedicalSentService = async (data, creator_by = 'system') => {
   }));
 
 
-  const { Form_ID, Outpatient_medication, OM_ID, ...cleaned } = medicalSent.get({ plain: true });
-  return cleaned;
-};
+  const { Form_ID, Outpatient_medication, OM_ID, ...cleaned } = medicalSent.get({ plain: true })
+  return cleaned
+}
 
 // Lấy toàn bộ MedicalSent
 export const getAllMedicalSentService = async () => {
@@ -70,16 +70,16 @@ export const getAllMedicalSentService = async () => {
     include: [
       {
         model: OutpatientMedication,
-        include: [MedicalRecord],
-      },
-    ],
-  });
+        include: [MedicalRecord]
+      }
+    ]
+  })
 
   return records.map((record) => {
-    const { Form_ID, Outpatient_medication, OM_ID, ...rest } = record.get({ plain: true });
-    return rest;
-  });
-};
+    const { Form_ID, Outpatient_medication, OM_ID, ...rest } = record.get({ plain: true })
+    return rest
+  })
+}
 
 // Lấy 1 bản ghi MedicalSent theo ID
 export const getMedicalSentByIdService = async (id) => {
@@ -87,61 +87,60 @@ export const getMedicalSentByIdService = async (id) => {
     include: [
       {
         model: OutpatientMedication,
-        include: [MedicalRecord],
-      },
-    ],
-  });
+        include: [MedicalRecord]
+      }
+    ]
+  })
 
-  if (!record) throw { status: 404, message: 'Medical sent record not found' };
+  if (!record) throw { status: 404, message: 'Medical sent record not found' }
 
-const { Form_ID, Outpatient_medication, OM_ID, ...cleaned } = record.get({ plain: true });
-  return cleaned;
-};
+  const { Form_ID, Outpatient_medication, OM_ID, ...cleaned } = record.get({ plain: true })
+  return cleaned
+}
 
 // Cập nhật MedicalSent
 export const updateMedicalSentService = async (id, updateData) => {
-  const record = await MedicalSent.findByPk(id);
-  if (!record) throw { status: 404, message: 'Medical sent record not found' };
+  const record = await MedicalSent.findByPk(id)
+  if (!record) throw { status: 404, message: 'Medical sent record not found' }
 
-  await record.update(updateData);
-const { Form_ID, Outpatient_medication, OM_ID, ...cleaned } = record.get({ plain: true });
-  return cleaned;
-};
+  await record.update(updateData)
+  const { Form_ID, Outpatient_medication, OM_ID, ...cleaned } = record.get({ plain: true })
+  return cleaned
+}
 
 // Xóa MedicalSent
 export const deleteMedicalSentService = async (id) => {
-  const record = await MedicalSent.findByPk(id);
-  if (!record) throw { status: 404, message: 'Medical sent record not found' };
+  const record = await MedicalSent.findByPk(id)
+  if (!record) throw { status: 404, message: 'Medical sent record not found' }
 
-  await record.destroy();
-  return { message: 'Deleted successfully' };
-};
-
+  await record.destroy()
+  return { message: 'Deleted successfully' }
+}
 
 export const getMedicalSentsByGuardianUserIdService = async (guardianUserId) => {
   // B1: Lấy dòng Guardian theo ID
-const guardianLink = await Guardian.findOne({ where: { userId: guardianUserId } });
-  if (!guardianLink) throw { status: 404, message: 'Không tìm thấy liên kết phụ huynh-học sinh' };
+  const guardianLink = await Guardian.findOne({ where: { userId: guardianUserId } })
+  if (!guardianLink) throw { status: 404, message: 'Không tìm thấy liên kết phụ huynh-học sinh' }
 
-  const obId = guardianLink.obId;
+  const obId = guardianLink.obId
 
   // B2: Tìm tất cả học sinh (userId) có chung obId này
   const relatedGuardianUsers = await GuardianUser.findAll({
     where: { obId }
-  });
+  })
 
-  const studentUserIds = relatedGuardianUsers.map(g => g.userId);
+  const studentUserIds = relatedGuardianUsers.map((g) => g.userId)
 
-  console.log('studentUserIds:', studentUserIds);
+  console.log('studentUserIds:', studentUserIds)
 
-  if (studentUserIds.length === 0) return [];
+  if (studentUserIds.length === 0) return []
 
   // B3: Lấy các đơn thuốc (MedicalSent) của các học sinh đó
   const medicalSents = await MedicalSent.findAll({
     where: {
       User_ID: studentUserIds
     }
-  });
+  })
 
-  return medicalSents;
-};
+  return medicalSents
+}

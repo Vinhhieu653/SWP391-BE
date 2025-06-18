@@ -21,7 +21,7 @@ const Evidence = sequelize.define(
   },
   {
     tableName: 'Evidence',
-    timestamps: false
+    timestamps: true
   }
 )
 

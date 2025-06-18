@@ -83,6 +83,24 @@ const router = express.Router()
  *                           type: string
  *                         password:
  *                           type: string
+ *           example:
+ *             guardian:
+ *               fullname: "Lê Thị A"
+ *               username: "lethia01"
+ *               email: "lethia@example.com"
+ *               password: "Guardian@123"
+ *               phoneNumber: "0901123456"
+ *               roleInFamily: "Mẹ"
+ *               isCallFirst: true
+ *               students:
+ *                 - fullname: "Nguyễn Văn B"
+ *                   username: "nguyenvanb"
+ *                   email: "vanb@student.com"
+ *                   password: "Student@123"
+ *                 - fullname: "Nguyễn Thị C"
+ *                   username: "nguyenthic"
+ *                   email: "thic@student.com"
+ *                   password: "Student@456"
  *     responses:
  *       201:
  *         description: Tạo phụ huynh và học sinh thành công

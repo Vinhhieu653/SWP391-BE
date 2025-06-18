@@ -24,7 +24,7 @@ const UserEvent = sequelize.define(
   },
   {
     tableName: 'user_event',
-    timestamps: false
+    timestamps: true
   }
 )
 

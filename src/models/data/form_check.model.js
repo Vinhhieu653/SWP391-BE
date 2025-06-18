@@ -38,7 +38,7 @@ const FormCheck = sequelize.define(
   },
   {
     tableName: 'Form_Check',
-    timestamps: false
+    timestamps: true
   }
 )
 

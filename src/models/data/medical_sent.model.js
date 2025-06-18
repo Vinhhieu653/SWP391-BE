@@ -42,15 +42,11 @@ const MedicalSent = sequelize.define(
     Notes: {
       type: DataTypes.TEXT,
       allowNull: true
-    },
-    Created_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
     }
   },
   {
     tableName: 'MedicalSent',
-    timestamps: false
+    timestamps: true
   }
 )
 
