@@ -21,7 +21,7 @@ const GuardianUser = sequelize.define(
   },
   {
     tableName: 'guardian_users',
-    timestamps: false
+    timestamps: true
   }
 )
 

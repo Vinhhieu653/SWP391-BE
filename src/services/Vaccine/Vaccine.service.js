@@ -31,30 +31,30 @@ export const createVaccineHistoryService = async (data) => {
       ...data,
       MR_ID: mrId,
       Event_ID: event.eventId
-    });
-    vaccineHistories.push(vaccineHistory);
-
-
+    })
+    vaccineHistories.push(vaccineHistory)
 
     const medicalRecord = await MedicalRecord.findByPk(mrId)
     if (medicalRecord) {
       const guardianUsers = await GuardianUser.findAll({
         where: { userId: medicalRecord.userId }
-      });
+      })
       const userEvent = await UserEvent.create({
         eventId: event.eventId,
         userId: medicalRecord.userId
-      });
-      await Promise.all(guardianUsers.map(async (guardianUser) => {
-        const guardian = await Guardian.findByPk(guardianUser.obId);
-        if (guardian) {
-          await Notification.create({
-            title: 'Con bạn có lịch tiêm chủng mới',
-            mess: `Bấm vao để xem chi tiết lịch tiêm chủng cho con bạn`,
-            userId: guardian.userId
-          });
-        }
-      }));
+      })
+      await Promise.all(
+        guardianUsers.map(async (guardianUser) => {
+          const guardian = await Guardian.findByPk(guardianUser.obId)
+          if (guardian) {
+            await Notification.create({
+              title: 'Con bạn có lịch tiêm chủng mới',
+              mess: `Bấm vao để xem chi tiết lịch tiêm chủng cho con bạn`,
+              userId: guardian.userId
+            })
+          }
+        })
+      )
     }
   }
 
@@ -150,9 +150,11 @@ export const getVaccineHistoryByMRIdService = async (MR_ID) => {
   })
 
   const medicalRecord = await MedicalRecord.findByPk(MR_ID)
-  const user = medicalRecord ? await User.findByPk(medicalRecord.userId, {
-    attributes: ['fullname']
-  }) : null
+  const user = medicalRecord
+    ? await User.findByPk(medicalRecord.userId, {
+        attributes: ['fullname']
+      })
+    : null
 
   return {
     patientName: user ? user.fullname : null,
@@ -240,15 +242,16 @@ export const getStudentsByEventIdService = async (eventId) => {
           vaccine_type: history.Vaccince_type,
           date_injection: history.Date_injection
         }
-      };
-    }));
-  const filteredResult = result.filter(item => item !== null);
+      }
+    })
+  )
+  const filteredResult = result.filter((item) => item !== null)
 
   return {
     eventId,
     totalStudents: filteredResult.length,
     students: filteredResult
-  };
+  }
 }
 
 export const updateVaccineStatusByMRIdService = async (updates) => {
@@ -271,7 +274,7 @@ export const updateVaccineStatusByMRIdService = async (updates) => {
 
 
   await Promise.all(
-    updates.map(item =>
+    updates.map((item) =>
       VaccineHistory.update(
         {
           Status: item.status,
@@ -280,9 +283,9 @@ export const updateVaccineStatusByMRIdService = async (updates) => {
         { where: { VH_ID: item.VH_ID } }
       )
     )
-  );
+  )
 
-  return await VaccineHistory.findAll({ where: { VH_ID: vhIdList } });
+  return await VaccineHistory.findAll({ where: { VH_ID: vhIdList } })
 }
 
 export const getAllVaccineTypesService = async () => {
@@ -292,9 +295,7 @@ export const getAllVaccineTypesService = async () => {
     ],
     raw: true
   })
-  return types
-    .map(item => item.Vaccine_name)
-    .filter(type => !!type)
+  return types.map((item) => item.Vaccine_name).filter((type) => !!type)
 }
 
 export const getVaccineHistoryByVaccineNameService = async (vaccineName) => {
@@ -303,17 +304,19 @@ export const getVaccineHistoryByVaccineNameService = async (vaccineName) => {
     order: [['Date_injection', 'DESC']]
   })
 
-  const result = await Promise.all(records.map(async (record) => {
-    const medicalRecord = await MedicalRecord.findByPk(record.MR_ID)
-    if (medicalRecord) {
-      record.dataValues.MedicalRecord = medicalRecord
-      const user = await User.findByPk(medicalRecord.userId, {
-        attributes: ['fullname']
-      })
-      record.dataValues.PatientName = user ? user.fullname : null
-    }
-    return record
-  }))
+  const result = await Promise.all(
+    records.map(async (record) => {
+      const medicalRecord = await MedicalRecord.findByPk(record.MR_ID)
+      if (medicalRecord) {
+        record.dataValues.MedicalRecord = medicalRecord
+        const user = await User.findByPk(medicalRecord.userId, {
+          attributes: ['fullname']
+        })
+        record.dataValues.PatientName = user ? user.fullname : null
+      }
+      return record
+    })
+  )
 
   return result
 }
@@ -329,7 +332,7 @@ export const getVaccineHistoryByGuardianUserIdService = async (guardianUserId) =
   }
 
   const guardianUsers = await GuardianUser.findAll({
-    where: { obId: guardian.obId },
+    where: { obId: guardian.obId }
   })
 
   if (!guardianUsers.length) {
@@ -340,7 +343,7 @@ export const getVaccineHistoryByGuardianUserIdService = async (guardianUserId) =
     }
   }
 
-  const obIds = guardianUsers.map(gu => gu.userId)
+  const obIds = guardianUsers.map((gu) => gu.userId)
 
   const medicalRecords = await MedicalRecord.findAll({
     where: { userId: obIds }
@@ -349,25 +352,26 @@ export const getVaccineHistoryByGuardianUserIdService = async (guardianUserId) =
   let totalVaccine = 0
   let totalNeedConfirm = 0
 
-  const allHistories = await Promise.all(medicalRecords.map(async (mr) => {
-    const user = await User.findByPk(mr.userId, { attributes: ['id', 'fullname'] })
-    const vaccineHistory = await VaccineHistory.findAll({
-      where: { MR_ID: mr.ID },
-      order: [['Date_injection', 'DESC']]
+  const allHistories = await Promise.all(
+    medicalRecords.map(async (mr) => {
+      const user = await User.findByPk(mr.userId, { attributes: ['id', 'fullname'] })
+      const vaccineHistory = await VaccineHistory.findAll({
+        where: { MR_ID: mr.ID },
+        order: [['Date_injection', 'DESC']]
+      })
+      totalVaccine += vaccineHistory.filter((vh) => vh.Status === 'Đã tiêm').length
+      totalNeedConfirm += vaccineHistory.filter((vh) => vh.Status === 'Chờ xác nhận').length
+      return {
+        totalVaccine,
+        totalNeedConfirm,
+        medicalRecord: mr,
+        user: user ? { id: user.id, fullname: user.fullname } : null,
+        vaccineHistory
+      }
     })
-    totalVaccine += vaccineHistory.filter(vh => vh.Status === 'Đã tiêm').length
-    totalNeedConfirm += vaccineHistory.filter(vh => vh.Status === 'Chờ xác nhận').length
-    return {
-      totalVaccine,
-      totalNeedConfirm,
-      medicalRecord: mr,
-      user: user ? { id: user.id, fullname: user.fullname } : null,
-      vaccineHistory
-    }
-  }))
+  )
 
   return {
     histories: allHistories
   }
 }
-

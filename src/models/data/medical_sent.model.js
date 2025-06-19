@@ -24,7 +24,7 @@ const MedicalSent = sequelize.define(
       allowNull: true
     },
     Image_prescription: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: true
     },
     Medications: {
@@ -42,15 +42,11 @@ const MedicalSent = sequelize.define(
     Notes: {
       type: DataTypes.TEXT,
       allowNull: true
-    },
-    Created_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
     }
   },
   {
     tableName: 'MedicalSent',
-    timestamps: false
+    timestamps: true
   }
 )
 

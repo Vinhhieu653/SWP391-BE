@@ -43,7 +43,7 @@ const MedicalRecord = sequelize.define(
   },
   {
     tableName: 'Medical_Record',
-    timestamps: false
+    timestamps: true
   }
 )
 

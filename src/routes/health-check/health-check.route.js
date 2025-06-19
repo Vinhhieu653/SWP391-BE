@@ -39,9 +39,6 @@ const router = Router()
  *               schoolYear:
  *                 type: string
  *                 example: "2025-2026"
- *               type:
- *                 type: string
- *                 example: "health check"
  *     responses:
  *       200:
  *         description: Đã tạo đợt khám
@@ -245,9 +242,6 @@ router.post('/:id/send-confirm', authenticateToken, authorizeRoles('nurse'), ctr
  *               is_need_meet:
  *                 type: boolean
  *                 example: false
- *               is_confirmed_by_guardian:
- *                 type: boolean
- *                 example: true
  *     responses:
  *       200:
  *         description: Đã lưu kết quả

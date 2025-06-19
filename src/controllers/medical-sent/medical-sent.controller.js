@@ -1,4 +1,5 @@
 import * as medicalSentService from '../../services/mecical-sent/medical-sent.service.js'
+import cloudinary from '../../utils/cloudinary.js'
 
 // Lấy tất cả đơn thuốc đã gửi
 export const getAllMedicalSents = async (req, res) => {
@@ -24,21 +25,58 @@ export const getMedicalSentById = async (req, res) => {
 // Tạo mới đơn thuốc đã gửi
 export const createMedicalSent = async (req, res) => {
   try {
-    const newRecord = await medicalSentService.createMedicalSentService(req.body)
+    let imageUrl = null
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path)
+      imageUrl = result.secure_url
+    }
+
+    const formData = {
+      ...req.body,
+      prescriptionImage: imageUrl
+    }
+
+    const newRecord = await medicalSentService.createMedicalSentService(formData)
+
     res.status(201).json(newRecord)
   } catch (error) {
-    res.status(400).json({ message: error.message })
+    res.status(error.status || 400).json({
+      status: error.status || 400,
+      message: error.message || 'Lỗi tạo đơn thuốc'
+    })
   }
 }
 
 // Cập nhật đơn thuốc đã gửi
 export const updateMedicalSent = async (req, res) => {
   try {
-    const updated = await medicalSentService.updateMedicalSentService(req.params.id, req.body)
-    if (!updated) return res.status(404).json({ message: 'Đơn thuốc không tồn tại' })
+    let imageUrl = null
+
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path)
+      imageUrl = result.secure_url
+    }
+
+    const formData = {
+      ...req.body
+    }
+
+    if (imageUrl) {
+      formData.prescriptionImage = imageUrl
+    }
+
+    const updated = await medicalSentService.updateMedicalSentService(req.params.id, formData)
+
+    if (!updated) {
+      return res.status(404).json({ message: 'Đơn thuốc không tồn tại' })
+    }
+
     res.status(200).json(updated)
   } catch (error) {
-    res.status(400).json({ message: error.message })
+    res.status(error.status || 400).json({
+      status: error.status || 400,
+      message: error.message || 'Lỗi cập nhật đơn thuốc'
+    })
   }
 }
 
@@ -56,16 +94,16 @@ export const deleteMedicalSent = async (req, res) => {
 // Lấy các toa thuốc của học sinh do 1 guardian quản lý
 export const getMedicalSentsByGuardian = async (req, res, next) => {
   try {
-    console.log('res.user:', req.user);
-    const guardianUserId = req.user?.userId;
+    console.log('res.user:', req.user)
+    const guardianUserId = req.user?.userId
 
     if (!guardianUserId) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: 'Unauthorized' })
     }
 
-    const results = await medicalSentService.getMedicalSentsByGuardianUserIdService(guardianUserId);
-    res.status(200).json(results);
+    const results = await medicalSentService.getMedicalSentsByGuardianUserIdService(guardianUserId)
+    res.status(200).json(results)
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}

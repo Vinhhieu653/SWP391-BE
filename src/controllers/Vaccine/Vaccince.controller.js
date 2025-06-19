@@ -71,9 +71,10 @@ export const confirmVaccineHistory = async (req, res) => {
     const { isConfirmed } = req.body
     const confirmed = await VaccineService.confirmVaccineHistoryService(req.params.id, isConfirmed)
     res.status(200).json({
-      message: isConfirmed === true || isConfirmed === 'true'
-        ? 'Vaccine history confirmed and user event created'
-        : 'Vaccine history marked as not allowed to inject',
+      message:
+        isConfirmed === true || isConfirmed === 'true'
+          ? 'Vaccine history confirmed and user event created'
+          : 'Vaccine history marked as not allowed to inject',
       data: confirmed
     })
   } catch (error) {
