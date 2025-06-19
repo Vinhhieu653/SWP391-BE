@@ -26,7 +26,7 @@ const HistoryCheck = sequelize.define(
   },
   {
     tableName: 'History_check',
-    timestamps: false
+    timestamps: true
   }
 )
 

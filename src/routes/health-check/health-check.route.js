@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import * as ctrl from '../../controllers/health-check/health-check.controller.js'
-
+import { authenticateToken, authorizeRoles } from '../../middlewares/auth.middleware.js'
 const router = Router()
 
 /**
@@ -43,7 +43,131 @@ const router = Router()
  *       200:
  *         description: Đã tạo đợt khám
  */
-router.post('/', ctrl.createHealthCheck)
+router.post('/', authenticateToken, authorizeRoles('nurse'), ctrl.createHealthCheck)
+
+/**
+ * @swagger
+ * /api/v1/health-check:
+ *   get:
+ *     summary: Lấy danh sách đợt khám sức khỏe
+ *     tags: [HealthCheck]
+ *     responses:
+ *       200:
+ *         description: Lấy thành công
+ */
+router.get('/', authenticateToken, authorizeRoles('nurse'), ctrl.getHealthChecks)
+
+/**
+ * @swagger
+ * /api/v1/health-check:
+ *   put:
+ *     summary: Cập nhật đợt khám sức khỏe
+ *     tags: [HealthCheck]
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: "Khám sức khỏe đầu năm lớp 6"
+ *               description:
+ *                 type: string
+ *                 example: "Đợt khám cho học sinh chuyển cấp khối 6"
+ *               dateEvent:
+ *                 type: string
+ *                 format: date
+ *                 example: "2025-08-25"
+ *               schoolYear:
+ *                 type: string
+ *                 example: "2025-2026"
+ *               type:
+ *                 type: string
+ *                 example: "health check"
+ *     responses:
+ *       200:
+ *         description: Cập nhật thành công
+ */
+router.put('/', authenticateToken, authorizeRoles('nurse'), ctrl.updateHealthCheck)
+
+/**
+ * @swagger
+ * /api/v1/health-check:
+ *   delete:
+ *     summary: Xoá đợt khám sức khỏe
+ *     tags: [HealthCheck]
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Xoá thành công
+ */
+router.delete('/', authenticateToken, authorizeRoles('nurse'), ctrl.deleteHealthCheck)
+
+/**
+ * @swagger
+ * /api/v1/health-check/{id}:
+ *   get:
+ *     summary: Lấy chi tiết một đợt khám sức khỏe
+ *     tags: [HealthCheck]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID của đợt khám sức khỏe
+ *     responses:
+ *       200:
+ *         description: Lấy thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     eventId:
+ *                       type: integer
+ *                       example: 12
+ *                     dateEvent:
+ *                       type: string
+ *                       format: date
+ *                       example: "2025-08-25"
+ *                     type:
+ *                       type: string
+ *                       example: "health check"
+ *                     title:
+ *                       type: string
+ *                       example: "Khám sức khỏe đầu năm lớp 6"
+ *                     description:
+ *                       type: string
+ *                       example: "Đợt khám cho học sinh chuyển cấp khối 6"
+ *                     schoolYear:
+ *                       type: string
+ *                       example: "2025-2026"
+ *       404:
+ *         description: Không tìm thấy
+ *       500:
+ *         description: Lỗi server
+ */
+router.get('/:id', authenticateToken, authorizeRoles('nurse'), ctrl.getHealthCheckById)
 
 /**
  * @swagger
@@ -62,7 +186,7 @@ router.post('/', ctrl.createHealthCheck)
  *       200:
  *         description: Đã gửi form xác nhận
  */
-router.post('/:id/send-confirm', ctrl.sendConfirmForms)
+router.post('/:id/send-confirm', authenticateToken, authorizeRoles('nurse'), ctrl.sendConfirmForms)
 
 /**
  * @swagger
@@ -118,14 +242,11 @@ router.post('/:id/send-confirm', ctrl.sendConfirmForms)
  *               is_need_meet:
  *                 type: boolean
  *                 example: false
- *               is_confirmed_by_guardian:
- *                 type: boolean
- *                 example: true
  *     responses:
  *       200:
  *         description: Đã lưu kết quả
  */
-router.post('/:id/submit-result', ctrl.submitResult)
+router.post('/:id/submit-result', authenticateToken, authorizeRoles('nurse'), ctrl.submitResult)
 
 /**
  * @swagger
@@ -144,146 +265,7 @@ router.post('/:id/submit-result', ctrl.submitResult)
  *       200:
  *         description: Đã gửi kết quả về phụ huynh
  */
-router.post('/:id/send-result', ctrl.sendResult)
-
-/**
- * @swagger
- * tags:
- *   - name: HealthCheck
- *     description: API quản lý khám sức khỏe định kỳ
- */
-
-/**
- * @swagger
- * /api/v1/health-check:
- *   post:
- *     summary: Tạo đợt khám sức khỏe
- *     tags: [HealthCheck]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - dateEvent
- *               - schoolYear
- *             properties:
- *               title:
- *                 type: string
- *               description:
- *                 type: string
- *               dateEvent:
- *                 type: string
- *                 format: date
- *               schoolYear:
- *                 type: string
- *     responses:
- *       200:
- *         description: Đã tạo đợt khám
- */
-
-/**
- * @swagger
- * /api/v1/health-check/{id}/send-confirm:
- *   post:
- *     summary: Gửi form xác nhận đến phụ huynh
- *     tags: [HealthCheck]
- *     parameters:
- *       - name: id
- *         in: path
- *         description: ID đợt khám
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Đã gửi form xác nhận
- */
-
-/**
- * @swagger
- * /api/v1/health-check/form/{formId}/confirm:
- *   patch:
- *     summary: Phụ huynh xác nhận form khám
- *     tags: [HealthCheck]
- *     parameters:
- *       - name: formId
- *         in: path
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Đã xác nhận form
- */
-
-/**
- * @swagger
- * /api/v1/health-check/{id}/submit-result:
- *   post:
- *     summary: Y tá nhập kết quả khám cho học sinh
- *     tags: [HealthCheck]
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - student_id
- *             properties:
- *               student_id:
- *                 type: integer
- *               height:
- *                 type: number
- *               weight:
- *                 type: number
- *               blood_pressure:
- *                 type: string
- *               vision_left:
- *                 type: number
- *               vision_right:
- *                 type: number
- *               dental_status:
- *                 type: string
- *               ent_status:
- *                 type: string
- *               skin_status:
- *                 type: string
- *               general_conclusion:
- *                 type: string
- *               is_need_meet:
- *                 type: boolean
- *               is_confirmed_by_guardian:
- *                 type: boolean
- *     responses:
- *       200:
- *         description: Đã lưu kết quả
- */
-
-/**
- * @swagger
- * /api/v1/health-check/{id}/send-result:
- *   post:
- *     summary: Gửi kết quả khám đến phụ huynh
- *     tags: [HealthCheck]
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Đã gửi kết quả về phụ huynh
- */
+router.post('/:id/send-result', authenticateToken, authorizeRoles('nurse'), ctrl.sendResult)
 
 /**
  * @swagger
@@ -301,6 +283,25 @@ router.post('/:id/send-result', ctrl.sendResult)
  *       200:
  *         description: Danh sách học sinh
  */
+router.get('/:id/students', authenticateToken, authorizeRoles('nurse'), ctrl.getStudentsByEvent)
+
+/**
+ * @swagger
+ * /api/v1/health-check/form/{formId}/confirm:
+ *   patch:
+ *     summary: Phụ huynh xác nhận form khám
+ *     tags: [HealthCheck]
+ *     parameters:
+ *       - name: formId
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Đã xác nhận form
+ */
+router.patch('/form/:formId/confirm', authenticateToken, authorizeRoles('nurse'), ctrl.confirmForm)
 
 /**
  * @swagger
@@ -318,10 +319,6 @@ router.post('/:id/send-result', ctrl.sendResult)
  *       200:
  *         description: Chi tiết form khám
  */
-
-// src/routes/health-check/index.js
-router.patch('/form/:formId/confirm', ctrl.confirmForm)
-router.get('/:id/students', ctrl.getStudentsByEvent)
-router.get('/form/:formId', ctrl.getFormDetail)
+router.get('/form/:formId', authenticateToken, authorizeRoles('nurse'), ctrl.getFormDetail)
 
 export default router

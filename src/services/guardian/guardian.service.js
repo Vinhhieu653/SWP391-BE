@@ -207,3 +207,116 @@ export const getStudentsByUserId = async (userId) => {
     students
   }
 }
+
+export const addStudentByGuardianId = async (obId, studentData) => {
+  const guardian = await Guardian.findOne({ where: { obId } })
+  if (!guardian) {
+    throw Object.assign(new Error('Guardian not found'), { status: 404 })
+  }
+
+  const existingUsername = await User.findOne({ where: { username: studentData.username } })
+  if (existingUsername) throw Object.assign(new Error('Student username already taken'), { status: 400 })
+  const existingEmail = await User.findOne({ where: { email: studentData.email } })
+  if (existingEmail) throw Object.assign(new Error('Student email already taken'), { status: 400 })
+
+  const studentUser = await registerService.registerUser({
+    fullname: studentData.fullname,
+    username: studentData.username,
+    email: studentData.email,
+    password: studentData.password,
+    phoneNumber: studentData.phoneNumber || null,
+    roleId: 3
+  })
+
+  await GuardianUser.create({
+    obId: guardian.obId,
+    userId: studentUser.id
+  })
+
+  return {
+    message: 'Student added successfully',
+    data: {
+      student: {
+        id: studentUser.id,
+        username: studentUser.username,
+        fullname: studentUser.fullname,
+        email: studentUser.email,
+        phoneNumber: studentUser.phoneNumber
+      }
+    }
+  }
+}
+
+export const updateStudentByGuardianId = async (obId, studentId, studentData) => {
+  const guardian = await Guardian.findOne({ where: { obId } })
+  if (!guardian) {
+    throw Object.assign(new Error('Guardian not found'), { status: 404 })
+  }
+
+  // Check if student belongs to guardian
+  const link = await GuardianUser.findOne({
+    where: { obId: guardian.obId, userId: studentId }
+  })
+  if (!link) {
+    throw Object.assign(new Error('Student not found for this guardian'), { status: 404 })
+  }
+
+  const student = await User.findByPk(studentId)
+  if (!student) {
+    throw Object.assign(new Error('Student not found'), { status: 404 })
+  }
+
+  // Check username/email uniqueness if changed
+  if (studentData.username && studentData.username !== student.username) {
+    const existing = await User.findOne({ where: { username: studentData.username } })
+    if (existing) throw Object.assign(new Error('Username already taken'), { status: 400 })
+  }
+  if (studentData.email && studentData.email !== student.email) {
+    const existing = await User.findOne({ where: { email: studentData.email } })
+    if (existing) throw Object.assign(new Error('Email already taken'), { status: 400 })
+  }
+
+  // Update student data
+  await student.update({
+    fullname: studentData.fullname || student.fullname,
+    username: studentData.username || student.username,
+    email: studentData.email || student.email,
+    phoneNumber: studentData.phoneNumber || student.phoneNumber
+  })
+
+  return {
+    message: 'Student updated successfully',
+    data: {
+      student: {
+        id: student.id,
+        username: student.username,
+        fullname: student.fullname,
+        email: student.email,
+        phoneNumber: student.phoneNumber
+      }
+    }
+  }
+}
+
+export const deleteStudentByGuardianId = async (obId, studentId) => {
+  const guardian = await Guardian.findOne({ where: { obId } })
+  if (!guardian) {
+    throw Object.assign(new Error('Guardian not found'), { status: 404 })
+  }
+
+  // Check if student belongs to guardian
+  const link = await GuardianUser.findOne({
+    where: { obId: guardian.obId, userId: studentId }
+  })
+  if (!link) {
+    throw Object.assign(new Error('Student not found for this guardian'), { status: 404 })
+  }
+
+  // Delete link and student user
+  await GuardianUser.destroy({ where: { obId: guardian.obId, userId: studentId } })
+  await User.destroy({ where: { id: studentId } })
+
+  return {
+    message: 'Student deleted successfully'
+  }
+}

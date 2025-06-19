@@ -10,28 +10,43 @@ const MedicalSent = sequelize.define(
       primaryKey: true,
       autoIncrement: true
     },
-    Form_ID: {
+    User_ID: {
+      // userId: người gửi hoặc người nhận đơn
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    Sent_by: {
-      type: DataTypes.STRING
+    Guardian_phone: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    Class: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     Image_prescription: {
-      type: DataTypes.TEXT
+      type: DataTypes.STRING,
+      allowNull: true
     },
-    Date_sent: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
+    Medications: {
+      type: DataTypes.TEXT,
+      allowNull: true
     },
-    Is_confirm: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
+    Delivery_time: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    Status: {
+      type: DataTypes.STRING,
+      defaultValue: 'pending'
+    },
+    Notes: {
+      type: DataTypes.TEXT,
+      allowNull: true
     }
   },
   {
     tableName: 'MedicalSent',
-    timestamps: false
+    timestamps: true
   }
 )
 
