@@ -14,10 +14,13 @@ export const createVaccineHistory = async (req, res) => {
 
 export const createVaccineWithEvidence = async (req, res) => {
   try {
-    const results = await VaccineService.createVaccineHistoryWithEvidenceService(req.body, req.file)
+    const result = await VaccineService.createVaccineHistoryWithEvidenceService(
+      req.body,
+      req.file
+    )
     res.status(201).json({
-      message: 'Vaccine histories with evidence created successfully',
-      data: results
+      message: 'Vaccine history with evidence created successfully',
+      data: result[0]
     })
   } catch (error) {
     res.status(error.status || 500).json({ message: error.message || 'Internal server error' })
@@ -65,7 +68,6 @@ export const updateVaccineHistory = async (req, res) => {
 
 export const confirmVaccineHistory = async (req, res) => {
   try {
-    // Nhận giá trị xác nhận từ body: { isConfirmed: true/false }
     const { isConfirmed } = req.body
     const confirmed = await VaccineService.confirmVaccineHistoryService(req.params.id, isConfirmed)
     res.status(200).json({
@@ -103,9 +105,8 @@ export const getStudentsByEventId = async (req, res) => {
 
 export const updateVaccineStatusByMRId = async (req, res) => {
   try {
-    // Nhận mảng update từ body: [{ VH_ID, status, note_affter_injection }, ...]
-    const updates = req.body.updates
-    const records = await VaccineService.updateVaccineStatusByMRIdService(updates)
+    const updates = req.body.updates;
+    const records = await VaccineService.updateVaccineStatusByMRIdService(updates);
     res.status(200).json({
       message: 'Vaccine status updated successfully',
       data: records

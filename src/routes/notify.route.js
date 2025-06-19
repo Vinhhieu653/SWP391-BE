@@ -1,5 +1,5 @@
 import express from 'express'
-import { getNotificationsByUser } from '../controllers/Notification/notifycation.controller.js'
+import { getNotificationsByUser, markNotificationAsRead } from '../controllers/Notification/notifycation.controller.js'
 import { authenticateToken } from '../middlewares/auth.middleware.js'
 
 const router = express.Router()
@@ -74,5 +74,40 @@ router.post('/', (req, res) => {
  *                   type: integer
  */
 router.get('/user/:userId', authenticateToken, getNotificationsByUser)
+
+/**
+ * @swagger
+ * /api/v1/notify/mark-read:
+ *   put:
+ *     summary: Đánh dấu thông báo là đã đọc
+ *     tags: [Notify]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               notificationIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *                 description: Danh sách notificationId cần đánh dấu đã đọc
+ *     responses:
+ *       200:
+ *         description: Đánh dấu thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 updatedCount:
+ *                   type: integer
+ */
+router.put('/mark-read', authenticateToken, markNotificationAsRead)
 
 export default router
