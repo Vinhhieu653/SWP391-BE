@@ -102,3 +102,48 @@ export const getMedicalRecordsByGuardianUserIdService = async (guardianUserId) =
     }
   })
 }
+
+export const createStudentWithMedicalRecord = async ({ guardianUserId, student, medicalRecord }) => {
+  if (!guardianUserId || !student || !medicalRecord) {
+    const error = new Error('Missing guardian or student/medical data');
+    error.status = 400;
+    throw error;
+  }
+
+  // Đăng ký user học sinh cơ bản (chỉ cần fullname, dateOfBirth, gender)
+  const studentUser = await User.create({
+    fullname: student.fullname,
+    dateOfBirth: student.dateOfBirth,
+    gender: student.gender,
+    roleId: 3
+  });
+
+  // Tạo hồ sơ y tế, gán với userId vừa tạo
+  const medicalRecordCreated = await MedicalRecord.create({
+    ...medicalRecord,
+    userId: studentUser.id,
+    fullName: student.fullname,
+    dateOfBirth: student.dateOfBirth,
+    gender: student.gender
+  });
+
+  console.log('Medical record created:', guardianUserId);
+  // Tìm guardian theo userId
+  const guardian = await Guardian.findOne({ where: { userId: guardianUserId } });
+  if (!guardian) throw Object.assign(new Error('Guardian not found'), { status: 404 });
+
+  // Gán học sinh vào guardian
+  await GuardianUser.create({
+    obId: guardian.obId,
+    userId: studentUser.id
+  });
+
+  return {
+    message: 'Student and medical record created successfully',
+    data: {
+      student: studentUser,
+      medicalRecord: medicalRecordCreated
+    }
+  };
+};
+

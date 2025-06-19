@@ -5,7 +5,8 @@ import {
   getMedicalRecordById,
   updateMedicalRecord,
   deleteMedicalRecord,
-  getMedicalRecordsByGuardian
+  getMedicalRecordsByGuardian,
+  createStudentAndMedical
 } from '../../controllers/medical-record/medical-record.controler.js'
 import { authenticateToken, authorizeRoles } from '../../middlewares/auth.middleware.js'
 
@@ -235,5 +236,104 @@ router.put('/:id', authenticateToken, authorizeRoles('guardian', 'nurse'), updat
  *         description: Không tìm thấy
  */
 router.delete('/:id', authenticateToken, authorizeRoles('guardian', 'nurse'), deleteMedicalRecord)
+
+/**
+ * @swagger
+ * /api/v1/medical-records/student:
+ *   post:
+ *     summary: Tạo học sinh mới và hồ sơ y tế, đồng thời gán vào guardian hiện tại
+ *     tags: [MedicalRecord]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - guardianUserId
+ *               - student
+ *               - medicalRecord
+ *             properties:
+ *               guardianUserId:
+ *                 type: integer
+ *                 example: 1
+ *               student:
+ *                 type: object
+ *                 required:
+ *                   - fullname
+ *                   - dateOfBirth
+ *                   - gender
+ *                 properties:
+ *                   fullname:
+ *                     type: string
+ *                     example: "Nguyễn Văn A"
+ *                   dateOfBirth:
+ *                     type: string
+ *                     format: date
+ *                     example: "2014-09-15"
+ *                   gender:
+ *                     type: string
+ *                     example: "Nam"
+ *               medicalRecord:
+ *                 type: object
+ *                 required:
+ *                   - class
+ *                   - height
+ *                   - weight
+ *                   - bloodType
+ *                 properties:
+ *                   class:
+ *                     type: string
+ *                     example: "Lớp 4A"
+ *                   height:
+ *                     type: number
+ *                     example: 130
+ *                   weight:
+ *                     type: number
+ *                     example: 28
+ *                   bloodType:
+ *                     type: string
+ *                     example: "O"
+ *                   chronicDiseases:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         name:
+ *                           type: string
+ *                           example: "Hen suyễn"
+ *                   allergies:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         name:
+ *                           type: string
+ *                           example: "Phấn hoa"
+ *                   pastIllnesses:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         disease:
+ *                           type: string
+ *                           example: "Sốt xuất huyết"
+ *                         date:
+ *                           type: string
+ *                           format: date
+ *                           example: "2023-05-01"
+ *                         treatment:
+ *                           type: string
+ *                           example: "Nghỉ ngơi + truyền dịch"
+ *     responses:
+ *       201:
+ *         description: Tạo học sinh và hồ sơ y tế thành công
+ *       400:
+ *         description: Dữ liệu không hợp lệ
+ */
+router.post('/student', authenticateToken, authorizeRoles('guardian', 'nurse'), createStudentAndMedical)
+
 
 export default router

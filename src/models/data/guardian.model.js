@@ -18,6 +18,10 @@ const Guardian = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false
     },
+    address: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     isCallFirst: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
