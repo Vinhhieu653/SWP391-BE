@@ -3,7 +3,6 @@ import Notification from '../../models/data/noti.model.js'
 export const getNotificationsByUserId = async (userId, page = 1, limit = 10) => {
   const offset = (page - 1) * limit
 
-  // Get total unread notifications
   const unreadCount = await Notification.count({
     where: {
       userId,
@@ -11,7 +10,6 @@ export const getNotificationsByUserId = async (userId, page = 1, limit = 10) => 
     }
   })
 
-  // Get paginated notifications
   const notifications = await Notification.findAll({
     where: { userId },
     order: [['createdAt', 'DESC']],
@@ -19,7 +17,6 @@ export const getNotificationsByUserId = async (userId, page = 1, limit = 10) => 
     offset
   })
 
-  // Get total count for pagination
   const totalCount = await Notification.count({
     where: { userId }
   })
@@ -33,4 +30,13 @@ export const getNotificationsByUserId = async (userId, page = 1, limit = 10) => 
     },
     unreadCount
   }
+}
+
+export const markNotificationAsReadService = async (notificationIds) => {
+  const ids = Array.isArray(notificationIds) ? notificationIds : [notificationIds];
+  const [updatedCount] = await Notification.update(
+    { isRead: true },
+    { where: { notiId: ids } }
+  );
+  return updatedCount;
 }
