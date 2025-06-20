@@ -289,7 +289,7 @@ router.get('/:id/students', authenticateToken, authorizeRoles('nurse'), ctrl.get
  * @swagger
  * /api/v1/health-check/form/{formId}/confirm:
  *   patch:
- *     summary: Phụ huynh xác nhận form khám
+ *     summary: Phụ huynh xác nhận hoặc từ chối form khám
  *     tags: [HealthCheck]
  *     parameters:
  *       - name: formId
@@ -297,10 +297,26 @@ router.get('/:id/students', authenticateToken, authorizeRoles('nurse'), ctrl.get
  *         required: true
  *         schema:
  *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               action:
+ *                 type: string
+ *                 enum: [approve, reject]
+ *                 example: approve
  *     responses:
  *       200:
- *         description: Đã xác nhận form
+ *         description: Đã cập nhật trạng thái form
+ *       400:
+ *         description: Hành động không hợp lệ
+ *       404:
+ *         description: Không tìm thấy form
  */
+
 router.patch('/form/:formId/confirm', authenticateToken, authorizeRoles('nurse'), ctrl.confirmForm)
 
 /**

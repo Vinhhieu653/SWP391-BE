@@ -9,7 +9,9 @@ const users = [
     email: 'admin@example.com',
     password: 'Login123@',
     phoneNumber: '0123456789',
-    roleName: 'admin'
+    roleName: 'admin',
+    dateOfBirth: '1990-01-01',
+    gender: 'male'
   },
   {
     fullname: 'Nurse One',
@@ -17,7 +19,9 @@ const users = [
     email: 'nurse1@example.com',
     password: 'Login123@',
     phoneNumber: '0987654321',
-    roleName: 'nurse'
+    roleName: 'nurse',
+    dateOfBirth: '1992-03-15',
+    gender: 'female'
   },
   {
     fullname: 'Student One',
@@ -25,7 +29,9 @@ const users = [
     email: 'student1@example.com',
     password: 'Login123@',
     phoneNumber: '0909090909',
-    roleName: 'student'
+    roleName: 'student',
+    dateOfBirth: '2010-08-10',
+    gender: 'male'
   },
   {
     fullname: 'Guardian One',
@@ -33,7 +39,9 @@ const users = [
     email: 'guardian1@example.com',
     password: 'Login123@',
     phoneNumber: '0911223344',
-    roleName: 'guardian'
+    roleName: 'guardian',
+    dateOfBirth: '1985-05-20',
+    gender: 'female'
   },
   {
     fullname: 'Nurse two',
@@ -41,7 +49,9 @@ const users = [
     email: 'nurse2@example.com',
     password: 'Login123@',
     phoneNumber: '0987654321',
-    roleName: 'nurse'
+    roleName: 'nurse',
+    dateOfBirth: '1991-11-30',
+    gender: 'female'
   }
 ]
 
@@ -61,7 +71,9 @@ export async function seedUsers() {
         email: u.email,
         password: passwordHash,
         phoneNumber: u.phoneNumber,
-        roleId: role.id
+        roleId: role.id,
+        dateOfBirth: u.dateOfBirth,
+        gender: u.gender
       }
     })
 

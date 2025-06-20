@@ -66,7 +66,6 @@ router.get('/', getAllMedicalRecords)
  *         description: Không tìm thấy
  */
 router.get('/:id', getMedicalRecordById)
-
 /**
  * @swagger
  * /api/v1/medical-records:
@@ -103,43 +102,20 @@ router.get('/:id', getMedicalRecordById)
  *                 type: string
  *                 example: "Lớp 1A"
  *               chronicDiseases:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     name:
- *                       type: string
- *                       example: "Hen suyễn nhẹ"
+ *                 type: string
+ *                 example: "Hen suyễn nhẹ, Tim mạch"
  *               allergies:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     name:
- *                       type: string
- *                       example: "Tôm cua"
+ *                 type: string
+ *                 example: "Tôm cua, Phấn hoa"
  *               pastIllnesses:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     disease:
- *                       type: string
- *                       example: "Viêm phổi"
- *                     date:
- *                       type: string
- *                       format: date
- *                       example: "2020-12-10"
- *                     treatment:
- *                       type: string
- *                       example: "Kháng sinh"
+ *                 type: string
+ *                 example: "2020-12-10 - Viêm phổi (Kháng sinh)"
  *     responses:
  *       201:
  *         description: Tạo hồ sơ thành công
  *       400:
  *         description: Dữ liệu không hợp lệ
  */
-
 router.post('/', authenticateToken, authorizeRoles('guardian', 'nurse'), createMedicalRecord)
 
 /**
@@ -334,6 +310,5 @@ router.delete('/:id', authenticateToken, authorizeRoles('guardian', 'nurse'), de
  *         description: Dữ liệu không hợp lệ
  */
 router.post('/student', authenticateToken, authorizeRoles('guardian', 'nurse'), createStudentAndMedical)
-
 
 export default router

@@ -181,7 +181,7 @@ export async function submitResult(
     skin_status,
     general_conclusion,
     is_need_meet,
-    is_confirmed_by_guardian
+    status
   }
 ) {
   const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
@@ -200,7 +200,7 @@ export async function submitResult(
       Skin_Status: skin_status,
       General_Conclusion: general_conclusion,
       Is_need_meet: is_need_meet,
-      Is_confirmed_by_guardian: is_confirmed_by_guardian
+      status: status
     },
     {
       where: {
@@ -249,10 +249,18 @@ export async function sendResult(eventId) {
   }
 }
 
-export async function confirmForm(formId) {
+export async function confirmForm(formId, action) {
   const form = await FormCheck.findByPk(formId)
   if (!form) throw new Error('Không tìm thấy form')
-  form.Is_confirmed_by_guardian = true
+
+  if (action === 'approve') {
+    form.status = 'approved'
+  } else if (action === 'reject') {
+    form.status = 'rejected'
+  } else {
+    throw new Error('Hành động không hợp lệ')
+  }
+
   await form.save()
 }
 
