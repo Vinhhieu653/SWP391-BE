@@ -65,12 +65,11 @@ export const createVaccineHistoryService = async (data) => {
 }
 
 export const createVaccineHistoryWithEvidenceService = async (data, imageFile) => {
-
-    const event = await Event.create({
+  const event = await Event.create({
     dateEvent: data.Date_injection || new Date(),
     type: 'vaccine'
   })
-  const mrId = data.MR_ID;
+  const mrId = data.MR_ID
 
   if (!mrId) {
     throw { status: 400, message: 'MR_ID is required' }
@@ -80,27 +79,29 @@ export const createVaccineHistoryWithEvidenceService = async (data, imageFile) =
     ...data,
     MR_ID: mrId,
     Date_injection: data.Date_injection || new Date(),
-     Event_ID: event.eventId,
+    Event_ID: event.eventId,
     Status: 'Đã tiêm'
-  });
+  })
 
   if (imageFile) {
-    const result = await cloudinary.uploader.upload(imageFile.path);
+    const result = await cloudinary.uploader.upload(imageFile.path)
     await Evidence.create({
       VH_ID: vaccineHistory.VH_ID,
       Image: result.secure_url
-    });
+    })
   }
 
-  const completeRecord = await VaccineHistory.findByPk(vaccineHistory.VH_ID);
+  const completeRecord = await VaccineHistory.findByPk(vaccineHistory.VH_ID)
   const evidence = await Evidence.findOne({
     where: { VH_ID: vaccineHistory.VH_ID }
-  });
+  })
 
-  return [{
-    ...completeRecord.dataValues,
-    evidence: evidence || null
-  }];
+  return [
+    {
+      ...completeRecord.dataValues,
+      evidence: evidence || null
+    }
+  ]
 }
 
 export const getAllVaccineHistoryService = async () => {
@@ -259,19 +260,17 @@ export const updateVaccineStatusByMRIdService = async (updates) => {
     throw { status: 400, message: 'Input must be a non-empty array of update objects' }
   }
 
-  const vhIdList = updates.map(item => item.VH_ID);
+  const vhIdList = updates.map((item) => item.VH_ID)
 
- 
-  const records = await VaccineHistory.findAll({ where: { VH_ID: vhIdList } });
+  const records = await VaccineHistory.findAll({ where: { VH_ID: vhIdList } })
   if (records.length !== vhIdList.length) {
     throw { status: 404, message: 'Some VH_IDs do not exist in vaccine history' }
   }
 
-  const notAllowed = records.filter(r => r.Status !== 'Cho phép tiêm');
+  const notAllowed = records.filter((r) => r.Status !== 'Cho phép tiêm')
   if (notAllowed.length > 0) {
     throw { status: 400, message: 'Chỉ được phép cập nhật khi tất cả trạng thái là "Cho phép tiêm"' }
   }
-
 
   await Promise.all(
     updates.map((item) =>

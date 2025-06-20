@@ -47,14 +47,37 @@ export const getMedicalRecordById = async (id) => {
 
 // Tạo mới hồ sơ y tế
 export const createMedicalRecord = async (data) => {
-  return await MedicalRecord.create(data)
+  const converted = {
+    ...data,
+    chronicDiseases: Array.isArray(data.chronicDiseases)
+      ? data.chronicDiseases.map((d) => d.name).join(', ')
+      : data.chronicDiseases,
+    allergies: Array.isArray(data.allergies) ? data.allergies.map((a) => a.name).join(', ') : data.allergies,
+    pastIllnesses: Array.isArray(data.pastIllnesses)
+      ? data.pastIllnesses.map((p) => `${p.date} - ${p.disease} (${p.treatment})`).join(' | ')
+      : data.pastIllnesses
+  }
+
+  return await MedicalRecord.create(converted)
 }
 
 // Cập nhật hồ sơ y tế
 export const updateMedicalRecord = async (id, data) => {
   const record = await MedicalRecord.findByPk(id)
   if (!record) return null
-  return await record.update(data)
+
+  const converted = {
+    ...data,
+    chronicDiseases: Array.isArray(data.chronicDiseases)
+      ? data.chronicDiseases.map((d) => d.name).join(', ')
+      : data.chronicDiseases,
+    allergies: Array.isArray(data.allergies) ? data.allergies.map((a) => a.name).join(', ') : data.allergies,
+    pastIllnesses: Array.isArray(data.pastIllnesses)
+      ? data.pastIllnesses.map((p) => `${p.date} - ${p.disease} (${p.treatment})`).join(' | ')
+      : data.pastIllnesses
+  }
+
+  return await record.update(converted)
 }
 
 // Xóa hồ sơ y tế
@@ -105,9 +128,9 @@ export const getMedicalRecordsByGuardianUserIdService = async (guardianUserId) =
 
 export const createStudentWithMedicalRecord = async ({ guardianUserId, student, medicalRecord }) => {
   if (!guardianUserId || !student || !medicalRecord) {
-    const error = new Error('Missing guardian or student/medical data');
-    error.status = 400;
-    throw error;
+    const error = new Error('Missing guardian or student/medical data')
+    error.status = 400
+    throw error
   }
 
   // Đăng ký user học sinh cơ bản (chỉ cần fullname, dateOfBirth, gender)
@@ -116,7 +139,7 @@ export const createStudentWithMedicalRecord = async ({ guardianUserId, student, 
     dateOfBirth: student.dateOfBirth,
     gender: student.gender,
     roleId: 3
-  });
+  })
 
   // Tạo hồ sơ y tế, gán với userId vừa tạo
   const medicalRecordCreated = await MedicalRecord.create({
@@ -124,19 +147,28 @@ export const createStudentWithMedicalRecord = async ({ guardianUserId, student, 
     userId: studentUser.id,
     fullName: student.fullname,
     dateOfBirth: student.dateOfBirth,
-    gender: student.gender
-  });
+    gender: student.gender,
+    chronicDiseases: Array.isArray(medicalRecord.chronicDiseases)
+      ? medicalRecord.chronicDiseases.map((d) => d.name).join(', ')
+      : medicalRecord.chronicDiseases,
+    allergies: Array.isArray(medicalRecord.allergies)
+      ? medicalRecord.allergies.map((a) => a.name).join(', ')
+      : medicalRecord.allergies,
+    pastIllnesses: Array.isArray(medicalRecord.pastIllnesses)
+      ? medicalRecord.pastIllnesses.map((p) => `${p.date} - ${p.disease} (${p.treatment})`).join(' | ')
+      : medicalRecord.pastIllnesses
+  })
 
-  console.log('Medical record created:', guardianUserId);
+  console.log('Medical record created:', guardianUserId)
   // Tìm guardian theo userId
-  const guardian = await Guardian.findOne({ where: { userId: guardianUserId } });
-  if (!guardian) throw Object.assign(new Error('Guardian not found'), { status: 404 });
+  const guardian = await Guardian.findOne({ where: { userId: guardianUserId } })
+  if (!guardian) throw Object.assign(new Error('Guardian not found'), { status: 404 })
 
   // Gán học sinh vào guardian
   await GuardianUser.create({
     obId: guardian.obId,
     userId: studentUser.id
-  });
+  })
 
   return {
     message: 'Student and medical record created successfully',
@@ -144,6 +176,5 @@ export const createStudentWithMedicalRecord = async ({ guardianUserId, student, 
       student: studentUser,
       medicalRecord: medicalRecordCreated
     }
-  };
-};
-
+  }
+}

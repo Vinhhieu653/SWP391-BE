@@ -23,18 +23,24 @@ const router = express.Router()
  *                     type: integer
  *                   username:
  *                     type: string
+ *                   fullname:
+ *                     type: string
  *                   email:
  *                     type: string
  *                   phoneNumber:
  *                     type: string
- *                   status:
+ *                   dateOfBirth:
  *                     type: string
- *                     enum: [pending, approved, rejected]
+ *                     format: date
+ *                   gender:
+ *                     type: string
+ *                     enum: [male, female, other]
  *                   roleId:
  *                     type: integer
  *       500:
  *         description: Server error
  */
+
 router.get('/', authenticateToken, authorizeRoles('admin'), userController.getAllUsers)
 
 /**
@@ -56,10 +62,32 @@ router.get('/', authenticateToken, authorizeRoles('admin'), userController.getAl
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/User'
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 username:
+ *                   type: string
+ *                 fullname:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 phoneNumber:
+ *                   type: string
+ *                 dateOfBirth:
+ *                   type: string
+ *                   format: date
+ *                 gender:
+ *                   type: string
+ *                 role:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
  *       404:
  *         description: User not found
  */
+
 router.get('/:id', authenticateToken, authorizeRoles('admin'), userController.getUserById)
 
 /**
@@ -91,6 +119,14 @@ router.get('/:id', authenticateToken, authorizeRoles('admin'), userController.ge
  *               phoneNumber:
  *                 type: string
  *                 example: "0123456789"
+ *               dateOfBirth:
+ *                 type: string
+ *                 format: date
+ *                 example: "2000-01-01"
+ *               gender:
+ *                 type: string
+ *                 enum: [male, female, other]
+ *                 example: "male"
  *     responses:
  *       201:
  *         description: Registration successful
@@ -123,13 +159,14 @@ router.get('/:id', authenticateToken, authorizeRoles('admin'), userController.ge
  *                   type: string
  *                   example: Internal server error
  */
+
 router.post('/register', authenticateToken, authorizeRoles('admin'), userController.register)
 
 /**
  * @swagger
  * /api/v1/users/edit/{id}:
  *   put:
- *     summary: Update user info (username, fullname, email, phoneNumber)
+ *     summary: Update user info
  *     tags: [Users]
  *     parameters:
  *       - in: path
@@ -153,6 +190,12 @@ router.post('/register', authenticateToken, authorizeRoles('admin'), userControl
  *                 type: string
  *               phoneNumber:
  *                 type: string
+ *               dateOfBirth:
+ *                 type: string
+ *                 format: date
+ *               gender:
+ *                 type: string
+ *                 enum: [male, female, other]
  *     responses:
  *       200:
  *         description: User updated successfully
@@ -177,27 +220,17 @@ router.post('/register', authenticateToken, authorizeRoles('admin'), userControl
  *                       type: string
  *                     phoneNumber:
  *                       type: string
+ *                     dateOfBirth:
+ *                       type: string
+ *                       format: date
+ *                     gender:
+ *                       type: string
  *       400:
  *         description: Bad request (validation or duplication errors)
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Username taken / Email taken / User not found
  *       500:
  *         description: Server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Internal server error
  */
+
 router.put('/edit/:id', authenticateToken, authorizeRoles('admin'), userController.update)
 
 /**
@@ -221,6 +254,7 @@ router.put('/edit/:id', authenticateToken, authorizeRoles('admin'), userControll
  *       500:
  *         description: Internal server error
  */
+
 router.delete('/delete/:id', authenticateToken, authorizeRoles('admin'), userController.deleteUser)
 
 export default router

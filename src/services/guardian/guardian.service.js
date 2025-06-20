@@ -6,23 +6,23 @@ import * as registerService from '../auth/register.service.js'
 // Create guardian with associated student users
 export const createGuardianWithStudents = async ({ guardian }) => {
   if (!guardian) {
-    const error = new Error('Missing guardian data');
-    error.status = 400;
-    throw error;
+    const error = new Error('Missing guardian data')
+    error.status = 400
+    throw error
   }
 
   // Loại bỏ students nếu truyền nhầm
-  const { students, ...guardianData } = guardian;
+  const { students, ...guardianData } = guardian
 
   // Check username/email trùng
-  const existingUsername = await User.findOne({ where: { username: guardianData.username } });
+  const existingUsername = await User.findOne({ where: { username: guardianData.username } })
   if (existingUsername) {
-    throw Object.assign(new Error('Guardian username already taken'), { status: 400 });
+    throw Object.assign(new Error('Guardian username already taken'), { status: 400 })
   }
 
-  const existingEmail = await User.findOne({ where: { email: guardianData.email } });
+  const existingEmail = await User.findOne({ where: { email: guardianData.email } })
   if (existingEmail) {
-    throw Object.assign(new Error('Guardian email already taken'), { status: 400 });
+    throw Object.assign(new Error('Guardian email already taken'), { status: 400 })
   }
 
   // Tạo user với role guardian
@@ -31,8 +31,10 @@ export const createGuardianWithStudents = async ({ guardian }) => {
     username: guardianData.username,
     email: guardianData.email,
     phoneNumber: guardianData.phoneNumber,
-    roleId: 4
-  });
+    roleId: 4,
+    dateOfBirth: guardianData.dateOfBirth,
+    gender: guardianData.gender
+  })
 
   // Tạo guardian
   const guardianRecord = await Guardian.create({
@@ -40,8 +42,10 @@ export const createGuardianWithStudents = async ({ guardian }) => {
     roleInFamily: guardianData.roleInFamily,
     isCallFirst: guardianData.isCallFirst,
     userId: guardianUser.id,
-    address: guardianData.address
-  });
+    address: guardianData.address,
+    dateOfBirth: guardianData.dateOfBirth,
+    gender: guardianData.gender
+  })
 
   // Gộp dữ liệu trả về
   const responseData = {
@@ -54,16 +58,16 @@ export const createGuardianWithStudents = async ({ guardian }) => {
     roleId: guardianUser.roleId,
     roleInFamily: guardianRecord.roleInFamily,
     isCallFirst: guardianRecord.isCallFirst,
-    address: guardianRecord.address
-  };
+    address: guardianRecord.address,
+    dateOfBirth: guardianUser.dateOfBirth,
+    gender: guardianUser.gender
+  }
 
   return {
     message: 'Guardian registered successfully',
     data: responseData
-  };
-};
-
-
+  }
+}
 
 // Get one guardian by obId including guardian info and student list
 export const getGuardianById = async (obId) => {
@@ -227,7 +231,9 @@ export const addStudentByGuardianId = async (obId, studentData) => {
     email: studentData.email,
     password: studentData.password,
     phoneNumber: studentData.phoneNumber || null,
-    roleId: 3
+    roleId: 3,
+    dateOfBirth: studentData.dateOfBirth,
+    gender: studentData.gender
   })
 
   await GuardianUser.create({
@@ -243,7 +249,9 @@ export const addStudentByGuardianId = async (obId, studentData) => {
         username: studentUser.username,
         fullname: studentUser.fullname,
         email: studentUser.email,
-        phoneNumber: studentUser.phoneNumber
+        phoneNumber: studentUser.phoneNumber,
+        dateOfBirth: studentUser.dateOfBirth,
+        gender: studentUser.gender
       }
     }
   }
@@ -283,7 +291,9 @@ export const updateStudentByGuardianId = async (obId, studentId, studentData) =>
     fullname: studentData.fullname || student.fullname,
     username: studentData.username || student.username,
     email: studentData.email || student.email,
-    phoneNumber: studentData.phoneNumber || student.phoneNumber
+    phoneNumber: studentData.phoneNumber || student.phoneNumber,
+    dateOfBirth: studentData.dateOfBirth || student.dateOfBirth,
+    gender: studentData.gender || student.gender
   })
 
   return {
@@ -294,7 +304,9 @@ export const updateStudentByGuardianId = async (obId, studentId, studentData) =>
         username: student.username,
         fullname: student.fullname,
         email: student.email,
-        phoneNumber: student.phoneNumber
+        phoneNumber: student.phoneNumber,
+        dateOfBirth: student.dateOfBirth,
+        gender: student.gender
       }
     }
   }
