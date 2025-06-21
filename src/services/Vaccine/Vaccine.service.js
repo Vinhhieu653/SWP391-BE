@@ -236,7 +236,7 @@ export const getStudentsByEventIdService = async (eventId) => {
       return {
         studentId: student.id,
         fullname: student.fullname,
-        class: medicalRecord.class,
+        Class: medicalRecord.Class,
         vaccineHistory: {
           id: history.VH_ID,
           vaccine_name: history.Vaccine_name,
