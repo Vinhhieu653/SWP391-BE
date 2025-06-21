@@ -25,12 +25,12 @@ export const createMedicalSentService = async (data, creator_by = 'system') => {
   const medicalRecord = await MedicalRecord.findOne({ where: { userId: userId } })
   if (!medicalRecord) throw { status: 404, message: 'Medical record not found for this user' }
 
-  const MR_ID = medicalRecord.MR_ID
+  const ID = medicalRecord.ID
 
-  // 2. Tìm hoặc tạo OutpatientMedication theo MR_ID
-  let outpatient = await OutpatientMedication.findOne({ where: { MR_ID: MR_ID } })
+  // 2. Tìm hoặc tạo OutpatientMedication theo ID
+  let outpatient = await OutpatientMedication.findOne({ where: { ID: ID } })
   if (!outpatient) {
-    outpatient = await OutpatientMedication.create({ MR_ID: MR_ID })
+    outpatient = await OutpatientMedication.create({ ID: ID })
   }
 
   // 3. Tạo bản ghi MedicalSent

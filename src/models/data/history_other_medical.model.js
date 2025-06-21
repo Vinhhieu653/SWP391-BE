@@ -13,7 +13,7 @@ const HistoryOtherMedical = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    MR_ID: {
+    ID: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
