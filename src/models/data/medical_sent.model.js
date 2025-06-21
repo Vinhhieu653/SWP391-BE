@@ -19,7 +19,7 @@ const MedicalSent = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true
     },
-    Class: {
+    class: {
       type: DataTypes.STRING,
       allowNull: true
     },
