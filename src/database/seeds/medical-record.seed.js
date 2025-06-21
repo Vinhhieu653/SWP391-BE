@@ -3,17 +3,17 @@ import MedicalRecord from '../../models/data/medicalRecord.model.js'
 const records = [
   {
     userId: 1,
-    class: '5A',
+    Class: '5A',
     historyHealth: 'Allergic to peanuts'
   },
   {
     userId: 2,
-    class: '6B',
+    Class: '6B',
     historyHealth: 'Asthma'
   },
   {
     userId: 3,
-    class: '7C',
+    Class: '7C',
     historyHealth: 'No known issues'
   }
 ]
@@ -23,7 +23,7 @@ export async function seedMedicalRecords() {
     const [instance, created] = await MedicalRecord.findOrCreate({
       where: {
         userId: record.userId,
-        class: record.class
+        Class: record.Class
       },
       defaults: {
         historyHealth: record.historyHealth

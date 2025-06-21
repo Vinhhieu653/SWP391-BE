@@ -13,7 +13,7 @@ const MedicalRecord = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    class: {
+    Class: {
       type: DataTypes.STRING,
       allowNull: true
     },
