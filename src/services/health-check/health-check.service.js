@@ -30,34 +30,53 @@ export const createHealthCheck = async (data) => {
     School_year: data.schoolYear || '2024-2025',
     Event_ID: event.eventId
   })
+
   for (const mrId of mrIds) {
     const medicalRecord = await MedicalRecord.findByPk(mrId)
-    if (medicalRecord) {
-      const guardianUsers = await GuardianUser.findAll({
-        where: { userId: medicalRecord.userId }
-      })
-      const userEvent = await UserEvent.create({
-        eventId: event.eventId,
-        userId: medicalRecord.userId
-      })
-      const historyCheck = await HistoryCheck.create({
-        ID: mrId,
-        HC_ID: health_check.HC_ID,
-        Date_create: new Date()
-      })
-      await Promise.all(
-        guardianUsers.map(async (guardianUser) => {
-          const guardian = await Guardian.findByPk(guardianUser.obId)
-          if (guardian) {
-            const date = new Date(event.dateEvent)
-            await Notification.create({
-              title: `Con bạn có đợt khám sức khỏe mới vào ngày ${date.toLocaleDateString('vi-VN')}`,
-              mess: 'Bấm vào để xem chi tiết và xác nhận cho con bạn được khám sức khỏe',
-              userId: guardian.userId
-            })
-          }
-        })
-      )
+    if (!medicalRecord) continue
+
+    console.log(`👉 MR ID: ${mrId}, userId: ${medicalRecord.userId}`)
+
+    const guardianUsers = await GuardianUser.findAll({
+      where: { userId: medicalRecord.userId }
+    })
+
+    // Debug GuardianUser
+    if (!guardianUsers.length) {
+      console.warn(`⚠️ Không tìm thấy GuardianUser cho userId: ${medicalRecord.userId}`)
+    }
+
+    await UserEvent.create({
+      eventId: event.eventId,
+      userId: medicalRecord.userId
+    })
+
+    await HistoryCheck.create({
+      ID: mrId,
+      HC_ID: health_check.HC_ID,
+      Date_create: new Date()
+    })
+
+    for (const guardianUser of guardianUsers) {
+      const guardian = await Guardian.findByPk(guardianUser.obId)
+
+      console.log(`🧾 GuardianUser → obId: ${guardianUser.obId}, Guardian:`, guardian?.userId)
+
+      if (guardian && guardian.userId) {
+        try {
+          const dateStr = new Date(event.dateEvent).toLocaleDateString('vi-VN')
+          await Notification.create({
+            title: `Con bạn có đợt khám sức khỏe mới vào ngày ${dateStr}`,
+            mess: 'Bấm vào để xem chi tiết và xác nhận cho con bạn được khám sức khỏe',
+            userId: guardian.userId
+          })
+          console.log(`✅ Gửi noti cho guardian userId ${guardian.userId}`)
+        } catch (e) {
+          console.error('❌ Lỗi khi gửi Notification:', e)
+        }
+      } else {
+        console.warn(`⚠️ Guardian không tồn tại hoặc thiếu userId (guardianId: ${guardianUser.obId})`)
+      }
     }
   }
 
@@ -209,6 +228,79 @@ export async function submitResult(
       }
     }
   )
+}
+
+export async function updateFormResult(eventId, studentId, data) {
+  const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
+  if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
+
+  const [updated] = await FormCheck.update(
+    {
+      Height: data.height,
+      Weight: data.weight,
+      Blood_Pressure: data.blood_pressure,
+      Vision_Left: data.vision_left,
+      Vision_Right: data.vision_right,
+      Dental_Status: data.dental_status,
+      ENT_Status: data.ent_status,
+      Skin_Status: data.skin_status,
+      General_Conclusion: data.general_conclusion,
+      Is_need_meet: data.is_need_meet,
+      status: data.status
+    },
+    {
+      where: {
+        HC_ID: healthCheck.HC_ID,
+        Student_ID: studentId
+      }
+    }
+  )
+
+  if (!updated) throw new Error('Không tìm thấy form khám để cập nhật')
+  return 'Cập nhật thành công'
+}
+
+export async function deleteFormResult(eventId, studentId) {
+  const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
+  if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
+
+  const deleted = await FormCheck.destroy({
+    where: {
+      HC_ID: healthCheck.HC_ID,
+      Student_ID: studentId
+    }
+  })
+
+  if (!deleted) throw new Error('Không tìm thấy form khám để xóa')
+  return 'Xóa thành công'
+}
+
+export async function getFormResult(eventId, studentId) {
+  const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
+  if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
+
+  const form = await FormCheck.findOne({
+    where: {
+      HC_ID: healthCheck.HC_ID,
+      Student_ID: studentId
+    }
+  })
+
+  if (!form) throw new Error('Không tìm thấy form khám')
+  return form
+}
+
+export async function getAllFormsByEvent(eventId) {
+  const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
+  if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
+
+  const forms = await FormCheck.findAll({
+    where: {
+      HC_ID: healthCheck.HC_ID
+    }
+  })
+
+  return forms
 }
 
 export async function sendResult(eventId) {
