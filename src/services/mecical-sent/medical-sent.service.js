@@ -11,7 +11,7 @@ export const createMedicalSentService = async (data, creator_by = 'system') => {
   const {
     userId,
     guardianPhone,
-    class: studentClass,
+    Class: studentClass,
     prescriptionImage,
     medications,
     deliveryTime,
@@ -37,7 +37,7 @@ export const createMedicalSentService = async (data, creator_by = 'system') => {
   const medicalSent = await MedicalSent.create({
     User_ID: userId,
     Guardian_phone: guardianPhone,
-    class: studentClass,
+    Class: studentClass,
     Image_prescription: prescriptionImage,
     Medications: medications,
     Delivery_time: deliveryTime,
