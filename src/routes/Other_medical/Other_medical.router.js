@@ -27,7 +27,7 @@ const upload = multer({ dest: 'uploads/' })
  *           schema:
  *             type: object
  *             properties:
- *               MR_ID:
+ *               ID:
  *                 type: string
  *               Decription:
  *                 type: string
@@ -107,7 +107,7 @@ router.get('/:id', getOtherMedicalById)
  *           schema:
  *             type: object
  *             properties:
- *               MR_ID:
+ *               ID:
  *                 type: string
  *               Handle:
  *                type: string

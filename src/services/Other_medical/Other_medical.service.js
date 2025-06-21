@@ -4,14 +4,14 @@ import MedicalRecord from '../../models/data/medicalRecord.model.js'
 import User from '../../models/data/user.model.js'
 
 export const createOtherMedicalService = async (data, creator_by) => {
-  if (!data.MR_ID) {
-    throw { status: 400, message: 'MR_ID is required' }
+  if (!data.ID) {
+    throw { status: 400, message: 'ID is required' }
   }
   const otherMedical = await OtherMedical.create(data)
 
   await HistoryOtherMedical.create({
     OrtherM_ID: otherMedical.OrtherM_ID,
-    MR_ID: data.MR_ID,
+    ID: data.ID,
     Date_create: new Date(),
     creater_by: creator_by || 'system'
   })
@@ -24,14 +24,14 @@ export const getAllOtherMedicalService = async () => {
   const result = await Promise.all(
     otherMedicalRecords.map(async (record) => {
       const history = await HistoryOtherMedical.findAll({ where: { OrtherM_ID: record.OrtherM_ID } })
-      let MR_ID = null
+      let ID = null
       if (history.length > 0) {
         record.dataValues.history = history
-        MR_ID = history[0].MR_ID
+        ID = history[0].ID
       } else {
         record.dataValues.history = []
       }
-      const medicalRecord = MR_ID ? await MedicalRecord.findOne({ where: { ID: MR_ID } }) : null
+      const medicalRecord = ID ? await MedicalRecord.findOne({ where: { ID: ID } }) : null
       if (medicalRecord) {
         record.dataValues.Medical_record = medicalRecord
         const user = medicalRecord.userId
@@ -53,14 +53,14 @@ export const getOtherMedicalByIdService = async (id) => {
   if (!otherMedical) throw { status: 404, message: 'Other medical record not found' }
 
   const history = await HistoryOtherMedical.findAll({ where: { OrtherM_ID: id } })
-  let MR_ID = null
+  let ID = null
   if (history.length > 0) {
     otherMedical.dataValues.history = history
-    MR_ID = history[0].MR_ID
+    ID = history[0].ID
   } else {
     otherMedical.dataValues.history = []
   }
-  const medicalRecord = MR_ID ? await MedicalRecord.findOne({ where: { ID: MR_ID } }) : null
+  const medicalRecord = ID ? await MedicalRecord.findOne({ where: { ID: ID } }) : null
   if (medicalRecord) {
     otherMedical.dataValues.Medical_record = medicalRecord
     const user = medicalRecord.userId

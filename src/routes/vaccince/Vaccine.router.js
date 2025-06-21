@@ -144,10 +144,10 @@ const upload = multer({ dest: 'uploads/' })
  *           schema:
  *             type: object
  *             required:
- *               - MR_ID
+ *               - ID
  *               - evidence
  *             properties:
- *               MR_ID:
+ *               ID:
  *                 type: integer
  *                 description: ID hồ sơ y tế
  *               Vaccine_name:

@@ -87,7 +87,9 @@ export async function sendResult(req, res) {
 export async function confirmForm(req, res) {
   try {
     const { formId } = req.params
-    await srv.confirmForm(+formId)
+    const { action } = req.body
+
+    await srv.confirmForm(+formId, action)
     return res.json({ success: true, message: 'Phụ huynh đã xác nhận form' })
   } catch (e) {
     console.error(e)

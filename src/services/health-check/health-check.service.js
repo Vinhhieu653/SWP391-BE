@@ -16,11 +16,11 @@ export const createHealthCheck = async (data) => {
     type: 'Health Check'
   })
 
-  let mrIds = data.MR_ID
+  let mrIds = data.ID
 
   if (!mrIds) {
-    const medicalRecords = await MedicalRecord.findAll({ attributes: ['MR_ID'] })
-    mrIds = medicalRecords.map((record) => record.MR_ID)
+    const medicalRecords = await MedicalRecord.findAll({ attributes: ['ID'] })
+    mrIds = medicalRecords.map((record) => record.ID)
   } else {
     mrIds = Array.isArray(mrIds) ? mrIds : [mrIds]
   }
@@ -41,7 +41,7 @@ export const createHealthCheck = async (data) => {
         userId: medicalRecord.userId
       })
       const historyCheck = await HistoryCheck.create({
-        MR_ID: mrId,
+        ID: mrId,
         HC_ID: health_check.HC_ID,
         Date_create: new Date()
       })
