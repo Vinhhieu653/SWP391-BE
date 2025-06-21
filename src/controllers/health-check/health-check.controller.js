@@ -73,6 +73,49 @@ export async function submitResult(req, res) {
   }
 }
 
+export const handleGetForm = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { student_id } = req.query
+    const form = await srv.getFormResult(id, student_id) // ✅ đổi sang srv
+    res.status(200).json(form)
+  } catch (err) {
+    res.status(404).json({ error: err.message })
+  }
+}
+
+export const handleGetAllForms = async (req, res) => {
+  try {
+    const { id } = req.params
+    const forms = await srv.getAllFormsByEvent(id) // ✅ đổi sang srv
+    res.status(200).json(forms)
+  } catch (err) {
+    res.status(404).json({ error: err.message })
+  }
+}
+
+export const handleUpdateForm = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { student_id } = req.body
+    const result = await srv.updateFormResult(id, student_id, req.body) // ✅ đổi sang srv
+    res.status(200).json({ message: result })
+  } catch (err) {
+    res.status(400).json({ error: err.message })
+  }
+}
+
+export const handleDeleteForm = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { student_id } = req.query
+    const result = await srv.deleteFormResult(id, student_id) // ✅ đổi sang srv
+    res.status(200).json({ message: result })
+  } catch (err) {
+    res.status(400).json({ error: err.message })
+  }
+}
+
 export async function sendResult(req, res) {
   try {
     await srv.sendResult(+req.params.id)
