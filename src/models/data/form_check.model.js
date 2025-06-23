@@ -31,9 +31,9 @@ const FormCheck = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
-    Is_confirmed_by_guardian: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
+    status: {
+      type: DataTypes.ENUM('created', 'pending', 'approved', 'rejected'),
+      defaultValue: 'created'
     }
   },
   {

@@ -33,10 +33,7 @@ export const getNotificationsByUserId = async (userId, page = 1, limit = 10) => 
 }
 
 export const markNotificationAsReadService = async (notificationIds) => {
-  const ids = Array.isArray(notificationIds) ? notificationIds : [notificationIds];
-  const [updatedCount] = await Notification.update(
-    { isRead: true },
-    { where: { notiId: ids } }
-  );
-  return updatedCount;
+  const ids = Array.isArray(notificationIds) ? notificationIds : [notificationIds]
+  const [updatedCount] = await Notification.update({ isRead: true }, { where: { notiId: ids } })
+  return updatedCount
 }

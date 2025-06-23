@@ -13,7 +13,7 @@ const MedicalRecord = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    class: {
+    Class: {
       type: DataTypes.STRING,
       allowNull: true
     },
@@ -29,15 +29,15 @@ const MedicalRecord = sequelize.define(
       type: DataTypes.STRING
     },
     chronicDiseases: {
-      type: DataTypes.JSONB,
+      type: DataTypes.TEXT,
       allowNull: true
     },
     allergies: {
-      type: DataTypes.JSONB,
+      type: DataTypes.TEXT,
       allowNull: true
     },
     pastIllnesses: {
-      type: DataTypes.JSONB,
+      type: DataTypes.TEXT,
       allowNull: true
     }
   },

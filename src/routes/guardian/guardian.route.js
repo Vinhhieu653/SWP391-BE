@@ -64,6 +64,11 @@ const router = express.Router()
  *                     type: boolean
  *                   address:
  *                     type: string
+ *                   dateOfBirth:
+ *                     type: string
+ *                     format: date
+ *                   gender:
+ *                     type: string
  *           example:
  *             guardian:
  *               fullname: "Lê Thị A"
@@ -72,7 +77,9 @@ const router = express.Router()
  *               phoneNumber: "0901123456"
  *               roleInFamily: "Mẹ"
  *               isCallFirst: true
- *               address: "123 Đường ABC, Quận 1, TP.HCM"             
+ *               dateOfBirth: "2011-11-21"
+ *               gender: "female"
+ *               address: "123 Đường ABC, Quận 1, TP.HCM"
  *     responses:
  *       201:
  *         description: Tạo phụ huynh và học sinh thành công

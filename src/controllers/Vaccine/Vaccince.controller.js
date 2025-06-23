@@ -14,10 +14,7 @@ export const createVaccineHistory = async (req, res) => {
 
 export const createVaccineWithEvidence = async (req, res) => {
   try {
-    const result = await VaccineService.createVaccineHistoryWithEvidenceService(
-      req.body,
-      req.file
-    )
+    const result = await VaccineService.createVaccineHistoryWithEvidenceService(req.body, req.file)
     res.status(201).json({
       message: 'Vaccine history with evidence created successfully',
       data: result[0]
@@ -105,8 +102,8 @@ export const getStudentsByEventId = async (req, res) => {
 
 export const updateVaccineStatusByMRId = async (req, res) => {
   try {
-    const updates = req.body.updates;
-    const records = await VaccineService.updateVaccineStatusByMRIdService(updates);
+    const updates = req.body.updates
+    const records = await VaccineService.updateVaccineStatusByMRIdService(updates)
     res.status(200).json({
       message: 'Vaccine status updated successfully',
       data: records
