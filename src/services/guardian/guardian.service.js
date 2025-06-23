@@ -5,61 +5,67 @@ import * as registerService from '../auth/register.service.js'
 
 // Create guardian with associated student users
 export const createGuardianWithStudents = async ({ guardian }) => {
-  if (!guardian || !Array.isArray(guardian.students)) {
-    const error = new Error('Missing guardian or students data')
+  if (!guardian) {
+    const error = new Error('Missing guardian data')
     error.status = 400
     throw error
   }
 
+  // Loại bỏ students nếu truyền nhầm
   const { students, ...guardianData } = guardian
 
-  // Check unique username/email
+  // Check username/email trùng
   const existingUsername = await User.findOne({ where: { username: guardianData.username } })
-  if (existingUsername) throw Object.assign(new Error('Guardian username already taken'), { status: 400 })
-  const existingEmail = await User.findOne({ where: { email: guardianData.email } })
-  if (existingEmail) throw Object.assign(new Error('Guardian email already taken'), { status: 400 })
+  if (existingUsername) {
+    throw Object.assign(new Error('Guardian username already taken'), { status: 400 })
+  }
 
-  // Register guardian user
+  const existingEmail = await User.findOne({ where: { email: guardianData.email } })
+  if (existingEmail) {
+    throw Object.assign(new Error('Guardian email already taken'), { status: 400 })
+  }
+
+  // Tạo user với role guardian
   const guardianUser = await registerService.registerUser({
     fullname: guardianData.fullname,
     username: guardianData.username,
     email: guardianData.email,
-    password: guardianData.password,
     phoneNumber: guardianData.phoneNumber,
-    roleId: 4 // Guardian role
+    roleId: 4,
+    dateOfBirth: guardianData.dateOfBirth,
+    gender: guardianData.gender
   })
 
-  // Create Guardian record
+  // Tạo guardian
   const guardianRecord = await Guardian.create({
     phoneNumber: guardianData.phoneNumber,
     roleInFamily: guardianData.roleInFamily,
     isCallFirst: guardianData.isCallFirst,
-    userId: guardianUser.id
+    userId: guardianUser.id,
+    address: guardianData.address,
+    dateOfBirth: guardianData.dateOfBirth,
+    gender: guardianData.gender
   })
 
-  // Register students and link
-  const createdStudents = []
-  for (const student of students) {
-    const studentUser = await registerService.registerUser({
-      fullname: student.fullname,
-      username: student.username,
-      email: student.email,
-      password: student.password,
-      phoneNumber: student.phoneNumber || null,
-      roleId: 3
-    })
-
-    await GuardianUser.create({
-      obId: guardianRecord.obId,
-      userId: studentUser.id
-    })
-
-    createdStudents.push(studentUser)
+  // Gộp dữ liệu trả về
+  const responseData = {
+    id: guardianUser.id,
+    obId: guardianRecord.obId,
+    fullname: guardianUser.fullname,
+    username: guardianUser.username,
+    email: guardianUser.email,
+    phoneNumber: guardianUser.phoneNumber,
+    roleId: guardianUser.roleId,
+    roleInFamily: guardianRecord.roleInFamily,
+    isCallFirst: guardianRecord.isCallFirst,
+    address: guardianRecord.address,
+    dateOfBirth: guardianUser.dateOfBirth,
+    gender: guardianUser.gender
   }
 
   return {
-    message: 'Guardian and students registered successfully',
-    data: { guardian: guardianUser, students: createdStudents }
+    message: 'Guardian registered successfully',
+    data: responseData
   }
 }
 
@@ -111,7 +117,7 @@ export const getAllGuardians = async () => {
       const students = studentIds.length
         ? await User.findAll({
             where: { id: studentIds },
-            attributes: ['id', 'username', 'fullname', 'email', 'phoneNumber']
+            attributes: ['id', 'fullname', 'dateOfBirth', 'gender']
           })
         : []
 
@@ -225,7 +231,9 @@ export const addStudentByGuardianId = async (obId, studentData) => {
     email: studentData.email,
     password: studentData.password,
     phoneNumber: studentData.phoneNumber || null,
-    roleId: 3
+    roleId: 3,
+    dateOfBirth: studentData.dateOfBirth,
+    gender: studentData.gender
   })
 
   await GuardianUser.create({
@@ -241,7 +249,9 @@ export const addStudentByGuardianId = async (obId, studentData) => {
         username: studentUser.username,
         fullname: studentUser.fullname,
         email: studentUser.email,
-        phoneNumber: studentUser.phoneNumber
+        phoneNumber: studentUser.phoneNumber,
+        dateOfBirth: studentUser.dateOfBirth,
+        gender: studentUser.gender
       }
     }
   }
@@ -281,7 +291,9 @@ export const updateStudentByGuardianId = async (obId, studentId, studentData) =>
     fullname: studentData.fullname || student.fullname,
     username: studentData.username || student.username,
     email: studentData.email || student.email,
-    phoneNumber: studentData.phoneNumber || student.phoneNumber
+    phoneNumber: studentData.phoneNumber || student.phoneNumber,
+    dateOfBirth: studentData.dateOfBirth || student.dateOfBirth,
+    gender: studentData.gender || student.gender
   })
 
   return {
@@ -292,7 +304,9 @@ export const updateStudentByGuardianId = async (obId, studentId, studentData) =>
         username: student.username,
         fullname: student.fullname,
         email: student.email,
-        phoneNumber: student.phoneNumber
+        phoneNumber: student.phoneNumber,
+        dateOfBirth: student.dateOfBirth,
+        gender: student.gender
       }
     }
   }

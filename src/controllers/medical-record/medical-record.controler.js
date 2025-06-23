@@ -65,3 +65,22 @@ export const getMedicalRecordsByGuardian = async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 }
+
+export const createStudentAndMedical = async (req, res, next) => {
+  try {
+    const { guardianUserId, student, medicalRecord } = req.body
+
+    const result = await medicalRecordService.createStudentWithMedicalRecord({
+      guardianUserId,
+      student,
+      medicalRecord
+    })
+
+    return res.status(201).json(result)
+  } catch (error) {
+    console.error('Error creating student & medical record:', error.message)
+    return res.status(error.status || 500).json({
+      message: error.message || 'Internal Server Error'
+    })
+  }
+}

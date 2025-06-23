@@ -71,12 +71,12 @@ function applyAssociations() {
   MedicalRecord.belongsTo(User, { foreignKey: 'userId' })
 
   //Medical_Record ↔ HistoryOtherMedical
-  MedicalRecord.hasMany(HistoryOtherMedical, { foreignKey: 'MR_ID' })
-  HistoryOtherMedical.belongsTo(MedicalRecord, { foreignKey: 'MR_ID' })
+  MedicalRecord.hasMany(HistoryOtherMedical, { foreignKey: 'ID' })
+  HistoryOtherMedical.belongsTo(MedicalRecord, { foreignKey: 'ID' })
 
   //medicalRecord ↔ Outpatient
-  MedicalRecord.hasMany(OutpatientMedication, { foreignKey: 'MR_ID' })
-  OutpatientMedication.belongsTo(MedicalRecord, { foreignKey: 'MR_ID' })
+  MedicalRecord.hasMany(OutpatientMedication, { foreignKey: 'ID' })
+  OutpatientMedication.belongsTo(MedicalRecord, { foreignKey: 'ID' })
 
   //outpatient ↔ medicationSent
   OutpatientMedication.hasMany(MedicalSent, { foreignKey: 'OM_ID' })
@@ -105,8 +105,8 @@ function applyAssociations() {
   MedicalSent.belongsTo(FormCheck, { foreignKey: 'Form_ID' })
 
   //historyCheck ↔ medicalRecord
-  MedicalRecord.hasMany(HistoryCheck, { foreignKey: 'MR_ID' })
-  HistoryCheck.belongsTo(MedicalRecord, { foreignKey: 'MR_ID' })
+  MedicalRecord.hasMany(HistoryCheck, { foreignKey: 'ID' })
+  HistoryCheck.belongsTo(MedicalRecord, { foreignKey: 'ID' })
 
   //otherMedical ↔ historyOtherMedical
   OtherMedical.hasMany(HistoryOtherMedical, { foreignKey: 'OrtherM_ID' })
@@ -117,8 +117,8 @@ function applyAssociations() {
   VaccineHistory.belongsTo(Event, { foreignKey: 'Event_ID' })
 
   //vaccineHistory ↔ medicalRecord
-  MedicalRecord.hasMany(VaccineHistory, { foreignKey: 'MR_ID' })
-  VaccineHistory.belongsTo(MedicalRecord, { foreignKey: 'MR_ID' })
+  MedicalRecord.hasMany(VaccineHistory, { foreignKey: 'ID' })
+  VaccineHistory.belongsTo(MedicalRecord, { foreignKey: 'ID' })
 
   //evidence ↔ vaccineHistory
   VaccineHistory.hasMany(Evidence, { foreignKey: 'VH_ID' })

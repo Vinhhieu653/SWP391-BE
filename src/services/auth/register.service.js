@@ -2,7 +2,7 @@ import User from '../../models/data/user.model.js'
 import Role from '../../models/data/role.model.js'
 import argon2 from 'argon2'
 
-export async function registerUser({ fullname, username, email, phoneNumber, roleId }) {
+export async function registerUser({ fullname, username, email, phoneNumber, roleId, dateOfBirth, gender }) {
   if (!fullname || !username || !email) {
     throw new Error('Missing required fields')
   }
@@ -25,7 +25,9 @@ export async function registerUser({ fullname, username, email, phoneNumber, rol
     username,
     email,
     phoneNumber,
-    roleId: finalRoleId
+    roleId: finalRoleId,
+    dateOfBirth,
+    gender
   })
 
   return newUser
@@ -33,7 +35,7 @@ export async function registerUser({ fullname, username, email, phoneNumber, rol
 
 export async function getAllUsers() {
   const users = await User.findAll({
-    attributes: ['id', 'username', 'fullname', 'email', 'phoneNumber', 'roleId']
+    attributes: ['id', 'username', 'fullname', 'email', 'phoneNumber', 'roleId', 'dateOfBirth', 'gender']
   })
   return users
 }
@@ -47,7 +49,7 @@ export async function getUserById(userId) {
   return user
 }
 
-export async function updateUser(userId, { username, fullname, email, phoneNumber }) {
+export async function updateUser(userId, { username, fullname, email, phoneNumber, dateOfBirth, gender }) {
   const user = await User.findByPk(userId)
   if (!user) throw new Error('User not found')
 
@@ -69,6 +71,14 @@ export async function updateUser(userId, { username, fullname, email, phoneNumbe
 
   if (phoneNumber) {
     user.phoneNumber = phoneNumber
+  }
+
+  if (dateOfBirth) {
+    user.dateOfBirth = dateOfBirth
+  }
+
+  if (gender) {
+    user.gender = gender
   }
 
   await user.save()

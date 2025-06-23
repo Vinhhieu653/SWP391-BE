@@ -15,7 +15,7 @@ export const createVaccineHistoryService = async (data) => {
     type: 'vaccine'
   })
 
-  let mrIds = data.MR_ID
+  let mrIds = data.ID
 
   if (!mrIds) {
     const medicalRecords = await MedicalRecord.findAll({ attributes: ['ID'] })
@@ -29,7 +29,7 @@ export const createVaccineHistoryService = async (data) => {
   for (const mrId of mrIds) {
     const vaccineHistory = await VaccineHistory.create({
       ...data,
-      MR_ID: mrId,
+      ID: mrId,
       Event_ID: event.eventId
     })
     vaccineHistories.push(vaccineHistory)
@@ -65,64 +65,43 @@ export const createVaccineHistoryService = async (data) => {
 }
 
 export const createVaccineHistoryWithEvidenceService = async (data, imageFile) => {
-  let mrIds = data.MR_ID
+  const event = await Event.create({
+    dateEvent: data.Date_injection || new Date(),
+    type: 'vaccine'
+  })
+  const mrId = data.ID
 
-  if (!mrIds) {
-    const medicalRecords = await MedicalRecord.findAll({ attributes: ['ID'] })
-    mrIds = medicalRecords.map((record) => record.ID)
-  } else {
-    mrIds = Array.isArray(mrIds) ? mrIds : [mrIds]
+  if (!mrId) {
+    throw { status: 400, message: 'ID is required' }
   }
 
-  const results = []
+  const vaccineHistory = await VaccineHistory.create({
+    ...data,
+    ID: mrId,
+    Date_injection: data.Date_injection || new Date(),
+    Event_ID: event.eventId,
+    Status: 'Đã tiêm'
+  })
 
-  for (const mrId of mrIds) {
-    const vaccineHistory = await VaccineHistory.create({
-      ...data,
-      MR_ID: mrId,
-      Date_injection: data.Date_injection || new Date()
+  if (imageFile) {
+    const result = await cloudinary.uploader.upload(imageFile.path)
+    await Evidence.create({
+      VH_ID: vaccineHistory.VH_ID,
+      Image: result.secure_url
     })
+  }
 
-    if (imageFile) {
-      const result = await cloudinary.uploader.upload(imageFile.path)
-      await Evidence.create({
-        VH_ID: vaccineHistory.VH_ID,
-        Image: result.secure_url
-      })
-    }
+  const completeRecord = await VaccineHistory.findByPk(vaccineHistory.VH_ID)
+  const evidence = await Evidence.findOne({
+    where: { VH_ID: vaccineHistory.VH_ID }
+  })
 
-    const medicalRecord = await MedicalRecord.findByPk(mrId)
-    if (medicalRecord) {
-      const guardianUsers = await GuardianUser.findAll({
-        where: { userId: medicalRecord.userId }
-      })
-
-      await Promise.all(
-        guardianUsers.map(async (guardianUser) => {
-          const guardian = await Guardian.findByPk(guardianUser.obId)
-          if (guardian) {
-            await Notification.create({
-              title: 'New Vaccine Record with Evidence',
-              mess: `A new vaccine record with evidence has been created for your dependent`,
-              userId: guardian.userId
-            })
-          }
-        })
-      )
-    }
-
-    const completeRecord = await VaccineHistory.findByPk(vaccineHistory.VH_ID)
-    const evidence = await Evidence.findOne({
-      where: { VH_ID: vaccineHistory.VH_ID }
-    })
-
-    results.push({
+  return [
+    {
       ...completeRecord.dataValues,
       evidence: evidence || null
-    })
-  }
-
-  return results
+    }
+  ]
 }
 
 export const getAllVaccineHistoryService = async () => {
@@ -132,7 +111,7 @@ export const getAllVaccineHistoryService = async () => {
 
   const result = await Promise.all(
     records.map(async (record) => {
-      const medicalRecord = await MedicalRecord.findByPk(record.MR_ID)
+      const medicalRecord = await MedicalRecord.findByPk(record.ID)
       if (medicalRecord) {
         record.dataValues.MedicalRecord = medicalRecord
         const user = await User.findByPk(medicalRecord.userId, {
@@ -153,7 +132,7 @@ export const getVaccineHistoryByIdService = async (id) => {
     throw { status: 404, message: 'Vaccine history record not found' }
   }
 
-  const medicalRecord = await MedicalRecord.findByPk(record.MR_ID)
+  const medicalRecord = await MedicalRecord.findByPk(record.ID)
   if (medicalRecord) {
     record.dataValues.MedicalRecord = medicalRecord
     const user = await User.findByPk(medicalRecord.userId, {
@@ -165,13 +144,13 @@ export const getVaccineHistoryByIdService = async (id) => {
   return record
 }
 
-export const getVaccineHistoryByMRIdService = async (MR_ID) => {
+export const getVaccineHistoryByMRIdService = async (ID) => {
   const records = await VaccineHistory.findAll({
-    where: { MR_ID },
+    where: { ID },
     order: [['Date_injection', 'DESC']]
   })
 
-  const medicalRecord = await MedicalRecord.findByPk(MR_ID)
+  const medicalRecord = await MedicalRecord.findByPk(ID)
   const user = medicalRecord
     ? await User.findByPk(medicalRecord.userId, {
         attributes: ['fullname']
@@ -192,7 +171,7 @@ export const updateVaccineHistoryService = async (id, updateData) => {
   }
 
   delete updateData.Event_ID
-  delete updateData.MR_ID
+  delete updateData.ID
 
   await record.update(updateData)
   return await getVaccineHistoryByIdService(id)
@@ -204,7 +183,7 @@ export const confirmVaccineHistoryService = async (id, isConfirmed) => {
     throw { status: 404, message: 'Vaccine history record not found' }
   }
 
-  const medicalRecord = await MedicalRecord.findByPk(record.MR_ID)
+  const medicalRecord = await MedicalRecord.findByPk(record.ID)
   if (!medicalRecord) {
     throw { status: 404, message: 'Medical record not found' }
   }
@@ -245,7 +224,7 @@ export const getStudentsByEventIdService = async (eventId) => {
 
   const result = await Promise.all(
     vaccineHistories.map(async (history) => {
-      const medicalRecord = await MedicalRecord.findByPk(history.MR_ID)
+      const medicalRecord = await MedicalRecord.findByPk(history.ID)
       if (!medicalRecord) return null
 
       const student = await User.findByPk(medicalRecord.userId, {
@@ -257,7 +236,7 @@ export const getStudentsByEventIdService = async (eventId) => {
       return {
         studentId: student.id,
         fullname: student.fullname,
-        class: medicalRecord.class,
+        Class: medicalRecord.Class,
         vaccineHistory: {
           id: history.VH_ID,
           vaccine_name: history.Vaccine_name,
@@ -276,31 +255,23 @@ export const getStudentsByEventIdService = async (eventId) => {
   }
 }
 
-/**
- * Cập nhật trạng thái và note cho nhiều bản ghi vaccine history.
- * @param {Array<{ VH_ID: number, status: string, note_affter_injection: string }>} updates
- */
 export const updateVaccineStatusByMRIdService = async (updates) => {
   if (!Array.isArray(updates) || updates.length === 0) {
     throw { status: 400, message: 'Input must be a non-empty array of update objects' }
   }
 
-  // Lấy tất cả VH_ID cần cập nhật
   const vhIdList = updates.map((item) => item.VH_ID)
 
-  // Lấy tất cả bản ghi cần cập nhật
   const records = await VaccineHistory.findAll({ where: { VH_ID: vhIdList } })
   if (records.length !== vhIdList.length) {
     throw { status: 404, message: 'Some VH_IDs do not exist in vaccine history' }
   }
 
-  // Kiểm tra trạng thái cho từng bản ghi
   const notAllowed = records.filter((r) => r.Status !== 'Cho phép tiêm')
   if (notAllowed.length > 0) {
     throw { status: 400, message: 'Chỉ được phép cập nhật khi tất cả trạng thái là "Cho phép tiêm"' }
   }
 
-  // Cập nhật từng bản ghi theo từng object trong updates
   await Promise.all(
     updates.map((item) =>
       VaccineHistory.update(
@@ -334,7 +305,7 @@ export const getVaccineHistoryByVaccineNameService = async (vaccineName) => {
 
   const result = await Promise.all(
     records.map(async (record) => {
-      const medicalRecord = await MedicalRecord.findByPk(record.MR_ID)
+      const medicalRecord = await MedicalRecord.findByPk(record.ID)
       if (medicalRecord) {
         record.dataValues.MedicalRecord = medicalRecord
         const user = await User.findByPk(medicalRecord.userId, {
@@ -384,7 +355,7 @@ export const getVaccineHistoryByGuardianUserIdService = async (guardianUserId) =
     medicalRecords.map(async (mr) => {
       const user = await User.findByPk(mr.userId, { attributes: ['id', 'fullname'] })
       const vaccineHistory = await VaccineHistory.findAll({
-        where: { MR_ID: mr.ID },
+        where: { ID: mr.ID },
         order: [['Date_injection', 'DESC']]
       })
       totalVaccine += vaccineHistory.filter((vh) => vh.Status === 'Đã tiêm').length

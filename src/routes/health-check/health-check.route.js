@@ -247,6 +247,147 @@ router.post('/:id/send-confirm', authenticateToken, authorizeRoles('nurse'), ctr
  *         description: Đã lưu kết quả
  */
 router.post('/:id/submit-result', authenticateToken, authorizeRoles('nurse'), ctrl.submitResult)
+/**
+ * @swagger
+ * /api/v1/health-check/{id}/form-result:
+ *   get:
+ *     summary: Xem chi tiết kết quả khám của học sinh trong đợt khám
+ *     tags: [HealthCheck]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID đợt khám
+ *       - in: query
+ *         name: student_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID học sinh
+ *     responses:
+ *       200:
+ *         description: Trả về form kết quả khám
+ *       404:
+ *         description: Không tìm thấy
+ */
+router.get('/:id/form-result', authenticateToken, authorizeRoles('nurse'), ctrl.handleGetForm)
+
+/**
+ * @swagger
+ * /api/v1/health-check/{id}/form-result/all:
+ *   get:
+ *     summary: Lấy danh sách toàn bộ form khám của đợt khám
+ *     tags: [HealthCheck]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID đợt khám
+ *     responses:
+ *       200:
+ *         description: Danh sách form
+ *       404:
+ *         description: Không tìm thấy đợt khám
+ */
+router.get('/:id/form-result/all', authenticateToken, authorizeRoles('nurse'), ctrl.handleGetAllForms)
+/**
+ * @swagger
+ * /api/v1/health-check/{id}/form-result:
+ *   put:
+ *     summary: Cập nhật kết quả khám sức khỏe
+ *     tags: [HealthCheck]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID đợt khám
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - student_id
+ *             properties:
+ *               student_id:
+ *                 type: integer
+ *                 example: 1
+ *               height:
+ *                 type: number
+ *                 example: 150
+ *               weight:
+ *                 type: number
+ *                 example: 45
+ *               blood_pressure:
+ *                 type: string
+ *                 example: "110/70"
+ *               vision_left:
+ *                 type: number
+ *                 example: 1
+ *               vision_right:
+ *                 type: number
+ *                 example: 0.9
+ *               dental_status:
+ *                 type: string
+ *                 example: "Bình thường"
+ *               ent_status:
+ *                 type: string
+ *                 example: "Bình thường"
+ *               skin_status:
+ *                 type: string
+ *                 example: "Không phát ban"
+ *               general_conclusion:
+ *                 type: string
+ *                 example: "Bình thường"
+ *               is_need_meet:
+ *                 type: boolean
+ *                 example: false
+ *               status:
+ *                 type: string
+ *                 example: "approved"
+ *     responses:
+ *       200:
+ *         description: Cập nhật thành công
+ *       400:
+ *         description: Lỗi
+ */
+router.put('/:id/form-result', authenticateToken, authorizeRoles('nurse'), ctrl.handleUpdateForm)
+
+router.put('/:id/form-result', authenticateToken, authorizeRoles('nurse'), ctrl.handleUpdateForm)
+
+/**
+ * @swagger
+ * /api/v1/health-check/{id}/form-result:
+ *   delete:
+ *     summary: Xóa kết quả khám của học sinh trong đợt khám
+ *     tags: [HealthCheck]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID đợt khám
+ *       - in: query
+ *         name: student_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID học sinh
+ *     responses:
+ *       200:
+ *         description: Xóa thành công
+ *       400:
+ *         description: Lỗi hoặc không tìm thấy
+ */
+router.delete('/:id/form-result', authenticateToken, authorizeRoles('nurse'), ctrl.handleDeleteForm)
 
 /**
  * @swagger
@@ -289,7 +430,7 @@ router.get('/:id/students', authenticateToken, authorizeRoles('nurse'), ctrl.get
  * @swagger
  * /api/v1/health-check/form/{formId}/confirm:
  *   patch:
- *     summary: Phụ huynh xác nhận form khám
+ *     summary: Phụ huynh xác nhận hoặc từ chối form khám
  *     tags: [HealthCheck]
  *     parameters:
  *       - name: formId
@@ -297,10 +438,26 @@ router.get('/:id/students', authenticateToken, authorizeRoles('nurse'), ctrl.get
  *         required: true
  *         schema:
  *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               action:
+ *                 type: string
+ *                 enum: [approve, reject]
+ *                 example: approve
  *     responses:
  *       200:
- *         description: Đã xác nhận form
+ *         description: Đã cập nhật trạng thái form
+ *       400:
+ *         description: Hành động không hợp lệ
+ *       404:
+ *         description: Không tìm thấy form
  */
+
 router.patch('/form/:formId/confirm', authenticateToken, authorizeRoles('nurse'), ctrl.confirmForm)
 
 /**

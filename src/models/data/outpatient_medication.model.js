@@ -9,7 +9,7 @@ const OutpatientMedication = sequelize.define(
       primaryKey: true,
       autoIncrement: true
     },
-    MR_ID: {
+    ID: {
       type: DataTypes.INTEGER,
       allowNull: false
     }

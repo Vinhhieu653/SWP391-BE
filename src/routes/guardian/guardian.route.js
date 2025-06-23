@@ -45,7 +45,6 @@ const router = express.Router()
  *                   - fullname
  *                   - username
  *                   - email
- *                   - password
  *                   - phoneNumber
  *                   - roleInFamily
  *                   - isCallFirst
@@ -57,50 +56,30 @@ const router = express.Router()
  *                     type: string
  *                   email:
  *                     type: string
- *                   password:
- *                     type: string
  *                   phoneNumber:
  *                     type: string
  *                   roleInFamily:
  *                     type: string
  *                   isCallFirst:
  *                     type: boolean
- *                   students:
- *                     type: array
- *                     items:
- *                       type: object
- *                       required:
- *                         - fullname
- *                         - username
- *                         - email
- *                         - password
- *                       properties:
- *                         fullname:
- *                           type: string
- *                         username:
- *                           type: string
- *                         email:
- *                           type: string
- *                         password:
- *                           type: string
+ *                   address:
+ *                     type: string
+ *                   dateOfBirth:
+ *                     type: string
+ *                     format: date
+ *                   gender:
+ *                     type: string
  *           example:
  *             guardian:
  *               fullname: "Lê Thị A"
  *               username: "lethia01"
  *               email: "lethia@example.com"
- *               password: "Guardian@123"
  *               phoneNumber: "0901123456"
  *               roleInFamily: "Mẹ"
  *               isCallFirst: true
- *               students:
- *                 - fullname: "Nguyễn Văn B"
- *                   username: "nguyenvanb"
- *                   email: "vanb@student.com"
- *                   password: "Student@123"
- *                 - fullname: "Nguyễn Thị C"
- *                   username: "nguyenthic"
- *                   email: "thic@student.com"
- *                   password: "Student@456"
+ *               dateOfBirth: "2011-11-21"
+ *               gender: "female"
+ *               address: "123 Đường ABC, Quận 1, TP.HCM"
  *     responses:
  *       201:
  *         description: Tạo phụ huynh và học sinh thành công

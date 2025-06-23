@@ -22,6 +22,14 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true
     },
+    dateOfBirth: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    gender: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     password: {
       type: DataTypes.STRING,
       allowNull: true
