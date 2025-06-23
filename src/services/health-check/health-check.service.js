@@ -163,7 +163,8 @@ export async function sendConfirmForms(eventId) {
   const forms = await FormCheck.bulkCreate(
     students.map((s) => ({
       HC_ID: healthCheck.HC_ID,
-      Student_ID: s.id
+      Student_ID: s.id,
+      status: 'pending'
     })),
     { returning: true }
   )
@@ -343,6 +344,7 @@ export async function sendResult(eventId) {
 
 export async function confirmForm(formId, action) {
   const form = await FormCheck.findByPk(formId)
+
   if (!form) throw new Error('Không tìm thấy form')
 
   if (action === 'approve') {

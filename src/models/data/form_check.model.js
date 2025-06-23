@@ -32,8 +32,8 @@ const FormCheck = sequelize.define(
       defaultValue: false
     },
     status: {
-      type: DataTypes.ENUM('pending', 'approved', 'rejected'),
-      defaultValue: 'pending'
+      type: DataTypes.ENUM('created', 'pending', 'approved', 'rejected'),
+      defaultValue: 'created'
     }
   },
   {
