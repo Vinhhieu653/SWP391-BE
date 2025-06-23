@@ -86,7 +86,7 @@ export const getMedicalRecordsByGuardianUserIdService = async (guardianUserId) =
     },
     include: {
       model: User,
-      attributes: ['fullname']
+      attributes: ['fullname', 'dateOfBirth', 'gender']
     }
   })
 
@@ -94,11 +94,15 @@ export const getMedicalRecordsByGuardianUserIdService = async (guardianUserId) =
   return records.map((record) => {
     const plain = record.get({ plain: true })
     const fullname = plain.User?.fullname || null
+    const dateOfBirth = plain.User?.dateOfBirth || null
+    const gender = plain.User?.gender || null
     delete plain.User
 
     return {
       ...plain,
-      fullname
+      fullname,
+      dateOfBirth,
+      gender
     }
   })
 }
@@ -147,3 +151,66 @@ export const createStudentWithMedicalRecord = async ({ guardianUserId, student, 
   };
 };
 
+export const updateStudentWithMedicalRecord = async ({
+  guardianUserId,
+  medicalRecordId,
+  student,
+  medicalRecord
+}) => {
+  if (!guardianUserId || !medicalRecordId || !student || !medicalRecord) {
+    const error = new Error('Missing required data for update');
+    error.status = 400;
+    throw error;
+  }
+
+  // Tìm hồ sơ y tế
+  const medicalRecordInstance = await MedicalRecord.findByPk(medicalRecordId);
+  if (!medicalRecordInstance) {
+    throw Object.assign(new Error('Medical record not found'), { status: 404 });
+  }
+
+  // Lấy userId từ hồ sơ y tế
+  const studentUserId = medicalRecordInstance.userId;
+
+  // Kiểm tra student user tồn tại
+  const studentUser = await User.findByPk(studentUserId);
+  if (!studentUser) {
+    throw Object.assign(new Error('Student user not found'), { status: 404 });
+  }
+
+  // Kiểm tra liên kết với guardian
+  const guardian = await Guardian.findOne({ where: { userId: guardianUserId } });
+  if (!guardian) throw Object.assign(new Error('Guardian not found'), { status: 404 });
+
+  const link = await GuardianUser.findOne({ where: { obId: guardian.obId, userId: studentUserId } });
+  if (!link) throw Object.assign(new Error('This student does not belong to the guardian'), { status: 403 });
+
+  // Cập nhật thông tin học sinh
+  await studentUser.update({
+    fullname: student.fullname || studentUser.fullname,
+    dateOfBirth: student.dateOfBirth || studentUser.dateOfBirth,
+    gender: student.gender || studentUser.gender
+  });
+
+  // Cập nhật thông tin hồ sơ y tế
+  await medicalRecordInstance.update({
+    ...medicalRecord,
+    fullname: student.fullname,
+    dateOfBirth: student.dateOfBirth,
+    gender: student.gender
+  });
+
+  return {
+    message: 'Student and medical record updated successfully',
+    data: {
+      student: {
+      id: studentUser.id,
+      fullname: studentUser.fullname,
+      dateOfBirth: studentUser.dateOfBirth,
+      gender: studentUser.gender,
+      roleId: studentUser.roleId
+    },
+      medicalRecord: medicalRecordInstance
+    }
+  };
+};

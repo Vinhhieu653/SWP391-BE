@@ -24,8 +24,7 @@ export const createMedicalSentService = async (data, creator_by = 'system') => {
   // 1. Tìm MedicalRecord theo userId
   const medicalRecord = await MedicalRecord.findOne({ where: { userId: userId } })
   if (!medicalRecord) throw { status: 404, message: 'Medical record not found for this user' }
-
-  const MR_ID = medicalRecord.MR_ID
+  const MR_ID = medicalRecord.ID
 
   // 2. Tìm hoặc tạo OutpatientMedication theo MR_ID
   let outpatient = await OutpatientMedication.findOne({ where: { MR_ID: MR_ID } })
