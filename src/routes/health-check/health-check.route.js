@@ -59,6 +59,43 @@ router.get('/', authenticateToken, authorizeRoles('nurse'), ctrl.getHealthChecks
 
 /**
  * @swagger
+ * /api/v1/health-check/student/{studentId}:
+ *   get:
+ *     summary: Lấy danh sách form khám của học sinh theo ID
+ *     tags: [HealthCheck]
+ *     parameters:
+ *       - in: path
+ *         name: studentId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID của học sinh
+ *     responses:
+ *       200:
+ *         description: Danh sách form khám của học sinh
+ *         content:
+ *           application/json:
+ *             example:
+ *               - formId: 12
+ *                 eventId: 4
+ *                 dateEvent: "2025-06-22"
+ *                 type: "Khám tổng quát"
+ *                 schoolYear: "2024-2025"
+ *                 height: 150
+ *                 weight: 45
+ *                 bloodPressure: "110/70"
+ *                 generalConclusion: "Bình thường"
+ *       404:
+ *         description: Không tìm thấy dữ liệu
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Học sinh này chưa tham gia đợt khám nào"
+ */
+router.get('/student/:studentId', authenticateToken, authorizeRoles('nurse'), ctrl.getHealthCheckByStudentId)
+
+/**
+ * @swagger
  * /api/v1/health-check:
  *   put:
  *     summary: Cập nhật đợt khám sức khỏe
