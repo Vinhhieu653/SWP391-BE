@@ -1,6 +1,5 @@
 import express from 'express'
 import {
-  createMedicalRecord,
   getAllMedicalRecords,
   getMedicalRecordById,
   updateMedicalRecord,
@@ -67,57 +66,6 @@ router.get('/', getAllMedicalRecords)
  *         description: Không tìm thấy
  */
 router.get('/:id', getMedicalRecordById)
-/**
- * @swagger
- * /api/v1/medical-records:
- *   post:
- *     summary: Tạo mới hồ sơ y tế
- *     tags: [MedicalRecord]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - userId
- *               - bloodType
- *               - height
- *               - weight
- *             properties:
- *               userId:
- *                 type: integer
- *                 example: 1
- *               bloodType:
- *                 type: string
- *                 example: "O+"
- *               height:
- *                 type: number
- *                 example: 120
- *               weight:
- *                 type: number
- *                 example: 30
- *               class:
- *                 type: string
- *                 example: "Lớp 1A"
- *               chronicDiseases:
- *                 type: string
- *                 example: "Hen suyễn nhẹ, Tim mạch"
- *               allergies:
- *                 type: string
- *                 example: "Tôm cua, Phấn hoa"
- *               pastIllnesses:
- *                 type: string
- *                 example: "2020-12-10 - Viêm phổi (Kháng sinh)"
- *     responses:
- *       201:
- *         description: Tạo hồ sơ thành công
- *       400:
- *         description: Dữ liệu không hợp lệ
- */
-router.post('/', authenticateToken, authorizeRoles('guardian'), createMedicalRecord)
 
 /**
  * @swagger
@@ -190,7 +138,7 @@ router.delete('/:id', authenticateToken, authorizeRoles('guardian'), deleteMedic
  *                 properties:
  *                   class:
  *                     type: string
- *                     example: "Lớp 4A"
+ *                     example: "4A"
  *                   height:
  *                     type: number
  *                     example: 130
@@ -279,7 +227,7 @@ router.post('/student', authenticateToken, authorizeRoles('guardian'), createStu
  *                 properties:
  *                   class:
  *                     type: string
- *                     example: "Lớp 5B"
+ *                     example: "5B"
  *                   height:
  *                     type: number
  *                     example: 135

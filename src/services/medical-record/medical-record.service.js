@@ -45,22 +45,6 @@ export const getMedicalRecordById = async (id) => {
   }
 }
 
-// Tạo mới hồ sơ y tế
-export const createMedicalRecord = async (data) => {
-  const converted = {
-    ...data,
-    chronicDiseases: Array.isArray(data.chronicDiseases)
-      ? data.chronicDiseases.map((d) => d.name).join(', ')
-      : data.chronicDiseases,
-    allergies: Array.isArray(data.allergies) ? data.allergies.map((a) => a.name).join(', ') : data.allergies,
-    pastIllnesses: Array.isArray(data.pastIllnesses)
-      ? data.pastIllnesses.map((p) => `${p.date} - ${p.disease} (${p.treatment})`).join(' | ')
-      : data.pastIllnesses
-  }
-
-  return await MedicalRecord.create(converted)
-}
-
 // Cập nhật hồ sơ y tế
 export const updateMedicalRecord = async (id, data) => {
   const record = await MedicalRecord.findByPk(id)

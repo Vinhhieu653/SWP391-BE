@@ -31,6 +31,7 @@ import { seedUsers } from './database/seeds/users.seed.js'
 import { seedBlogs } from './database/seeds/blogs.seed.js'
 import { seedCategories } from './database/seeds/category.seed.js'
 import applyAssociations from './models/associate/associate.js'
+import { seedMedicalRecords } from './database/seeds/medical-record.seed.js'
 
 dotenv.config()
 
@@ -103,7 +104,7 @@ async function startServer() {
     await seedUsers()
     await seedCategories()
     await seedBlogs()
-    // await seedMedicalRecords()
+    await seedMedicalRecords()
 
     server.listen(PORT, () => {
       console.log(`Server chạy tại http://localhost:${PORT}/api-docs/`)

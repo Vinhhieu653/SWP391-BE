@@ -21,16 +21,6 @@ export const getMedicalRecordById = async (req, res) => {
   }
 }
 
-// Tạo mới hồ sơ y tế
-export const createMedicalRecord = async (req, res) => {
-  try {
-    const newRecord = await medicalRecordService.createMedicalRecord(req.body)
-    res.status(201).json(newRecord)
-  } catch (error) {
-    res.status(400).json({ message: error.message })
-  }
-}
-
 // Cập nhật hồ sơ y tế
 export const updateMedicalRecord = async (req, res) => {
   try {
