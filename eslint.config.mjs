@@ -9,10 +9,10 @@ export default defineConfig([
     files: ['**/*.{js,mjs,cjs,ts}'],
     languageOptions: {
       env: {
-        node: true, // thêm dòng này
+        node: true,
         browser: true
       },
-      globals: globals.node // thêm nếu cần
+      globals: globals.node
     }
   },
   tseslint.configs.recommended

@@ -1,6 +1,7 @@
 import User from '../../models/data/user.model.js'
 import argon2 from 'argon2'
-import { sendRandomPasswordMail } from '../../services/send-mail/email.service.js'
+import { sendRandomPasswordMail, sendResetPasswordMail } from '../../services/send-mail/email.service.js'
+import jwt from 'jsonwebtoken'
 
 export async function changePassword(userId, currentPassword, newPassword) {
   const user = await User.findByPk(userId)
@@ -41,4 +42,35 @@ export const sendRandomPassword = async (email) => {
     password: newPassword,
     actionLink
   })
+}
+
+export const forgotPasswordService = async (email) => {
+  const user = await User.findOne({ where: { email } })
+  if (!user) throw new Error('Email không tồn tại')
+
+  const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '15m' })
+  const actionLink = `${process.env.FRONTEND_URL || 'http://localhost:5173/'}/reset-password?token=${token}`
+
+  await sendResetPasswordMail({
+    to: email,
+    studentName: user.fullname || 'Người dùng',
+    actionLink,
+    year: new Date().getFullYear()
+  })
+}
+
+export const resetPasswordWithConfirmService = async (token, newPassword) => {
+  let decoded
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET)
+  } catch {
+    throw new Error('Token không hợp lệ hoặc đã hết hạn')
+  }
+
+  const user = await User.findOne({ where: { email: decoded.email } })
+  if (!user) throw new Error('Người dùng không tồn tại')
+
+  const hashed = await argon2.hash(newPassword)
+  user.password = hashed
+  await user.save()
 }

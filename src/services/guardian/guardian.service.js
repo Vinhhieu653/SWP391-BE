@@ -191,16 +191,16 @@ export const deleteGuardian = async (obId) => {
 
 export const getStudentsByUserId = async (userId) => {
   // Tìm guardian theo userId
-  const guardian = await Guardian.findOne({ where: { userId } });
+  const guardian = await Guardian.findOne({ where: { userId } })
   if (!guardian) {
-    const error = new Error('Guardian not found for this userId');
-    error.status = 404;
-    throw error;
+    const error = new Error('Guardian not found for this userId')
+    error.status = 404
+    throw error
   }
 
   // Lấy danh sách liên kết giữa guardian và học sinh
-  const links = await GuardianUser.findAll({ where: { obId: guardian.obId } });
-  const studentIds = links.map((link) => link.userId);
+  const links = await GuardianUser.findAll({ where: { obId: guardian.obId } })
+  const studentIds = links.map((link) => link.userId)
 
   // Truy vấn các học sinh
   const students = studentIds.length
@@ -208,44 +208,39 @@ export const getStudentsByUserId = async (userId) => {
         where: { id: studentIds },
         attributes: ['id', 'username', 'fullname', 'dateOfBirth']
       })
-    : [];
+    : []
 
   // Truy vấn thông tin Class từ bảng MedicalRecord
- const medicalRecords = await MedicalRecord.findAll({
-  where: { userId: studentIds },
-  attributes: ['userId', 'Class']
-});
+  const medicalRecords = await MedicalRecord.findAll({
+    where: { userId: studentIds },
+    attributes: ['userId', 'Class']
+  })
 
+  // Map userId -> Class (dùng số nguyên, không ép string)
+  const recordMap = {}
+  for (const record of medicalRecords) {
+    recordMap[record.userId] = record.Class
+  }
 
-// Map userId -> Class (dùng số nguyên, không ép string)
-const recordMap = {};
-for (const record of medicalRecords) {
-  recordMap[record.userId] = record.Class;
-}
+  // Gộp Class vào từng học sinh
+  const studentsWithClass = students.map((student) => {
+    const className = recordMap[student.id] || null
+    console.log('studentId:', student.id, '→ className:', className)
 
-// Gộp Class vào từng học sinh
-const studentsWithClass = students.map((student) => {
-  const className = recordMap[student.id] || null;
-  console.log('studentId:', student.id, '→ className:', className);
-
-  return {
-    id: student.id,
-    username: student.username,
-    fullname: student.fullname,
-    dateOfBirth: student.dateOfBirth,
-    className
-  };
-});
-
-
-
+    return {
+      id: student.id,
+      username: student.username,
+      fullname: student.fullname,
+      dateOfBirth: student.dateOfBirth,
+      className
+    }
+  })
 
   return {
     guardianObId: guardian.obId,
     students: studentsWithClass
-  };
-};
-
+  }
+}
 
 export const addStudentByGuardianId = async (obId, studentData) => {
   const guardian = await Guardian.findOne({ where: { obId } })
