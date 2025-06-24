@@ -90,3 +90,18 @@ export const deleteOtherMedical = async (req, res) => {
     res.status(error.status || 500).json({ message: error.message || 'Internal server error' })
   }
 }
+
+export const getOtherMedicalByGuardianUserId = async (req, res) => {
+  try {
+    const { guardianUserId } = req.params
+    const records = await OtherMedicalService.getOtherMedicalByGuardianUserIdService(guardianUserId)
+    res.status(200).json({
+      status: 200,
+      success: true,
+      message: 'Fetched successfully',
+      data: records
+    })
+  } catch (error) {
+    res.status(error.status || 500).json({ message: error.message || 'Internal server error' })
+  }
+}
