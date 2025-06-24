@@ -37,7 +37,7 @@ const router = Router()
  *         description: Lỗi server
  */
 
-router.post('/change-password', authController.changePassword)
+router.post('/change-password', authenticateToken, authController.changePassword)
 
 /**
  * @swagger
