@@ -115,6 +115,51 @@ export async function getHealthCheckById(id) {
     schoolYear: hc.School_year
   }
 }
+export async function getHealthChecksByStudentId(studentId) {
+  const forms = await FormCheck.findAll({
+    where: { Student_ID: studentId },
+    include: {
+      model: HealthCheck,
+      include: {
+        model: Event,
+        attributes: ['eventId', 'dateEvent', 'type']
+      }
+    }
+  })
+
+  if (!forms || forms.length === 0) {
+    throw new Error('Học sinh này chưa tham gia đợt khám nào')
+  }
+
+  return forms.map((form) => ({
+    formId: form.Form_ID,
+    studentId: form.Student_ID,
+    status: form.status,
+
+    // from HealthCheck
+    healthCheckId: form.HealthCheck?.HC_ID,
+    title: form.HealthCheck?.title,
+    description: form.HealthCheck?.description,
+    schoolYear: form.HealthCheck?.School_year,
+
+    // from Event
+    eventId: form.HealthCheck?.Event?.eventId,
+    dateEvent: form.HealthCheck?.Event?.dateEvent,
+    type: form.HealthCheck?.Event?.type
+  }))
+
+  return forms.map((form) => ({
+    formId: form.Form_ID,
+    eventId: form.HealthCheck?.Event?.eventId,
+    dateEvent: form.HealthCheck?.Event?.dateEvent,
+    type: form.HealthCheck?.Event?.type,
+    schoolYear: form.HealthCheck?.School_year,
+    height: form.height,
+    weight: form.weight,
+    bloodPressure: form.blood_pressure,
+    generalConclusion: form.general_conclusion
+  }))
+}
 
 export async function updateHealthCheck(id, data) {
   const healthCheck = await HealthCheck.findByPk(id, { include: Event })

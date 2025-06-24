@@ -45,22 +45,6 @@ export const getMedicalRecordById = async (id) => {
   }
 }
 
-// Tạo mới hồ sơ y tế
-export const createMedicalRecord = async (data) => {
-  const converted = {
-    ...data,
-    chronicDiseases: Array.isArray(data.chronicDiseases)
-      ? data.chronicDiseases.map((d) => d.name).join(', ')
-      : data.chronicDiseases,
-    allergies: Array.isArray(data.allergies) ? data.allergies.map((a) => a.name).join(', ') : data.allergies,
-    pastIllnesses: Array.isArray(data.pastIllnesses)
-      ? data.pastIllnesses.map((p) => `${p.date} - ${p.disease} (${p.treatment})`).join(' | ')
-      : data.pastIllnesses
-  }
-
-  return await MedicalRecord.create(converted)
-}
-
 // Cập nhật hồ sơ y tế
 export const updateMedicalRecord = async (id, data) => {
   const record = await MedicalRecord.findByPk(id)
@@ -196,49 +180,44 @@ export const createStudentWithMedicalRecord = async ({ guardianUserId, student, 
       student: studentUser,
       medicalRecord: medicalRecordCreated
     }
-  };
-};
+  }
+}
 
-export const updateStudentWithMedicalRecord = async ({
-  guardianUserId,
-  medicalRecordId,
-  student,
-  medicalRecord
-}) => {
+export const updateStudentWithMedicalRecord = async ({ guardianUserId, medicalRecordId, student, medicalRecord }) => {
   if (!guardianUserId || !medicalRecordId || !student || !medicalRecord) {
-    const error = new Error('Missing required data for update');
-    error.status = 400;
-    throw error;
+    const error = new Error('Missing required data for update')
+    error.status = 400
+    throw error
   }
 
   // Tìm hồ sơ y tế
-  const medicalRecordInstance = await MedicalRecord.findByPk(medicalRecordId);
+  const medicalRecordInstance = await MedicalRecord.findByPk(medicalRecordId)
   if (!medicalRecordInstance) {
-    throw Object.assign(new Error('Medical record not found'), { status: 404 });
+    throw Object.assign(new Error('Medical record not found'), { status: 404 })
   }
 
   // Lấy userId từ hồ sơ y tế
-  const studentUserId = medicalRecordInstance.userId;
+  const studentUserId = medicalRecordInstance.userId
 
   // Kiểm tra student user tồn tại
-  const studentUser = await User.findByPk(studentUserId);
+  const studentUser = await User.findByPk(studentUserId)
   if (!studentUser) {
-    throw Object.assign(new Error('Student user not found'), { status: 404 });
+    throw Object.assign(new Error('Student user not found'), { status: 404 })
   }
 
   // Kiểm tra liên kết với guardian
-  const guardian = await Guardian.findOne({ where: { userId: guardianUserId } });
-  if (!guardian) throw Object.assign(new Error('Guardian not found'), { status: 404 });
+  const guardian = await Guardian.findOne({ where: { userId: guardianUserId } })
+  if (!guardian) throw Object.assign(new Error('Guardian not found'), { status: 404 })
 
-  const link = await GuardianUser.findOne({ where: { obId: guardian.obId, userId: studentUserId } });
-  if (!link) throw Object.assign(new Error('This student does not belong to the guardian'), { status: 403 });
+  const link = await GuardianUser.findOne({ where: { obId: guardian.obId, userId: studentUserId } })
+  if (!link) throw Object.assign(new Error('This student does not belong to the guardian'), { status: 403 })
 
   // Cập nhật thông tin học sinh
   await studentUser.update({
     fullname: student.fullname || studentUser.fullname,
     dateOfBirth: student.dateOfBirth || studentUser.dateOfBirth,
     gender: student.gender || studentUser.gender
-  });
+  })
 
   // Format dữ liệu trước khi update
 const formattedMedicalRecord = {
@@ -273,13 +252,13 @@ await medicalRecordInstance.update(formattedMedicalRecord);
     message: 'Student and medical record updated successfully',
     data: {
       student: {
-      id: studentUser.id,
-      fullname: studentUser.fullname,
-      dateOfBirth: studentUser.dateOfBirth,
-      gender: studentUser.gender,
-      roleId: studentUser.roleId
-    },
+        id: studentUser.id,
+        fullname: studentUser.fullname,
+        dateOfBirth: studentUser.dateOfBirth,
+        gender: studentUser.gender,
+        roleId: studentUser.roleId
+      },
       medicalRecord: medicalRecordInstance
     }
-  };
-};
+  }
+}

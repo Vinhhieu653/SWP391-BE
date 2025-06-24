@@ -33,7 +33,7 @@ export const sendRandomPassword = async (email) => {
   user.password = hashed
   await user.save()
 
-  const actionLink = `${process.env.FRONTEND_URL || 'https://example.com'}/reset-password?email=${encodeURIComponent(email)}`
+  const actionLink = `${process.env.FRONTEND_URL || 'http://localhost:5173/'}/reset-password?email=${encodeURIComponent(email)}`
 
   await sendRandomPasswordMail({
     to: email,

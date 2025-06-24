@@ -1,6 +1,5 @@
 import express from 'express'
 import {
-  createMedicalRecord,
   getAllMedicalRecords,
   getMedicalRecordById,
   updateMedicalRecord,
@@ -67,58 +66,6 @@ router.get('/', getAllMedicalRecords)
  *         description: Không tìm thấy
  */
 router.get('/:id', getMedicalRecordById)
-/**
- * @swagger
- * /api/v1/medical-records:
- *   post:
- *     summary: Tạo mới hồ sơ y tế
- *     tags: [MedicalRecord]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - userId
- *               - bloodType
- *               - height
- *               - weight
- *             properties:
- *               userId:
- *                 type: integer
- *                 example: 1
- *               bloodType:
- *                 type: string
- *                 example: "O+"
- *               height:
- *                 type: number
- *                 example: 120
- *               weight:
- *                 type: number
- *                 example: 30
- *               class:
- *                 type: string
- *                 example: "Lớp 1A"
- *               chronicDiseases:
- *                 type: string
- *                 example: "Hen suyễn nhẹ, Tim mạch"
- *               allergies:
- *                 type: string
- *                 example: "Tôm cua, Phấn hoa"
- *               pastIllnesses:
- *                 type: string
- *                 example: "2020-12-10 - Viêm phổi (Kháng sinh)"
- *     responses:
- *       201:
- *         description: Tạo hồ sơ thành công
- *       400:
- *         description: Dữ liệu không hợp lệ
- */
-router.post('/', authenticateToken, authorizeRoles('guardian', 'nurse'), createMedicalRecord)
-
 
 /**
  * @swagger
@@ -140,7 +87,7 @@ router.post('/', authenticateToken, authorizeRoles('guardian', 'nurse'), createM
  *       404:
  *         description: Không tìm thấy
  */
-router.delete('/:id', authenticateToken, authorizeRoles('guardian', 'nurse'), deleteMedicalRecord)
+router.delete('/:id', authenticateToken, authorizeRoles('guardian'), deleteMedicalRecord)
 
 /**
  * @swagger
@@ -191,7 +138,7 @@ router.delete('/:id', authenticateToken, authorizeRoles('guardian', 'nurse'), de
  *                 properties:
  *                   class:
  *                     type: string
- *                     example: "Lớp 4A"
+ *                     example: "4A"
  *                   height:
  *                     type: number
  *                     example: 130
@@ -238,8 +185,7 @@ router.delete('/:id', authenticateToken, authorizeRoles('guardian', 'nurse'), de
  *       400:
  *         description: Dữ liệu không hợp lệ
  */
-router.post('/student', authenticateToken, authorizeRoles('guardian', 'nurse'), createStudentAndMedical)
-
+router.post('/student', authenticateToken, authorizeRoles('guardian'), createStudentAndMedical)
 
 /**
  * @swagger
@@ -281,7 +227,7 @@ router.post('/student', authenticateToken, authorizeRoles('guardian', 'nurse'), 
  *                 properties:
  *                   class:
  *                     type: string
- *                     example: "Lớp 5B"
+ *                     example: "5B"
  *                   height:
  *                     type: number
  *                     example: 135
@@ -330,8 +276,6 @@ router.post('/student', authenticateToken, authorizeRoles('guardian', 'nurse'), 
  *       404:
  *         description: Không tìm thấy hồ sơ hoặc học sinh
  */
-router.put('/student/:id', authenticateToken, authorizeRoles('guardian', 'nurse'), updateStudentAndMedical);
-
-
+router.put('/student/:id', authenticateToken, authorizeRoles('guardian'), updateStudentAndMedical)
 
 export default router
