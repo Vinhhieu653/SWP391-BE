@@ -85,25 +85,24 @@ export const createStudentAndMedical = async (req, res, next) => {
   }
 }
 
-
 export const updateStudentAndMedical = async (req, res) => {
   try {
-    const medicalRecordId = parseInt(req.params.id, 10);
+    const medicalRecordId = parseInt(req.params.id, 10)
 
-    const { guardianUserId, student, medicalRecord } = req.body;
+    const { guardianUserId, student, medicalRecord } = req.body
 
     const result = await medicalRecordService.updateStudentWithMedicalRecord({
       guardianUserId,
       medicalRecordId,
       student,
       medicalRecord
-    });
+    })
 
-    return res.status(200).json(result);
+    return res.status(200).json(result)
   } catch (error) {
-    console.error('Error updating student & medical record:', error.message);
+    console.error('Error updating student & medical record:', error.message)
     return res.status(error.status || 500).json({
       message: error.message || 'Internal Server Error'
-    });
+    })
   }
-};
+}

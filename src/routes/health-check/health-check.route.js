@@ -458,7 +458,7 @@ router.get('/:id/students', authenticateToken, authorizeRoles('nurse'), ctrl.get
  *         description: Không tìm thấy form
  */
 
-router.patch('/form/:formId/confirm', authenticateToken, authorizeRoles('nurse'), ctrl.confirmForm)
+router.patch('/form/:formId/confirm', authenticateToken, authorizeRoles('guardian'), ctrl.confirmForm)
 
 /**
  * @swagger
