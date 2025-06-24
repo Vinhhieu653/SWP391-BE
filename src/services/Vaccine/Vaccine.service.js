@@ -115,7 +115,7 @@ export const getAllVaccineHistoryService = async () => {
       if (medicalRecord) {
         record.dataValues.MedicalRecord = medicalRecord
         const user = await User.findByPk(medicalRecord.userId, {
-          attributes: ['fullname','dateOfBirth']
+          attributes: ['fullname', 'dateOfBirth']
         })
         record.dataValues.PatientName = user ? user.fullname : null
       }
@@ -136,7 +136,7 @@ export const getVaccineHistoryByIdService = async (id) => {
   if (medicalRecord) {
     record.dataValues.MedicalRecord = medicalRecord
     const user = await User.findByPk(medicalRecord.userId, {
-      attributes: ['fullname','dateOfBirth']
+      attributes: ['fullname', 'dateOfBirth']
     })
     record.dataValues.PatientName = user ? user.fullname : null
   }
@@ -153,7 +153,7 @@ export const getVaccineHistoryByMRIdService = async (ID) => {
   const medicalRecord = await MedicalRecord.findByPk(ID)
   const user = medicalRecord
     ? await User.findByPk(medicalRecord.userId, {
-        attributes: ['fullname','dateOfBirth']
+        attributes: ['fullname', 'dateOfBirth']
       })
     : null
 
@@ -228,7 +228,7 @@ export const getStudentsByEventIdService = async (eventId) => {
       if (!medicalRecord) return null
 
       const student = await User.findByPk(medicalRecord.userId, {
-        attributes: ['id', 'fullname','dateOfBirth']
+        attributes: ['id', 'fullname', 'dateOfBirth']
       })
 
       if (!student) return null
@@ -309,7 +309,7 @@ export const getVaccineHistoryByVaccineNameService = async (vaccineName) => {
       if (medicalRecord) {
         record.dataValues.MedicalRecord = medicalRecord
         const user = await User.findByPk(medicalRecord.userId, {
-          attributes: ['fullname','dateOfBirth']
+          attributes: ['fullname', 'dateOfBirth']
         })
         record.dataValues.PatientName = user ? user.fullname : null
       }
@@ -353,7 +353,7 @@ export const getVaccineHistoryByGuardianUserIdService = async (guardianUserId) =
 
   const allHistories = await Promise.all(
     medicalRecords.map(async (mr) => {
-      const user = await User.findByPk(mr.userId, { attributes: ['id', 'fullname','dateOfBirth'] })
+      const user = await User.findByPk(mr.userId, { attributes: ['id', 'fullname', 'dateOfBirth'] })
       const vaccineHistory = await VaccineHistory.findAll({
         where: { ID: mr.ID },
         order: [['Date_injection', 'DESC']]
@@ -364,7 +364,7 @@ export const getVaccineHistoryByGuardianUserIdService = async (guardianUserId) =
         totalVaccine,
         totalNeedConfirm,
         medicalRecord: mr,
-        user: user ? { id: user.id, fullname: user.fullname, dateOfBirth:user.dateOfBirth } : null,
+        user: user ? { id: user.id, fullname: user.fullname, dateOfBirth: user.dateOfBirth } : null,
         vaccineHistory
       }
     })
