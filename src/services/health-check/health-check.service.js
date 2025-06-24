@@ -197,9 +197,15 @@ export async function deleteHealthCheck(id) {
 
 export async function sendConfirmForms(eventId) {
   const students = await User.findAll({
-    where: { roleId: 3 }, // học sinh
-    include: [{ model: Guardian }]
+    where: { roleId: 3 },
+    include: [
+      {
+        model: GuardianUser,
+        include: [Guardian]
+      }
+    ]
   })
+
   if (!students.length) throw new Error('Không có học sinh trong đợt khám')
 
   const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
@@ -215,17 +221,17 @@ export async function sendConfirmForms(eventId) {
   )
 
   // Gửi noti cho phụ huynh
-  for (let i = 0; i < students.length; i++) {
-    const student = students[i]
-    const guardian = student.Guardian
-
-    if (guardian) {
-      await Notification.create({
-        userId: guardian.id,
-        title: 'Xác nhận thông tin khám sức khỏe',
-        mess: `Vui lòng xác nhận form khám sức khỏe của học sinh ${student.fullName || 'con bạn'}`,
-        isRead: false
-      })
+  for (const student of students) {
+    for (const gu of student.GuardianUsers) {
+      const guardian = gu.Guardian
+      if (guardian && guardian.userId) {
+        await Notification.create({
+          userId: guardian.userId,
+          title: 'Xác nhận thông tin khám sức khỏe',
+          mess: `Vui lòng xác nhận form khám sức khỏe của học sinh ${student.fullName || 'con bạn'}`,
+          isRead: false
+        })
+      }
     }
   }
 
