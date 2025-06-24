@@ -92,7 +92,7 @@ router.get('/', authenticateToken, authorizeRoles('nurse'), ctrl.getHealthChecks
  *             example:
  *               message: "Học sinh này chưa tham gia đợt khám nào"
  */
-router.get('/student/:studentId', authenticateToken, authorizeRoles('nurse'), ctrl.getHealthCheckByStudentId)
+router.get('/student/:studentId', authenticateToken, authorizeRoles('guardian'), ctrl.getHealthCheckByStudentId)
 
 /**
  * @swagger
