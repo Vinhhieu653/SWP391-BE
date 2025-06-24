@@ -230,6 +230,68 @@ const upload = multer({ dest: 'uploads/' })
  *                   type: array
  */
 
+/**
+ * @swagger
+ * /api/v1/vaccine/types:
+ *   get:
+ *     summary: Lấy danh sách tất cả loại vaccine
+ *     tags: [Vaccine]
+ *     responses:
+ *       200:
+ *         description: Danh sách loại vaccine
+ */
+
+/**
+ * @swagger
+ * /api/v1/vaccine/event/{eventId}/students:
+ *   get:
+ *     summary: Lấy danh sách học sinh theo sự kiện tiêm chủng
+ *     tags: [Vaccine]
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Danh sách học sinh
+ */
+
+/**
+ * @swagger
+ * /api/v1/vaccine/by-name/{vaccineName}:
+ *   get:
+ *     summary: Lấy lịch sử tiêm chủng theo tên vaccine
+ *     tags: [Vaccine]
+ *     parameters:
+ *       - in: path
+ *         name: vaccineName
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Danh sách lịch sử tiêm chủng theo tên vaccine
+ */
+
+/**
+ * @swagger
+ * /api/v1/vaccine/guardian/{guardianUserId}:
+ *   get:
+ *     summary: Lấy lịch sử tiêm chủng theo userId của phụ huynh
+ *     tags: [Vaccine]
+ *     parameters:
+ *       - in: path
+ *         name: guardianUserId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Danh sách lịch sử tiêm chủng của phụ huynh
+ */
+
 router.post('/', authenticateToken, authorizeRoles('nurse'), createVaccineHistory)
 router.post(
   '/evidence',

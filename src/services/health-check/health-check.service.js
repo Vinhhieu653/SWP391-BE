@@ -41,7 +41,6 @@ export const createHealthCheck = async (data) => {
       where: { userId: medicalRecord.userId }
     })
 
-    // Debug GuardianUser
     if (!guardianUsers.length) {
       console.warn(`⚠️ Không tìm thấy GuardianUser cho userId: ${medicalRecord.userId}`)
     }
