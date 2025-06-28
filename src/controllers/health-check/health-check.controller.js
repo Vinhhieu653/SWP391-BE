@@ -115,11 +115,11 @@ export const handleUpdateForm = async (req, res) => {
   }
 }
 
-export const handleDeleteForm = async (req, res) => {
+export const handleResetForm = async (req, res) => {
   try {
     const { id } = req.params
     const { student_id } = req.query
-    const result = await srv.deleteFormResult(id, student_id) // ✅ đổi sang srv
+    const result = await srv.resetFormResult(id, student_id) // ✅ đổi sang srv
     res.status(200).json({ message: result })
   } catch (err) {
     res.status(400).json({ error: err.message })

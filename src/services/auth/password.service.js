@@ -49,7 +49,7 @@ export const forgotPasswordService = async (email) => {
   if (!user) throw new Error('Email không tồn tại')
 
   const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '15m' })
-  const actionLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/forgot-password?token=${token}`
+  const actionLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${token}`
 
   await sendResetPasswordMail({
     to: email,
