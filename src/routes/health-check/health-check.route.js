@@ -402,8 +402,8 @@ router.put('/:id/form-result', authenticateToken, authorizeRoles('nurse'), ctrl.
 /**
  * @swagger
  * /api/v1/health-check/{id}/form-result:
- *   delete:
- *     summary: Xóa kết quả khám của học sinh trong đợt khám
+ *   patch:
+ *     summary: Reset kết quả khám của học sinh trong đợt khám
  *     tags: [HealthCheck]
  *     parameters:
  *       - in: path
@@ -420,11 +420,12 @@ router.put('/:id/form-result', authenticateToken, authorizeRoles('nurse'), ctrl.
  *         description: ID học sinh
  *     responses:
  *       200:
- *         description: Xóa thành công
+ *         description: Reset thành công
  *       400:
  *         description: Lỗi hoặc không tìm thấy
  */
-router.delete('/:id/form-result', authenticateToken, authorizeRoles('nurse'), ctrl.handleDeleteForm)
+
+router.patch('/:id/form-result', authenticateToken, authorizeRoles('nurse'), ctrl.handleResetForm)
 
 /**
  * @swagger

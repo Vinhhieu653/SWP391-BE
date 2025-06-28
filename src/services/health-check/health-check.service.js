@@ -310,19 +310,30 @@ export async function updateFormResult(eventId, studentId, data) {
   return 'Cập nhật thành công'
 }
 
-export async function deleteFormResult(eventId, studentId) {
-  const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
-  if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
-
-  const deleted = await FormCheck.destroy({
-    where: {
-      HC_ID: healthCheck.HC_ID,
-      Student_ID: studentId
+export async function resetFormResult(formId) {
+  const [updated] = await FormCheck.update(
+    {
+      Height: null,
+      Weight: null,
+      Blood_Pressure: null,
+      Vision_Left: null,
+      Vision_Right: null,
+      Dental_Status: null,
+      ENT_Status: null,
+      Skin_Status: null,
+      General_Conclusion: null,
+      Is_need_meet: null,
+      status: 'approved' // hoặc 'confirmed' tùy logic của m
+    },
+    {
+      where: {
+        Form_ID: formId
+      }
     }
-  })
+  )
 
-  if (!deleted) throw new Error('Không tìm thấy form khám để xóa')
-  return 'Xóa thành công'
+  if (!updated) throw new Error('Không tìm thấy form khám để reset')
+  return 'Đã reset kết quả khám'
 }
 
 export async function getFormResult(eventId, studentId) {

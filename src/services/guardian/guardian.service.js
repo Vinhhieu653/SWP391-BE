@@ -371,16 +371,16 @@ export async function importGuardiansExcelService(fileBuffer) {
   const sheet = workbook.worksheets[0]
   const results = []
 
-  // 👉 Fix lệch header
-  const rawHeaderRow = sheet.getRow(1).values
-  const headers = rawHeaderRow.slice(1).map((h) => (h || '').toString().trim().toLowerCase())
+  const headerRow = sheet.getRow(1)
+  const headers = headerRow.values.slice(1).map((h) => (h || '').toString().trim().toLowerCase())
 
   for (let i = 2; i <= sheet.rowCount; i++) {
     const row = sheet.getRow(i)
     const rowData = {}
 
     headers.forEach((key, index) => {
-      rowData[key] = row.getCell(index + 1).value
+      const cell = row.getCell(index + 1).value
+      rowData[key] = typeof cell === 'object' && cell?.text ? cell.text : cell
     })
 
     try {
@@ -391,19 +391,21 @@ export async function importGuardiansExcelService(fileBuffer) {
         phoneNumber: rowData.phonenumber,
         roleInFamily: rowData.roleinfamily,
         isCallFirst: rowData.iscallfirst === true || rowData.iscallfirst === 'TRUE',
-        dateOfBirth: rowData.dateofbirth,
+        dateOfBirth:
+          rowData.dateofbirth instanceof Date ? rowData.dateofbirth.toISOString().split('T')[0] : rowData.dateofbirth,
+
         gender: rowData.gender,
         address: rowData.address
+      }
+
+      if (!guardianData.phoneNumber || !guardianData.roleInFamily) {
+        throw new Error('Thiếu số điện thoại hoặc vai trò trong gia đình')
       }
 
       await createGuardianWithStudents({ guardian: guardianData })
       results.push({ username: guardianData.username, status: 'success' })
     } catch (err) {
-      results.push({
-        username: rowData.username || '(no username)',
-        status: 'failed',
-        error: err.message
-      })
+      results.push({ username: rowData.username, status: 'failed', error: err.message })
     }
   }
 
