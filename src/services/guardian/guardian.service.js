@@ -4,7 +4,6 @@ import GuardianUser from '../../models/data/guardian_user.model.js'
 import * as registerService from '../auth/register.service.js'
 import MedicalRecord from '../../models/data/medicalRecord.model.js'
 import ExcelJS from 'exceljs'
-import { createGuardian } from './createGuardian.service.js'
 // Create guardian with associated student users
 export const createGuardianWithStudents = async ({ guardian }) => {
   if (!guardian) {
@@ -136,7 +135,7 @@ export const getAllGuardians = async () => {
 
 // Update guardian record and its user info
 export const updateGuardian = async (obId, data) => {
-  const { fullname, username, email, phoneNumber, roleInFamily, isCallFirst } = data
+  const { fullname, username, email, phoneNumber, roleInFamily, isCallFirst, address } = data
 
   const guardian = await Guardian.findOne({ where: { obId } })
   if (!guardian) throw Object.assign(new Error('Guardian not found'), { status: 404 })
@@ -165,11 +164,21 @@ export const updateGuardian = async (obId, data) => {
   guardian.roleInFamily = roleInFamily || guardian.roleInFamily
   guardian.isCallFirst = isCallFirst !== undefined ? isCallFirst : guardian.isCallFirst
   guardian.phoneNumber = phoneNumber || guardian.phoneNumber
+  if (address !== undefined) guardian.address = address
   await guardian.save()
 
   return {
     message: 'Guardian updated successfully',
-    data: { guardian: guardian.dataValues, fullname: user.fullname }
+    data: {
+      guardian: guardian.dataValues,
+      user: {
+        id: user.id,
+        username: user.username,
+        fullname: user.fullname,
+        email: user.email,
+        phoneNumber: user.phoneNumber
+      }
+    }
   }
 }
 
