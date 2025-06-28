@@ -429,36 +429,35 @@ export async function getStudentsByEvent(HC_ID) {
         include: [{ model: Guardian }]
       }
     ]
-  });
+  })
 
-  const studentsId = forms.map((form) => form.Student.id);
+  const studentsId = forms.map((form) => form.Student.id)
 
   const records = await MedicalRecord.findAll({
     where: {
       userId: {
-        [Op.in]: studentsId,
-      },
+        [Op.in]: studentsId
+      }
     },
-    attributes: ['userId', 'Class'], // nhớ lấy userId để mapping
-  });
+    attributes: ['userId', 'Class'] // nhớ lấy userId để mapping
+  })
 
   // Tạo map userId -> Class
-  const classMap = {};
+  const classMap = {}
   records.forEach((record) => {
-    classMap[record.userId] = record.Class;
-  });
+    classMap[record.userId] = record.Class
+  })
 
   // Gán Class vào Student
   forms.forEach((form) => {
-    const student = form.Student;
+    const student = form.Student
     if (student && classMap[student.id]) {
-      student.Class = classMap[student.id];
+      student.Class = classMap[student.id]
     }
-  });
+  })
 
-  return forms;
+  return forms
 }
-
 
 export async function getFormDetail(formId) {
   const form = await FormCheck.findByPk(formId, {
