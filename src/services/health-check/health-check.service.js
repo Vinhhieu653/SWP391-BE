@@ -381,6 +381,8 @@ export async function sendResult(eventId) {
   })
 
   for (const form of forms) {
+    if (form.status !== 'approved') continue
+
     const mr = await MedicalRecord.findOne({ where: { userId: form.Student_ID } })
 
     if (mr) {
@@ -393,7 +395,7 @@ export async function sendResult(eventId) {
           if (guardian) {
             await Notification.create({
               title: 'Đã có kết quả khám sức khỏe cho con bạn',
-              mess: `Bấm vao để xem chi tiết và xác nhận kết quả khám sức khỏe`,
+              mess: 'Bấm vào để xem chi tiết và xác nhận kết quả khám sức khỏe',
               userId: guardian.userId
             })
           }
