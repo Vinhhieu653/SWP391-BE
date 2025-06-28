@@ -43,7 +43,7 @@ router.post('/change-password', authenticateToken, authController.changePassword
  * @swagger
  * /api/v1/auth/send-random-password:
  *   post:
- *     summary: Gửi mật khẩu ngẫu nhiên đến email phụ huynh và đổi mật khẩu luôn
+ *     summary: Gửi mật khẩu ngẫu nhiên đến email phụ huynh
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -65,7 +65,7 @@ router.post('/send-random-password', authController.sendRandomPassword)
  * @swagger
  * /api/v1/auth/forgot-password:
  *   post:
- *     summary: Gửi email đặt lại mật khẩu
+ *     summary: Gửi email đặt lại mật khẩu ngẫu nhiên
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -85,40 +85,8 @@ router.post('/send-random-password', authController.sendRandomPassword)
  *       400:
  *         description: Email không tồn tại
  *
- *
- * @swagger
- * /api/v1/auth/reset-password:
- *   post:
- *     summary: Đặt lại mật khẩu bằng token (có xác nhận)
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - token
- *               - newPassword
- *               - confirmPassword
- *             properties:
- *               token:
- *                 type: string
- *                 example: "jwt-token-abcxyz"
- *               newPassword:
- *                 type: string
- *                 example: Abc@1234
- *               confirmPassword:
- *                 type: string
- *                 example: Abc@1234
- *     responses:
- *       200:
- *         description: Đặt lại mật khẩu thành công
- *       400:
- *         description: Token không hợp lệ hoặc mật khẩu không khớp
  */
 
 router.post('/forgot-password', authController.forgotPassword)
-router.post('/reset-password', authController.resetPassword)
 
 export default router

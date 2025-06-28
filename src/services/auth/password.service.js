@@ -48,29 +48,31 @@ export const forgotPasswordService = async (email) => {
   const user = await User.findOne({ where: { email } })
   if (!user) throw new Error('Email không tồn tại')
 
-  const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '15m' })
-  const actionLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${token}`
+  // Nếu là phụ huynh → gửi mật khẩu random
+  if (user.roleId === 4) {
+    const newPassword = generateRandomPassword(6)
+    const hashed = await argon2.hash(newPassword)
+    user.password = hashed
+    await user.save()
 
-  await sendResetPasswordMail({
-    to: email,
-    studentName: user.fullname || 'Người dùng',
-    actionLink,
-    year: new Date().getFullYear()
-  })
-}
+    const actionLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?email=${encodeURIComponent(email)}`
 
-export const resetPasswordWithConfirmService = async (token, newPassword) => {
-  let decoded
-  try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET)
-  } catch {
-    throw new Error('Token không hợp lệ hoặc đã hết hạn')
+    await sendRandomPasswordMail({
+      to: email,
+      studentName: user.fullname || 'Phụ huynh',
+      password: newPassword,
+      actionLink
+    })
+  } else {
+    // Các role khác → gửi link reset bằng token
+    const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '15m' })
+    const actionLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${token}`
+
+    await sendResetPasswordMail({
+      to: email,
+      studentName: user.fullname || 'Người dùng',
+      actionLink,
+      year: new Date().getFullYear()
+    })
   }
-
-  const user = await User.findOne({ where: { email: decoded.email } })
-  if (!user) throw new Error('Người dùng không tồn tại')
-
-  const hashed = await argon2.hash(newPassword)
-  user.password = hashed
-  await user.save()
 }
