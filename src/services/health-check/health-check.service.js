@@ -9,6 +9,7 @@ import Notification from '../../models/data/noti.model.js'
 import MedicalRecord from '../../models/data/medicalRecord.model.js'
 import HistoryCheck from '../../models/data/history_check.model.js'
 import GuardianUser from '../../models/data/guardian_user.model.js'
+import { Op } from 'sequelize'
 
 export const createHealthCheck = async (data) => {
   const event = await Event.create({
@@ -424,19 +425,40 @@ export async function getStudentsByEvent(HC_ID) {
     include: [
       {
         model: User,
-        as: 'Student', // nếu alias là 'Student'
-        include: [
-          {
-            model: MedicalRecord,
-            include: [Class]
-          }
-        ]
+        as: 'Student',
+        include: [{ model: Guardian }]
       }
     ]
-  })
+  });
 
-  return forms
+  const studentsId = forms.map((form) => form.Student.id);
+
+  const records = await MedicalRecord.findAll({
+    where: {
+      userId: {
+        [Op.in]: studentsId,
+      },
+    },
+    attributes: ['userId', 'Class'], // nhớ lấy userId để mapping
+  });
+
+  // Tạo map userId -> Class
+  const classMap = {};
+  records.forEach((record) => {
+    classMap[record.userId] = record.Class;
+  });
+
+  // Gán Class vào Student
+  forms.forEach((form) => {
+    const student = form.Student;
+    if (student && classMap[student.id]) {
+      student.Class = classMap[student.id];
+    }
+  });
+
+  return forms;
 }
+
 
 export async function getFormDetail(formId) {
   const form = await FormCheck.findByPk(formId, {
