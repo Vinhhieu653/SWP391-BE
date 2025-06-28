@@ -31,14 +31,31 @@ const upload = multer({ dest: 'uploads/' })
  * @swagger
  * /api/v1/vaccine:
  *   get:
- *     summary: Lấy danh sách tất cả lịch sử tiêm chủng
+ *     summary: Lấy danh sách tất cả lịch sử tiêm chủng (trả kèm khối lớp grade)
  *     tags: [Vaccine]
  *     responses:
  *       200:
  *         description: Danh sách lịch sử tiêm chủng
- *
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   VH_ID:
+ *                     type: integer
+ *                   Vaccine_name:
+ *                     type: string
+ *                   Vaccince_type:
+ *                     type: string
+ *                   Date_injection:
+ *                     type: string
+ *                   grade:
+ *                     type: integer
+ *                   # ... các trường khác ...
  *   post:
- *     summary: Tạo mới lịch sử tiêm chủng (Chỉ dành cho Y tá)
+ *     summary: Tạo mới lịch sử tiêm chủng (Chỉ dành cho Y tá, lọc theo khối lớp, không tạo nếu đã tiêm cùng tên vaccine)
  *     tags: [Vaccine]
  *     security:
  *       - bearerAuth: []
@@ -56,6 +73,8 @@ const upload = multer({ dest: 'uploads/' })
  *               Date_injection:
  *                 type: string
  *                 format: date-time
+ *               Grade:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Tạo thành công
@@ -262,7 +281,7 @@ const upload = multer({ dest: 'uploads/' })
  * @swagger
  * /api/v1/vaccine/by-name/{vaccineName}:
  *   get:
- *     summary: Lấy lịch sử tiêm chủng theo tên vaccine
+ *     summary: Lấy lịch sử tiêm chủng theo tên vaccine, khối (grade) và ngày event
  *     tags: [Vaccine]
  *     parameters:
  *       - in: path
@@ -270,9 +289,22 @@ const upload = multer({ dest: 'uploads/' })
  *         required: true
  *         schema:
  *           type: string
+ *       - in: query
+ *         name: grade
+ *         required: false
+ *         schema:
+ *           type: integer
+ *         description: Lọc theo khối lớp (grade)
+ *       - in: query
+ *         name: eventDate
+ *         required: false
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Lọc theo ngày event (YYYY-MM-DD)
  *     responses:
  *       200:
- *         description: Danh sách lịch sử tiêm chủng theo tên vaccine
+ *         description: Danh sách lịch sử tiêm chủng theo tên vaccine, khối và ngày event
  */
 
 /**

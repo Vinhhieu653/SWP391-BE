@@ -96,9 +96,24 @@ export const getOtherMedicalByIdService = async (id) => {
       ? await User.findOne({ where: { id: medicalRecord.userId }, attributes: ['fullname'] })
       : null
     otherMedical.dataValues.UserFullname = user ? user.fullname : null
+
+    const guardianUser = await GuardianUser.findOne({ where: { userId: medicalRecord.userId } })
+    let guardian = null
+    if (guardianUser) {
+      const guardianRecord = await Guardian.findByPk(guardianUser.obId)
+      if (guardianRecord) {
+        const guardianUserInfo = await User.findByPk(guardianRecord.userId, { attributes: ['fullname'] })
+        guardian = {
+          ...guardianRecord.get({ plain: true }),
+          fullname: guardianUserInfo ? guardianUserInfo.fullname : null
+        }
+      }
+    }
+    otherMedical.dataValues.guardian = guardian
   } else {
     otherMedical.dataValues.Medical_record = null
     otherMedical.dataValues.UserFullname = null
+    otherMedical.dataValues.guardian = null
   }
   return otherMedical
 }

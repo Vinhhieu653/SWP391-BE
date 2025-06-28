@@ -8,7 +8,10 @@ export const createVaccineHistory = async (req, res) => {
       data: result
     })
   } catch (error) {
-    res.status(error.status || 500).json({ message: error.message || 'Internal server error' })
+    res.status(error.status || 500).json({
+      message: error.message || 'Internal server error',
+      error: error
+    })
   }
 }
 
@@ -127,7 +130,9 @@ export const getAllVaccineTypes = async (req, res) => {
 
 export const getVaccineHistoryByVaccineName = async (req, res) => {
   try {
-    const records = await VaccineService.getVaccineHistoryByVaccineNameService(req.params.vaccineName)
+    const { vaccineName } = req.params;
+    const { grade, eventDate } = req.query;
+    const records = await VaccineService.getVaccineHistoryByVaccineNameService(vaccineName, grade, eventDate);
     res.status(200).json({
       message: 'Vaccine histories fetched successfully',
       data: records

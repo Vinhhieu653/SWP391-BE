@@ -104,7 +104,6 @@ async function startServer() {
     await seedUsers()
     await seedCategories()
     await seedBlogs()
-    await seedMedicalRecords()
 
     server.listen(PORT, () => {
       console.log(`Server chạy tại http://localhost:${PORT}/api-docs/`)
