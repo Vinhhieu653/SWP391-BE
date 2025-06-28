@@ -93,3 +93,18 @@ export const deleteStudentByGuardian = async (req, res) => {
     res.status(error.status || 500).json({ message: error.message })
   }
 }
+
+export async function importGuardiansFromExcel(req, res) {
+  try {
+    console.log('req.file:', req.file) // ✅ debug
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'Vui lòng upload file Excel' })
+    }
+
+    const result = await guardianService.importGuardiansExcelService(req.file.buffer)
+    res.status(200).json({ message: 'Import thành công', data: result })
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+}

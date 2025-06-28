@@ -250,7 +250,7 @@ export async function submitResult(
     ent_status,
     skin_status,
     general_conclusion,
-    is_need_meet,
+    is_need_meet
   }
 ) {
   const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
@@ -422,11 +422,10 @@ export async function getStudentsByEvent(HC_ID) {
         ]
       }
     ]
-  });
+  })
 
-  return forms;
+  return forms
 }
-
 
 export async function getFormDetail(formId) {
   const form = await FormCheck.findByPk(formId, {

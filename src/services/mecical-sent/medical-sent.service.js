@@ -8,15 +8,7 @@ import Notification from '../../models/data/noti.model.js'
 
 // Tạo mới MedicalSent và liên kết OutpatientMedication
 export const createMedicalSentService = async (data, creator_by = 'system') => {
-  const {
-    userId,
-    Class: studentClass,
-    prescriptionImage,
-    medications,
-    deliveryTime,
-    status,
-    notes
-  } = data
+  const { userId, Class: studentClass, prescriptionImage, medications, deliveryTime, status, notes } = data
 
   if (!userId) throw { status: 400, message: 'userId is required' }
 
@@ -32,7 +24,7 @@ export const createMedicalSentService = async (data, creator_by = 'system') => {
     outpatient = await OutpatientMedication.create({ ID: ID })
   }
 
-  const links = await GuardianUser.findAll({where: { userId: userId }})
+  const links = await GuardianUser.findAll({ where: { userId: userId } })
 
   const obId = links.length > 0 ? links[0].obId : null
 
@@ -42,7 +34,6 @@ export const createMedicalSentService = async (data, creator_by = 'system') => {
   if (!guardianLink) throw { status: 404, message: 'Guardian not found for this student' }
 
   const guardianPhone = guardianLink.phoneNumber
-
 
   // 3. Tạo bản ghi MedicalSent
   const medicalSent = await MedicalSent.create({

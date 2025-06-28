@@ -3,7 +3,8 @@ import Guardian from '../../models/data/guardian.model.js'
 import GuardianUser from '../../models/data/guardian_user.model.js'
 import * as registerService from '../auth/register.service.js'
 import MedicalRecord from '../../models/data/medicalRecord.model.js'
-
+import ExcelJS from 'exceljs'
+import { createGuardian } from './createGuardian.service.js'
 // Create guardian with associated student users
 export const createGuardianWithStudents = async ({ guardian }) => {
   if (!guardian) {
@@ -361,4 +362,50 @@ export const deleteStudentByGuardianId = async (obId, studentId) => {
   return {
     message: 'Student deleted successfully'
   }
+}
+
+export async function importGuardiansExcelService(fileBuffer) {
+  const workbook = new ExcelJS.Workbook()
+  await workbook.xlsx.load(fileBuffer)
+
+  const sheet = workbook.worksheets[0]
+  const results = []
+
+  // 👉 Fix lệch header
+  const rawHeaderRow = sheet.getRow(1).values
+  const headers = rawHeaderRow.slice(1).map((h) => (h || '').toString().trim().toLowerCase())
+
+  for (let i = 2; i <= sheet.rowCount; i++) {
+    const row = sheet.getRow(i)
+    const rowData = {}
+
+    headers.forEach((key, index) => {
+      rowData[key] = row.getCell(index + 1).value
+    })
+
+    try {
+      const guardianData = {
+        fullname: rowData.fullname,
+        username: rowData.username,
+        email: rowData.email,
+        phoneNumber: rowData.phonenumber,
+        roleInFamily: rowData.roleinfamily,
+        isCallFirst: rowData.iscallfirst === true || rowData.iscallfirst === 'TRUE',
+        dateOfBirth: rowData.dateofbirth,
+        gender: rowData.gender,
+        address: rowData.address
+      }
+
+      await createGuardianWithStudents({ guardian: guardianData })
+      results.push({ username: guardianData.username, status: 'success' })
+    } catch (err) {
+      results.push({
+        username: rowData.username || '(no username)',
+        status: 'failed',
+        error: err.message
+      })
+    }
+  }
+
+  return results
 }
