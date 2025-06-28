@@ -4,7 +4,8 @@ import {
   getAllOtherMedical,
   getOtherMedicalById,
   updateOtherMedical,
-  deleteOtherMedical
+  deleteOtherMedical,
+  getOtherMedicalByGuardianUserId
 } from '../../controllers/other_medical/Other_medical.controller.js'
 import { authenticateToken, authorizeRoles } from '../../middlewares/auth.middleware.js'
 import multer from 'multer'
@@ -152,5 +153,26 @@ router.put('/:id', authenticateToken, authorizeRoles('nurse', 'admin'), upload.s
  *         description: Not found
  */
 router.delete('/:id', authenticateToken, authorizeRoles('nurse', 'admin'), deleteOtherMedical)
+
+/**
+ * @swagger
+ * /api/v1/other-medical/guardian/{guardianUserId}:
+ *   get:
+ *     summary: Lấy tất cả OtherMedical theo userId của guardian
+ *     tags: [OtherMedical]
+ *     parameters:
+ *       - in: path
+ *         name: guardianUserId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: UserId của guardian
+ *     responses:
+ *       200:
+ *         description: Danh sách OtherMedical của guardian
+ *       404:
+ *         description: Not found
+ */
+router.get('/guardian/:guardianUserId', getOtherMedicalByGuardianUserId)
 
 export default router

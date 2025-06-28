@@ -66,3 +66,17 @@ export const sendRandomPasswordMail = async ({ to, studentName, password, action
     }
   })
 }
+
+export const sendResetPasswordMail = async ({ to, studentName, actionLink, year }) => {
+  return transporter.sendMail({
+    from: process.env.EMAIL_FROM,
+    to,
+    subject: 'Yêu cầu đặt lại mật khẩu',
+    template: 'email-send-reset-password', // .hbs file name
+    context: {
+      studentName,
+      actionLink,
+      year
+    }
+  })
+}

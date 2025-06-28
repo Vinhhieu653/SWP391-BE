@@ -67,26 +67,26 @@ export const updateMedicalRecord = async (id, data) => {
 // Xóa hồ sơ y tế
 export const deleteMedicalRecord = async (id) => {
   // Tìm hồ sơ y tế
-  const record = await MedicalRecord.findByPk(id);
-  if (!record) return null;
+  const record = await MedicalRecord.findByPk(id)
+  if (!record) return null
 
-  const studentUserId = record.userId;
+  const studentUserId = record.userId
 
   // Xóa liên kết giữa học sinh và guardian (nếu có)
   await GuardianUser.destroy({
     where: { userId: studentUserId }
-  });
+  })
 
   // Xóa user học sinh
   await User.destroy({
     where: { id: studentUserId }
-  });
+  })
 
   // Cuối cùng là xóa hồ sơ y tế
-  await record.destroy();
+  await record.destroy()
 
-  return true;
-};
+  return true
+}
 
 // Lấy danh sách MedicalRecord học sinh theo userId phụ huynh
 export const getMedicalRecordsByGuardianUserIdService = async (guardianUserId) => {
@@ -141,7 +141,7 @@ export const createStudentWithMedicalRecord = async ({ guardianUserId, student, 
     fullname: student.fullname,
     dateOfBirth: student.dateOfBirth,
     gender: student.gender,
-    Class: medicalRecord.class|| null,
+    Class: medicalRecord.class || null,
     roleId: 3
   })
 
@@ -220,33 +220,32 @@ export const updateStudentWithMedicalRecord = async ({ guardianUserId, medicalRe
   })
 
   // Format dữ liệu trước khi update
-const formattedMedicalRecord = {
-  fullname: student.fullname,
-  dateOfBirth: student.dateOfBirth,
-  gender: student.gender,
-  Class: medicalRecord.Class,
-  height: medicalRecord.height,
-  weight: medicalRecord.weight,
-  bloodType: medicalRecord.bloodType,
+  const formattedMedicalRecord = {
+    fullname: student.fullname,
+    dateOfBirth: student.dateOfBirth,
+    gender: student.gender,
+    Class: medicalRecord.Class,
+    height: medicalRecord.height,
+    weight: medicalRecord.weight,
+    bloodType: medicalRecord.bloodType,
 
-  // Convert mảng -> string
-  chronicDiseases: Array.isArray(medicalRecord.chronicDiseases)
-    ? medicalRecord.chronicDiseases.map((d) => d.name).join(', ')
-    : medicalRecord.chronicDiseases || '',
+    // Convert mảng -> string
+    chronicDiseases: Array.isArray(medicalRecord.chronicDiseases)
+      ? medicalRecord.chronicDiseases.map((d) => d.name).join(', ')
+      : medicalRecord.chronicDiseases || '',
 
-  allergies: Array.isArray(medicalRecord.allergies)
-    ? medicalRecord.allergies.map((a) => a.name).join(', ')
-    : medicalRecord.allergies || '',
+    allergies: Array.isArray(medicalRecord.allergies)
+      ? medicalRecord.allergies.map((a) => a.name).join(', ')
+      : medicalRecord.allergies || '',
 
-  // Nếu có vaccines tương tự:
-  vaccines: Array.isArray(medicalRecord.vaccines)
-    ? JSON.stringify(medicalRecord.vaccines)
-    : medicalRecord.vaccines || '[]'
-};
+    // Nếu có vaccines tương tự:
+    vaccines: Array.isArray(medicalRecord.vaccines)
+      ? JSON.stringify(medicalRecord.vaccines)
+      : medicalRecord.vaccines || '[]'
+  }
 
-// Gọi update
-await medicalRecordInstance.update(formattedMedicalRecord);
-
+  // Gọi update
+  await medicalRecordInstance.update(formattedMedicalRecord)
 
   return {
     message: 'Student and medical record updated successfully',
