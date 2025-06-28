@@ -400,6 +400,8 @@ export async function sendResult(eventId) {
         })
       )
     }
+    form.status = 'checked'
+    await form.save()
   }
 }
 
