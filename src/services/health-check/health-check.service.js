@@ -246,7 +246,6 @@ export async function submitResult(
     skin_status,
     general_conclusion,
     is_need_meet,
-    status
   }
 ) {
   const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
@@ -265,7 +264,7 @@ export async function submitResult(
       Skin_Status: skin_status,
       General_Conclusion: general_conclusion,
       Is_need_meet: is_need_meet,
-      status: status
+      status: 'checked'
     },
     {
       where: {
@@ -403,23 +402,26 @@ export async function confirmForm(formId, action) {
   await form.save()
 }
 
-export async function getStudentsByEvent(eventId) {
-  const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
-  if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
-
+export async function getStudentsByEvent(HC_ID) {
   const forms = await FormCheck.findAll({
-    where: { HC_ID: healthCheck.HC_ID },
+    where: { HC_ID },
     include: [
       {
         model: User,
-        as: 'Student',
-        include: [{ model: Guardian }]
+        as: 'Student', // nếu alias là 'Student'
+        include: [
+          {
+            model: MedicalRecord,
+            include: [Class]
+          }
+        ]
       }
     ]
-  })
+  });
 
-  return forms // ← QUAN TRỌNG
+  return forms;
 }
+
 
 export async function getFormDetail(formId) {
   const form = await FormCheck.findByPk(formId, {
