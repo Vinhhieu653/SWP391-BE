@@ -14,7 +14,8 @@ import {
   updateVaccineStatusByMRId,
   getAllVaccineTypes,
   getVaccineHistoryByVaccineName,
-  getVaccineHistoryByGuardianUserId
+  getVaccineHistoryByGuardianUserId,
+  deleteVaccineHistoriesByNameDateGrade
 } from '../../controllers/Vaccine/Vaccince.controller.js'
 
 const router = express.Router()
@@ -324,6 +325,48 @@ const upload = multer({ dest: 'uploads/' })
  *         description: Danh sách lịch sử tiêm chủng của phụ huynh
  */
 
+/**
+ * @swagger
+ * /api/v1/vaccine/delete-by-name-date-grade:
+ *   delete:
+ *     summary: Xóa nhiều lịch sử tiêm chủng theo tên vaccine và ngày tiêm (Chỉ dành cho Nurse)
+ *     tags: [Vaccine]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - vaccineName
+ *               - dateInjection
+ *             properties:
+ *               vaccineName:
+ *                 type: string
+ *                 description: Tên vaccine
+ *               dateInjection:
+ *                 type: string
+ *                 format: date
+ *                 description: Ngày tiêm (YYYY-MM-DD)
+ *     responses:
+ *       200:
+ *         description: Xóa thành công các lịch sử tiêm chủng phù hợp
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     deletedCount:
+ *                       type: integer
+ */
+
 router.post('/', authenticateToken, authorizeRoles('nurse'), createVaccineHistory)
 router.post(
   '/evidence',
@@ -340,8 +383,9 @@ router.get('/:id', authenticateToken, authorizeRoles('admin'), getVaccineHistory
 router.put('/:id', authenticateToken, updateVaccineHistory)
 router.put('/:id/confirm', authenticateToken, confirmVaccineHistory)
 router.put('/vaccine-history/status', authenticateToken, updateVaccineStatusByMRId)
-router.delete('/:id', authenticateToken, authorizeRoles('admin'), deleteVaccineHistory)
-router.get('/by-name/:vaccineName', authenticateToken, authorizeRoles('admin'), getVaccineHistoryByVaccineName)
-router.get('/guardian/:guardianUserId', authenticateToken, authorizeRoles('admin'), getVaccineHistoryByGuardianUserId)
+router.delete('/delete-by-name-date-grade', authenticateToken, authorizeRoles('nurse'), deleteVaccineHistoriesByNameDateGrade)
+router.delete('/:id', authenticateToken, authorizeRoles('nurse'), deleteVaccineHistory)
+router.get('/by-name/:vaccineName', getVaccineHistoryByVaccineName)
+router.get('/guardian/:guardianUserId', getVaccineHistoryByGuardianUserId)
 
 export default router

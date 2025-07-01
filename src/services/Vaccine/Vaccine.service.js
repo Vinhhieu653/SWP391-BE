@@ -49,7 +49,7 @@ export const createVaccineHistoryService = async (data) => {
         Vaccine_name: vaccineName
       }
     });
-    if (existed && existed.Status !== 'Không cho phép tiêm') continue
+    if (existed && existed.Status !== 'Không tiêm') continue
 
     const vaccineHistory = await VaccineHistory.create({
       ...data,
@@ -229,7 +229,7 @@ export const confirmVaccineHistoryService = async (id, isConfirmed) => {
   if (isConfirmed === true || isConfirmed === 'true') {
     statusUpdate.Status = 'Cho phép tiêm'
   } else {
-    statusUpdate.Status = 'Không cho phép tiêm'
+    statusUpdate.Status = 'Không tiêm'
   }
 
   await record.update(statusUpdate)
@@ -304,16 +304,11 @@ export const updateVaccineStatusByMRIdService = async (updates) => {
     throw { status: 404, message: 'Some VH_IDs do not exist in vaccine history' }
   }
 
-  const notAllowed = records.filter((r) => r.Status !== 'Cho phép tiêm')
-  if (notAllowed.length > 0) {
-    throw { status: 400, message: 'Chỉ được phép cập nhật khi tất cả trạng thái là "Cho phép tiêm"' }
-  }
-
   await Promise.all(
     updates.map(async (item) => {
       await VaccineHistory.update(
         {
-          Status: 'Đã tiêm',
+          Status: item.status,
           note_affter_injection: item.note_affter_injection
         },
         { where: { VH_ID: item.VH_ID } }
@@ -329,9 +324,13 @@ export const updateVaccineStatusByMRIdService = async (updates) => {
             if (guardian) {
               const son = await User.findByPk(mr.userId, { attributes: ['fullname'] })
               const namevaccine = vh.Vaccine_name || 'Không rõ tên vaccine'
+              const status = item.status
+              const mess = status === 'Đã tiêm'
+                ? `Cháu đã được tiêm, triệu chứng sau tiêm của cháu ${son ? son.fullname : 'Không rõ tên'} đã được cập nhật.`
+                : `Cháu đã Chưa được tiêm, lý do chưa được tiêm của cháu ${son ? son.fullname : 'Không rõ tên'} đã được cập nhật.`
               await Notification.create({
                 title: `Cập nhật về việc tiêm chủng ${namevaccine}`,
-                mess: `Cháu đã được tiêm, triệu chứng sau tiêm của cháu ${son ? son.fullname : 'Không rõ tên'} đã được cập nhật.`,
+                mess: mess,
                 userId: guardian.userId
               })
             }
@@ -347,7 +346,7 @@ export const updateVaccineStatusByMRIdService = async (updates) => {
 export const getAllVaccineTypesService = async () => {
   const types = await VaccineHistory.findAll({
     where: {
-      Is_created_by_guardian: false,
+      Is_created_by_guardian: false
     },
     attributes: [
       'Vaccine_name',
@@ -494,4 +493,49 @@ export const getVaccineHistoryByGuardianUserIdService = async (guardianUserId) =
   return {
     histories: allHistories
   }
+}
+
+export const deleteVaccineHistoriesByNameDateGradeService = async (vaccineName, dateInjection) => {
+  if (!vaccineName || !dateInjection || typeof dateInjection !== 'string') {
+    throw { status: 400, message: 'vaccineName và dateInjection (YYYY-MM-DD) là bắt buộc' };
+  }
+
+  const histories = await VaccineHistory.findAll({
+    where: { Vaccine_name: vaccineName }
+  });
+
+  let deletedCount = 0;
+
+  for (const history of histories) {
+    const medicalRecord = await MedicalRecord.findByPk(history.ID);
+
+
+    let historyDate = null;
+    if (history.Date_injection instanceof Date) {
+      historyDate = history.Date_injection.toISOString().slice(0, 10);
+    } else if (typeof history.Date_injection === 'string') {
+      historyDate = history.Date_injection.slice(0, 10);
+    }
+
+    if (historyDate === dateInjection) {
+      if (medicalRecord) {
+        const guardianUsers = await GuardianUser.findAll({ where: { userId: medicalRecord.userId } });
+        for (const guardianUser of guardianUsers) {
+          const guardian = await Guardian.findByPk(guardianUser.obId);
+          if (guardian) {
+            const son = await User.findByPk(medicalRecord.userId, { attributes: ['fullname'] });
+            await Notification.create({
+              title: `Lịch tiêm chủng đã bị hủy`,
+              mess: `Lịch tiêm chủng cho cháu ${son ? son.fullname : 'Không rõ tên'} với vaccine ${vaccineName} vào ngày ${dateInjection} đã bị hủy, chúng tôi sẽ thông báo khi có lịch tiêm chủng mới.`,
+              userId: guardian.userId
+            });
+          }
+        }
+      }
+      await history.destroy();
+      deletedCount++;
+    }
+  }
+
+  return { deletedCount };
 }
