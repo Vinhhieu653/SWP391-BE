@@ -31,7 +31,9 @@ export const createOtherMedicalService = async (data, creator_by) => {
 
   if (guardian.userId) {
     try {
-      const dateStr = new Date(historyOtherMedical.Date_create).toLocaleDateString('vi-VN')
+      const dateObj = new Date(historyOtherMedical.Date_create)
+      dateObj.setHours(dateObj.getHours() + 7)
+      const dateStr = dateObj.toLocaleDateString('vi-VN')
       await Notification.create({
         title: `Con bạn có vài vấn đề về sức khỏe vào ngày ${dateStr}`,
         mess: 'Bấm vào để xem chi tiết về vấn đề sức khỏe của con bạn.',
