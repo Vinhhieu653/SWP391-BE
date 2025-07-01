@@ -332,16 +332,16 @@ router.post(
   upload.single('evidence'),
   createVaccineWithEvidence
 )
-router.get('/', getAllVaccineHistory)
-router.get('/types', getAllVaccineTypes)
-router.get('/medical-record/:mrId', getVaccineHistoryByMRId)
-router.get('/event/:eventId/students', getStudentsByEventId)
-router.get('/:id', getVaccineHistoryById)
+router.get('/', authenticateToken, authorizeRoles('admin'), getAllVaccineHistory)
+router.get('/types', authenticateToken, authorizeRoles('admin'), getAllVaccineTypes)
+router.get('/medical-record/:mrId', authenticateToken, authorizeRoles('admin'), getVaccineHistoryByMRId)
+router.get('/event/:eventId/students', authenticateToken, authorizeRoles('admin'), getStudentsByEventId)
+router.get('/:id', authenticateToken, authorizeRoles('admin'), getVaccineHistoryById)
 router.put('/:id', authenticateToken, updateVaccineHistory)
 router.put('/:id/confirm', authenticateToken, confirmVaccineHistory)
 router.put('/vaccine-history/status', authenticateToken, updateVaccineStatusByMRId)
 router.delete('/:id', authenticateToken, authorizeRoles('admin'), deleteVaccineHistory)
-router.get('/by-name/:vaccineName', getVaccineHistoryByVaccineName)
-router.get('/guardian/:guardianUserId', getVaccineHistoryByGuardianUserId)
+router.get('/by-name/:vaccineName', authenticateToken, authorizeRoles('admin'), getVaccineHistoryByVaccineName)
+router.get('/guardian/:guardianUserId', authenticateToken, authorizeRoles('admin'), getVaccineHistoryByGuardianUserId)
 
 export default router
