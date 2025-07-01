@@ -28,6 +28,7 @@ export const createHealthCheck = async (data) => {
 
   const health_check = await HealthCheck.create({
     ...data,
+    status: 'created',
     School_year: data.schoolYear || '2024-2025',
     Event_ID: event.eventId
   })
@@ -87,13 +88,15 @@ export const createHealthCheck = async (data) => {
 }
 
 export async function getAllHealthChecks() {
-  return await HealthCheck.findAll({
+  const healthChecks = await HealthCheck.findAll({
     include: {
       model: Event,
       attributes: ['eventId', 'dateEvent', 'type']
     },
     order: [['createdAt', 'DESC']]
   })
+
+  return healthChecks
 }
 
 export async function getHealthCheckById(id) {
@@ -106,15 +109,24 @@ export async function getHealthCheckById(id) {
 
   if (!hc) throw new Error('Không tìm thấy đợt khám')
 
+  // 👉 Auto update status nếu đến ngày khám
+  const today = new Date()
+  const eventDate = new Date(hc.Event.dateEvent)
+  if (hc.status === 'pending' && eventDate <= today) {
+    await hc.update({ status: 'in progress' })
+  }
+
   return {
     eventId: hc.Event.eventId,
     dateEvent: hc.Event.dateEvent,
     type: hc.Event.type,
     title: hc.title,
     description: hc.description,
-    schoolYear: hc.School_year
+    schoolYear: hc.School_year,
+    status: hc.status // return status mới nhất
   }
 }
+
 export async function getHealthChecksByStudentId(studentId) {
   const forms = await FormCheck.findAll({
     where: { Student_ID: studentId },
@@ -167,6 +179,7 @@ export async function updateHealthCheck(id, data) {
 
   await healthCheck.update({
     title: data.title,
+    status: 'pending',
     description: data.description,
     School_year: data.schoolYear
   })
@@ -175,6 +188,36 @@ export async function updateHealthCheck(id, data) {
     dateEvent: data.dateEvent,
     type: data.type
   })
+
+  // ✅ Gửi noti cho phụ huynh liên quan
+  const forms = await FormCheck.findAll({ where: { HC_ID: healthCheck.HC_ID } })
+  const studentIds = forms.map((f) => f.Student_ID)
+
+  const medicalRecords = await MedicalRecord.findAll({
+    where: { userId: studentIds }
+  })
+
+  const allGuardianUsers = await GuardianUser.findAll({
+    where: {
+      userId: medicalRecords.map((r) => r.userId)
+    }
+  })
+
+  const guardianIds = allGuardianUsers.map((g) => g.obId)
+
+  const guardians = await Guardian.findAll({
+    where: { obId: guardianIds }
+  })
+
+  await Promise.all(
+    guardians.map((g) =>
+      Notification.create({
+        title: 'Thông tin đợt khám sức khỏe được cập nhật',
+        mess: `Đợt khám "${healthCheck.title}" đã được cập nhật. Vui lòng kiểm tra lại thông tin.`,
+        userId: g.userId
+      })
+    )
+  )
 
   return {
     eventId: healthCheck.Event.eventId,
@@ -210,12 +253,12 @@ export async function sendConfirmForms(eventId) {
 
   const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
   if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
+  await healthCheck.update({ status: 'pending' })
 
   const forms = await FormCheck.bulkCreate(
     students.map((s) => ({
       HC_ID: healthCheck.HC_ID,
-      Student_ID: s.id,
-      status: 'pending'
+      Student_ID: s.id
     })),
     { returning: true }
   )
@@ -308,6 +351,28 @@ export async function updateFormResult(eventId, studentId, data) {
   )
 
   if (!updated) throw new Error('Không tìm thấy form khám để cập nhật')
+
+  // ✅ Gửi noti cho phụ huynh của học sinh này
+  const guardianUsers = await GuardianUser.findAll({
+    where: { userId: studentId }
+  })
+
+  const guardianIds = guardianUsers.map((g) => g.obId)
+
+  const guardians = await Guardian.findAll({
+    where: { obId: guardianIds }
+  })
+
+  await Promise.all(
+    guardians.map((g) =>
+      Notification.create({
+        title: 'Kết quả khám sức khỏe đã được cập nhật',
+        mess: `Kết quả khám sức khỏe của học sinh đã được cập nhật. Vui lòng kiểm tra lại thông tin.`,
+        userId: g.userId
+      })
+    )
+  )
+
   return 'Cập nhật thành công'
 }
 
@@ -368,6 +433,7 @@ export async function getAllFormsByEvent(eventId) {
 export async function sendResult(eventId) {
   const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
   if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
+  await healthCheck.update({ status: 'checked' })
 
   const forms = await FormCheck.findAll({
     where: { HC_ID: healthCheck.HC_ID },

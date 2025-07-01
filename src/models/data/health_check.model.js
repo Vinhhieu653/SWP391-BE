@@ -17,6 +17,14 @@ const HealthCheck = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false
     },
+    status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'created',
+      validate: {
+        isIn: [['created', 'pending', 'in progress', 'checked']]
+      }
+    },
     title: {
       type: DataTypes.STRING,
       allowNull: false
