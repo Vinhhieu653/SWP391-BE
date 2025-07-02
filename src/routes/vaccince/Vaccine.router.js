@@ -383,7 +383,12 @@ router.get('/:id', authenticateToken, authorizeRoles('nurse'), getVaccineHistory
 router.put('/:id', authenticateToken, updateVaccineHistory)
 router.put('/:id/confirm', authenticateToken, confirmVaccineHistory)
 router.put('/vaccine-history/status', authenticateToken, updateVaccineStatusByMRId)
-router.delete('/delete-by-name-date-grade', authenticateToken, authorizeRoles('nurse'), deleteVaccineHistoriesByNameDateGrade)
+router.delete(
+  '/delete-by-name-date-grade',
+  authenticateToken,
+  authorizeRoles('nurse'),
+  deleteVaccineHistoriesByNameDateGrade
+)
 router.delete('/:id', authenticateToken, authorizeRoles('nurse'), deleteVaccineHistory)
 router.get('/by-name/:vaccineName', getVaccineHistoryByVaccineName)
 router.get('/guardian/:guardianUserId', getVaccineHistoryByGuardianUserId)

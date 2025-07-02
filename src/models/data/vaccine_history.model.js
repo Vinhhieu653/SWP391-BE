@@ -38,7 +38,7 @@ const VaccineHistory = sequelize.define(
     Is_created_by_guardian: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
-    },
+    }
   },
   {
     tableName: 'Vaccine_History',

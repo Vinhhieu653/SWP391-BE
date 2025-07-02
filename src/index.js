@@ -24,6 +24,7 @@ import guardianRouter from './routes/guardian/guardian.route.js'
 import healthCheckRouter from './routes/health-check/health-check.route.js'
 import vaccineRouter from './routes/vaccince/Vaccine.router.js'
 import medicalSentRouter from './routes/medical-sent/medical-sent.route.js'
+import dashboardRouter from './routes/dashboard/dashboard.route.js'
 import { basicAuth } from './middlewares/authSwagger.js'
 import { notFoundHandler, errorHandler } from './middlewares/responseUtils.js'
 import { seedRoles } from './database/seeds/role.seed.js'
@@ -85,6 +86,7 @@ app.use('/api/v1/health-check', healthCheckRouter)
 app.use('/api/v1/vaccine', vaccineRouter)
 app.use('/api/v1/medical-records', medicalRecordRouter)
 app.use('/api/v1/medical-sents', medicalSentRouter)
+app.use('/api/v1/dashboard', dashboardRouter)
 // Xử lý lỗi
 app.use(notFoundHandler)
 app.use(errorHandler)
