@@ -2,7 +2,8 @@ import User from '../../models/data/user.model.js'
 import Guardian from '../../models/data/guardian.model.js'
 import GuardianUser from '../../models/data/guardian_user.model.js'
 import * as registerService from '../auth/register.service.js'
-
+import MedicalRecord from '../../models/data/medicalRecord.model.js'
+import ExcelJS from 'exceljs'
 // Create guardian with associated student users
 export const createGuardianWithStudents = async ({ guardian }) => {
   if (!guardian) {
@@ -134,7 +135,7 @@ export const getAllGuardians = async () => {
 
 // Update guardian record and its user info
 export const updateGuardian = async (obId, data) => {
-  const { fullname, username, email, phoneNumber, roleInFamily, isCallFirst } = data
+  const { fullname, username, email, phoneNumber, roleInFamily, isCallFirst, address } = data
 
   const guardian = await Guardian.findOne({ where: { obId } })
   if (!guardian) throw Object.assign(new Error('Guardian not found'), { status: 404 })
@@ -163,11 +164,21 @@ export const updateGuardian = async (obId, data) => {
   guardian.roleInFamily = roleInFamily || guardian.roleInFamily
   guardian.isCallFirst = isCallFirst !== undefined ? isCallFirst : guardian.isCallFirst
   guardian.phoneNumber = phoneNumber || guardian.phoneNumber
+  if (address !== undefined) guardian.address = address
   await guardian.save()
 
   return {
     message: 'Guardian updated successfully',
-    data: { guardian: guardian.dataValues, fullname: user.fullname }
+    data: {
+      guardian: guardian.dataValues,
+      user: {
+        id: user.id,
+        username: user.username,
+        fullname: user.fullname,
+        email: user.email,
+        phoneNumber: user.phoneNumber
+      }
+    }
   }
 }
 
@@ -187,6 +198,7 @@ export const deleteGuardian = async (obId) => {
 }
 
 // Get students associated with a guardian by userId
+
 export const getStudentsByUserId = async (userId) => {
   // Tìm guardian theo userId
   const guardian = await Guardian.findOne({ where: { userId } })
@@ -200,17 +212,43 @@ export const getStudentsByUserId = async (userId) => {
   const links = await GuardianUser.findAll({ where: { obId: guardian.obId } })
   const studentIds = links.map((link) => link.userId)
 
-  // Truy vấn các học sinh tương ứng
+  // Truy vấn các học sinh
   const students = studentIds.length
     ? await User.findAll({
         where: { id: studentIds },
-        attributes: ['id', 'username', 'fullname', 'email', 'phoneNumber']
+        attributes: ['id', 'username', 'fullname', 'dateOfBirth']
       })
     : []
 
+  // Truy vấn thông tin Class từ bảng MedicalRecord
+  const medicalRecords = await MedicalRecord.findAll({
+    where: { userId: studentIds },
+    attributes: ['userId', 'Class']
+  })
+
+  // Map userId -> Class (dùng số nguyên, không ép string)
+  const recordMap = {}
+  for (const record of medicalRecords) {
+    recordMap[record.userId] = record.Class
+  }
+
+  // Gộp Class vào từng học sinh
+  const studentsWithClass = students.map((student) => {
+    const className = recordMap[student.id] || null
+    console.log('studentId:', student.id, '→ className:', className)
+
+    return {
+      id: student.id,
+      username: student.username,
+      fullname: student.fullname,
+      dateOfBirth: student.dateOfBirth,
+      className
+    }
+  })
+
   return {
     guardianObId: guardian.obId,
-    students
+    students: studentsWithClass
   }
 }
 
@@ -333,4 +371,52 @@ export const deleteStudentByGuardianId = async (obId, studentId) => {
   return {
     message: 'Student deleted successfully'
   }
+}
+
+export async function importGuardiansExcelService(fileBuffer) {
+  const workbook = new ExcelJS.Workbook()
+  await workbook.xlsx.load(fileBuffer)
+
+  const sheet = workbook.worksheets[0]
+  const results = []
+
+  const headerRow = sheet.getRow(1)
+  const headers = headerRow.values.slice(1).map((h) => (h || '').toString().trim().toLowerCase())
+
+  for (let i = 2; i <= sheet.rowCount; i++) {
+    const row = sheet.getRow(i)
+    const rowData = {}
+
+    headers.forEach((key, index) => {
+      const cell = row.getCell(index + 1).value
+      rowData[key] = typeof cell === 'object' && cell?.text ? cell.text : cell
+    })
+
+    try {
+      const guardianData = {
+        fullname: rowData.fullname,
+        username: rowData.username,
+        email: rowData.email,
+        phoneNumber: rowData.phonenumber,
+        roleInFamily: rowData.roleinfamily,
+        isCallFirst: rowData.iscallfirst === true || rowData.iscallfirst === 'TRUE',
+        dateOfBirth:
+          rowData.dateofbirth instanceof Date ? rowData.dateofbirth.toISOString().split('T')[0] : rowData.dateofbirth,
+
+        gender: rowData.gender,
+        address: rowData.address
+      }
+
+      if (!guardianData.phoneNumber || !guardianData.roleInFamily) {
+        throw new Error('Thiếu số điện thoại hoặc vai trò trong gia đình')
+      }
+
+      await createGuardianWithStudents({ guardian: guardianData })
+      results.push({ username: guardianData.username, status: 'success' })
+    } catch (err) {
+      results.push({ username: rowData.username, status: 'failed', error: err.message })
+    }
+  }
+
+  return results
 }

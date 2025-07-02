@@ -8,10 +8,12 @@ import {
   getStudentsByUserId,
   addStudentToGuardian,
   updateStudentByGuardian,
-  deleteStudentByGuardian
+  deleteStudentByGuardian,
+  importGuardiansFromExcel
 } from '../../controllers/guardian/guardian.controller.js'
 
 import { authenticateToken, authorizeRoles } from '../../middlewares/auth.middleware.js'
+import { upload } from '../../middlewares/upload.middleware.js'
 
 const router = express.Router()
 
@@ -316,5 +318,33 @@ router.put('/:guardianId/student/:studentId', authenticateToken, authorizeRoles(
  *         description: Không tìm thấy
  */
 router.delete('/:guardianId/student/:studentId', authenticateToken, authorizeRoles('admin'), deleteStudentByGuardian)
+
+/**
+ * @swagger
+ * /api/v1/guardians/import:
+ *   post:
+ *     summary: Import phụ huynh từ file Excel (.xlsx)
+ *     tags: [Guardian]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *                 description: Excel file chứa danh sách phụ huynh
+ *     responses:
+ *       200:
+ *         description: Import thành công
+ *       400:
+ *         description: Lỗi khi xử lý file
+ */
+
+router.post('/import', authenticateToken, authorizeRoles('admin'), upload.single('file'), importGuardiansFromExcel)
 
 export default router

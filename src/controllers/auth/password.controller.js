@@ -21,3 +21,13 @@ export const sendRandomPassword = async (req, res) => {
     res.status(500).json({ message: err.message })
   }
 }
+
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body
+    await authService.forgotPasswordService(email)
+    res.status(200).json({ message: 'Đã gửi email đặt lại mật khẩu' })
+  } catch (err) {
+    next(err)
+  }
+}

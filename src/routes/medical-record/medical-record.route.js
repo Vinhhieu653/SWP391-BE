@@ -1,12 +1,12 @@
 import express from 'express'
 import {
-  createMedicalRecord,
   getAllMedicalRecords,
   getMedicalRecordById,
   updateMedicalRecord,
   deleteMedicalRecord,
   getMedicalRecordsByGuardian,
-  createStudentAndMedical
+  createStudentAndMedical,
+  updateStudentAndMedical
 } from '../../controllers/medical-record/medical-record.controler.js'
 import { authenticateToken, authorizeRoles } from '../../middlewares/auth.middleware.js'
 
@@ -66,130 +66,6 @@ router.get('/', getAllMedicalRecords)
  *         description: Không tìm thấy
  */
 router.get('/:id', getMedicalRecordById)
-/**
- * @swagger
- * /api/v1/medical-records:
- *   post:
- *     summary: Tạo mới hồ sơ y tế
- *     tags: [MedicalRecord]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - userId
- *               - bloodType
- *               - height
- *               - weight
- *             properties:
- *               userId:
- *                 type: integer
- *                 example: 1
- *               bloodType:
- *                 type: string
- *                 example: "O+"
- *               height:
- *                 type: number
- *                 example: 120
- *               weight:
- *                 type: number
- *                 example: 30
- *               class:
- *                 type: string
- *                 example: "Lớp 1A"
- *               chronicDiseases:
- *                 type: string
- *                 example: "Hen suyễn nhẹ, Tim mạch"
- *               allergies:
- *                 type: string
- *                 example: "Tôm cua, Phấn hoa"
- *               pastIllnesses:
- *                 type: string
- *                 example: "2020-12-10 - Viêm phổi (Kháng sinh)"
- *     responses:
- *       201:
- *         description: Tạo hồ sơ thành công
- *       400:
- *         description: Dữ liệu không hợp lệ
- */
-router.post('/', authenticateToken, authorizeRoles('guardian', 'nurse'), createMedicalRecord)
-
-/**
- * @swagger
- * /api/v1/medical-records/{id}:
- *   put:
- *     summary: Cập nhật hồ sơ y tế
- *     tags: [MedicalRecord]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               bloodType:
- *                 type: string
- *                 example: "O+"
- *               height:
- *                 type: number
- *                 example: 130
- *               weight:
- *                 type: number
- *                 example: 35
- *               class:
- *                 type: string
- *                 example: "Lớp 1A"
- *               chronicDiseases:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     name:
- *                       type: string
- *                       example: "Tiểu đường"
- *               allergies:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     name:
- *                       type: string
- *                       example: "Phấn hoa"
- *               pastIllnesses:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     disease:
- *                       type: string
- *                       example: "Viêm họng"
- *                     date:
- *                       type: string
- *                       format: date
- *                       example: "2021-05-20"
- *                     treatment:
- *                       type: string
- *                       example: "Uống thuốc"
- *     responses:
- *       200:
- *         description: Cập nhật thành công
- *       404:
- *         description: Không tìm thấy
- */
-
-router.put('/:id', authenticateToken, authorizeRoles('guardian', 'nurse'), updateMedicalRecord)
 
 /**
  * @swagger
@@ -211,7 +87,7 @@ router.put('/:id', authenticateToken, authorizeRoles('guardian', 'nurse'), updat
  *       404:
  *         description: Không tìm thấy
  */
-router.delete('/:id', authenticateToken, authorizeRoles('guardian', 'nurse'), deleteMedicalRecord)
+router.delete('/:id', authenticateToken, authorizeRoles('guardian'), deleteMedicalRecord)
 
 /**
  * @swagger
@@ -262,7 +138,7 @@ router.delete('/:id', authenticateToken, authorizeRoles('guardian', 'nurse'), de
  *                 properties:
  *                   class:
  *                     type: string
- *                     example: "Lớp 4A"
+ *                     example: "4A"
  *                   height:
  *                     type: number
  *                     example: 130
@@ -309,6 +185,97 @@ router.delete('/:id', authenticateToken, authorizeRoles('guardian', 'nurse'), de
  *       400:
  *         description: Dữ liệu không hợp lệ
  */
-router.post('/student', authenticateToken, authorizeRoles('guardian', 'nurse'), createStudentAndMedical)
+router.post('/student', authenticateToken, authorizeRoles('guardian'), createStudentAndMedical)
+
+/**
+ * @swagger
+ * /api/v1/medical-records/student:
+ *   put:
+ *     summary: Cập nhật học sinh và hồ sơ y tế, xác thực bởi guardian
+ *     tags: [MedicalRecord]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - guardianUserId
+ *               - student
+ *               - medicalRecord
+ *             properties:
+ *               guardianUserId:
+ *                 type: integer
+ *                 example: 6
+ *               student:
+ *                 type: object
+ *                 properties:
+ *                   fullname:
+ *                     type: string
+ *                     example: "Nguyễn Văn B"
+ *                   dateOfBirth:
+ *                     type: string
+ *                     format: date
+ *                     example: "2013-05-10"
+ *                   gender:
+ *                     type: string
+ *                     example: "Nam"
+ *               medicalRecord:
+ *                 type: object
+ *                 properties:
+ *                   class:
+ *                     type: string
+ *                     example: "5B"
+ *                   height:
+ *                     type: number
+ *                     example: 135
+ *                   weight:
+ *                     type: number
+ *                     example: 30
+ *                   bloodType:
+ *                     type: string
+ *                     example: "B+"
+ *                   chronicDiseases:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         name:
+ *                           type: string
+ *                           example: "Hen suyễn"
+ *                   allergies:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         name:
+ *                           type: string
+ *                           example: "Trứng"
+ *                   pastIllnesses:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         disease:
+ *                           type: string
+ *                           example: "Viêm phế quản"
+ *                         date:
+ *                           type: string
+ *                           format: date
+ *                           example: "2022-11-01"
+ *                         treatment:
+ *                           type: string
+ *                           example: "Kháng sinh"
+ *     responses:
+ *       200:
+ *         description: Cập nhật học sinh và hồ sơ y tế thành công
+ *       400:
+ *         description: Dữ liệu không hợp lệ
+ *       404:
+ *         description: Không tìm thấy hồ sơ hoặc học sinh
+ */
+router.put('/student/:id', authenticateToken, authorizeRoles('guardian'), updateStudentAndMedical)
 
 export default router

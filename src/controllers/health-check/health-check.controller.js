@@ -32,6 +32,16 @@ export const getHealthCheckById = async (req, res) => {
   }
 }
 
+export const getHealthCheckByStudentId = async (req, res) => {
+  try {
+    const { studentId } = req.params
+    const data = await srv.getHealthChecksByStudentId(studentId)
+    res.json({ success: true, data })
+  } catch (err) {
+    res.status(404).json({ success: false, message: err.message })
+  }
+}
+
 export const updateHealthCheck = async (req, res) => {
   try {
     const { id } = req.query
@@ -105,11 +115,11 @@ export const handleUpdateForm = async (req, res) => {
   }
 }
 
-export const handleDeleteForm = async (req, res) => {
+export const handleResetForm = async (req, res) => {
   try {
     const { id } = req.params
     const { student_id } = req.query
-    const result = await srv.deleteFormResult(id, student_id) // ✅ đổi sang srv
+    const result = await srv.resetFormResult(id, student_id) // ✅ đổi sang srv
     res.status(200).json({ message: result })
   } catch (err) {
     res.status(400).json({ error: err.message })

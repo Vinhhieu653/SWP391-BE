@@ -34,7 +34,11 @@ const VaccineHistory = sequelize.define(
     Status: {
       type: DataTypes.STRING,
       defaultValue: 'Chờ xác nhận'
-    }
+    },
+    Is_created_by_guardian: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
   },
   {
     tableName: 'Vaccine_History',

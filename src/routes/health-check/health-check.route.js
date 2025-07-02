@@ -55,7 +55,49 @@ router.post('/', authenticateToken, authorizeRoles('nurse'), ctrl.createHealthCh
  *       200:
  *         description: Lấy thành công
  */
-router.get('/', authenticateToken, authorizeRoles('nurse'), ctrl.getHealthChecks)
+router.get('/', authenticateToken, authorizeRoles('admin', 'nurse', 'guardian'), ctrl.getHealthChecks)
+
+/**
+ * @swagger
+ * /api/v1/health-check/student/{studentId}:
+ *   get:
+ *     summary: Lấy danh sách form khám của học sinh theo ID
+ *     tags: [HealthCheck]
+ *     parameters:
+ *       - in: path
+ *         name: studentId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID của học sinh
+ *     responses:
+ *       200:
+ *         description: Danh sách form khám của học sinh
+ *         content:
+ *           application/json:
+ *             example:
+ *               - formId: 12
+ *                 eventId: 4
+ *                 dateEvent: "2025-06-22"
+ *                 type: "Khám tổng quát"
+ *                 schoolYear: "2024-2025"
+ *                 height: 150
+ *                 weight: 45
+ *                 bloodPressure: "110/70"
+ *                 generalConclusion: "Bình thường"
+ *       404:
+ *         description: Không tìm thấy dữ liệu
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Học sinh này chưa tham gia đợt khám nào"
+ */
+router.get(
+  '/student/:studentId',
+  authenticateToken,
+  authorizeRoles('admin', 'guardian', 'guardian'),
+  ctrl.getHealthCheckByStudentId
+)
 
 /**
  * @swagger
@@ -167,7 +209,7 @@ router.delete('/', authenticateToken, authorizeRoles('nurse'), ctrl.deleteHealth
  *       500:
  *         description: Lỗi server
  */
-router.get('/:id', authenticateToken, authorizeRoles('nurse'), ctrl.getHealthCheckById)
+router.get('/:id', authenticateToken, authorizeRoles('admin', 'nurse', 'guardian'), ctrl.getHealthCheckById)
 
 /**
  * @swagger
@@ -272,7 +314,7 @@ router.post('/:id/submit-result', authenticateToken, authorizeRoles('nurse'), ct
  *       404:
  *         description: Không tìm thấy
  */
-router.get('/:id/form-result', authenticateToken, authorizeRoles('nurse'), ctrl.handleGetForm)
+router.get('/:id/form-result', authenticateToken, authorizeRoles('admin', 'nurse', 'guardian'), ctrl.handleGetForm)
 
 /**
  * @swagger
@@ -293,7 +335,12 @@ router.get('/:id/form-result', authenticateToken, authorizeRoles('nurse'), ctrl.
  *       404:
  *         description: Không tìm thấy đợt khám
  */
-router.get('/:id/form-result/all', authenticateToken, authorizeRoles('nurse'), ctrl.handleGetAllForms)
+router.get(
+  '/:id/form-result/all',
+  authenticateToken,
+  authorizeRoles('admin', 'nurse', 'guardian'),
+  ctrl.handleGetAllForms
+)
 /**
  * @swagger
  * /api/v1/health-check/{id}/form-result:
@@ -365,8 +412,8 @@ router.put('/:id/form-result', authenticateToken, authorizeRoles('nurse'), ctrl.
 /**
  * @swagger
  * /api/v1/health-check/{id}/form-result:
- *   delete:
- *     summary: Xóa kết quả khám của học sinh trong đợt khám
+ *   patch:
+ *     summary: Reset kết quả khám của học sinh trong đợt khám
  *     tags: [HealthCheck]
  *     parameters:
  *       - in: path
@@ -383,11 +430,12 @@ router.put('/:id/form-result', authenticateToken, authorizeRoles('nurse'), ctrl.
  *         description: ID học sinh
  *     responses:
  *       200:
- *         description: Xóa thành công
+ *         description: Reset thành công
  *       400:
  *         description: Lỗi hoặc không tìm thấy
  */
-router.delete('/:id/form-result', authenticateToken, authorizeRoles('nurse'), ctrl.handleDeleteForm)
+
+router.patch('/:id/form-result', authenticateToken, authorizeRoles('nurse'), ctrl.handleResetForm)
 
 /**
  * @swagger
@@ -424,7 +472,7 @@ router.post('/:id/send-result', authenticateToken, authorizeRoles('nurse'), ctrl
  *       200:
  *         description: Danh sách học sinh
  */
-router.get('/:id/students', authenticateToken, authorizeRoles('nurse'), ctrl.getStudentsByEvent)
+router.get('/:id/students', authenticateToken, authorizeRoles('admin', 'nurse', 'guardian'), ctrl.getStudentsByEvent)
 
 /**
  * @swagger
@@ -458,7 +506,7 @@ router.get('/:id/students', authenticateToken, authorizeRoles('nurse'), ctrl.get
  *         description: Không tìm thấy form
  */
 
-router.patch('/form/:formId/confirm', authenticateToken, authorizeRoles('nurse'), ctrl.confirmForm)
+router.patch('/form/:formId/confirm', authenticateToken, authorizeRoles('guardian'), ctrl.confirmForm)
 
 /**
  * @swagger
@@ -476,6 +524,6 @@ router.patch('/form/:formId/confirm', authenticateToken, authorizeRoles('nurse')
  *       200:
  *         description: Chi tiết form khám
  */
-router.get('/form/:formId', authenticateToken, authorizeRoles('nurse'), ctrl.getFormDetail)
+router.get('/form/:formId', authenticateToken, authorizeRoles('admin', 'nurse', 'guardian'), ctrl.getFormDetail)
 
 export default router

@@ -21,16 +21,6 @@ export const getMedicalRecordById = async (req, res) => {
   }
 }
 
-// Tạo mới hồ sơ y tế
-export const createMedicalRecord = async (req, res) => {
-  try {
-    const newRecord = await medicalRecordService.createMedicalRecord(req.body)
-    res.status(201).json(newRecord)
-  } catch (error) {
-    res.status(400).json({ message: error.message })
-  }
-}
-
 // Cập nhật hồ sơ y tế
 export const updateMedicalRecord = async (req, res) => {
   try {
@@ -79,6 +69,28 @@ export const createStudentAndMedical = async (req, res, next) => {
     return res.status(201).json(result)
   } catch (error) {
     console.error('Error creating student & medical record:', error.message)
+    return res.status(error.status || 500).json({
+      message: error.message || 'Internal Server Error'
+    })
+  }
+}
+
+export const updateStudentAndMedical = async (req, res) => {
+  try {
+    const medicalRecordId = parseInt(req.params.id, 10)
+
+    const { guardianUserId, student, medicalRecord } = req.body
+
+    const result = await medicalRecordService.updateStudentWithMedicalRecord({
+      guardianUserId,
+      medicalRecordId,
+      student,
+      medicalRecord
+    })
+
+    return res.status(200).json(result)
+  } catch (error) {
+    console.error('Error updating student & medical record:', error.message)
     return res.status(error.status || 500).json({
       message: error.message || 'Internal Server Error'
     })
