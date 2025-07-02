@@ -377,7 +377,7 @@ router.post(
 )
 router.get('/', authenticateToken, authorizeRoles('nurse'), getAllVaccineHistory)
 router.get('/types', authenticateToken, authorizeRoles('nurse'), getAllVaccineTypes)
-router.get('/medical-record/:mrId', authenticateToken, authorizeRoles('nurse'), getVaccineHistoryByMRId)
+router.get('/medical-record/:mrId', authenticateToken, authorizeRoles('nurse', 'guardian'), getVaccineHistoryByMRId)
 router.get('/event/:eventId/students', authenticateToken, authorizeRoles('nurse'), getStudentsByEventId)
 router.get('/:id', authenticateToken, authorizeRoles('nurse'), getVaccineHistoryById)
 router.put('/:id', authenticateToken, updateVaccineHistory)
