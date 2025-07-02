@@ -9,19 +9,36 @@ export const getAllMedicalRecords = async () => {
       model: User,
       attributes: ['fullname']
     }
-  })
+  });
 
-  // Trả về fullName nằm ngoài cùng
-  return records.map((record) => {
-    const plain = record.get({ plain: true }) // bỏ các phương thức sequelize
-    const fullname = plain.User?.fullname || null
-    delete plain.User // xoá key User
 
-    return {
-      ...plain,
-      fullname
-    }
-  })
+  return await Promise.all(
+    records.map(async (record) => {
+      const plain = record.get({ plain: true });
+      const fullname = plain.User?.fullname || null;
+      delete plain.User; // xoá key User
+
+      const guardianUser = await GuardianUser.findOne({ where: { userId: record.userId } });
+      let guardian = null;
+      if (guardianUser) {
+        const guardianRecord = await Guardian.findByPk(guardianUser.obId);
+        if (guardianRecord) {
+          // Lấy tên phụ huynh từ bảng User với userId trong bảng Guardian
+          const guardianUserInfo = await User.findByPk(guardianRecord.userId, { attributes: ['fullname'] });
+          guardian = {
+            ...guardianRecord.get({ plain: true }),
+            fullname: guardianUserInfo ? guardianUserInfo.fullname : null
+          };
+        }
+      }
+
+      return {
+        ...plain,
+        fullname,
+        guardian
+      };
+    })
+  );
 }
 
 // Lấy hồ sơ y tế theo ID
@@ -64,45 +81,42 @@ export const updateMedicalRecord = async (id, data) => {
   return await record.update(converted)
 }
 
-// Xóa hồ sơ y tế
+
 export const deleteMedicalRecord = async (id) => {
-  // Tìm hồ sơ y tế
   const record = await MedicalRecord.findByPk(id)
   if (!record) return null
 
   const studentUserId = record.userId
 
-  // Xóa liên kết giữa học sinh và guardian (nếu có)
+
   await GuardianUser.destroy({
     where: { userId: studentUserId }
   })
 
-  // Xóa user học sinh
+
   await User.destroy({
     where: { id: studentUserId }
   })
 
-  // Cuối cùng là xóa hồ sơ y tế
   await record.destroy()
 
   return true
 }
 
-// Lấy danh sách MedicalRecord học sinh theo userId phụ huynh
+
 export const getMedicalRecordsByGuardianUserIdService = async (guardianUserId) => {
-  // B1: Tìm Guardian theo userId
+
   const guardianLink = await Guardian.findOne({ where: { userId: guardianUserId } })
   if (!guardianLink) throw { status: 404, message: 'Không tìm thấy liên kết phụ huynh-học sinh' }
 
   const obId = guardianLink.obId
 
-  // B2: Lấy tất cả userId học sinh thuộc cùng obId
+
   const relatedGuardianUsers = await GuardianUser.findAll({ where: { obId } })
 
   const studentUserIds = relatedGuardianUsers.map((g) => g.userId)
   if (studentUserIds.length === 0) return []
 
-  // B3: Lấy MedicalRecord của các học sinh đó
   const records = await MedicalRecord.findAll({
     where: {
       userId: studentUserIds
