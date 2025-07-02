@@ -282,7 +282,7 @@ export async function sendConfirmForms(eventId) {
 }
 
 export async function submitResult(
-  eventId,
+  HC_ID,
   {
     student_id,
     height,
@@ -297,8 +297,6 @@ export async function submitResult(
     is_need_meet
   }
 ) {
-  const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
-  if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
 
   // Cập nhật form khám cho học sinh
   await FormCheck.update(
@@ -317,16 +315,15 @@ export async function submitResult(
     },
     {
       where: {
-        HC_ID: healthCheck.HC_ID,
+        HC_ID: HC_ID,
         Student_ID: student_id
       }
     }
   )
 }
 
-export async function updateFormResult(eventId, studentId, data) {
-  const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
-  if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
+export async function updateFormResult(HC_ID, studentId, data) {
+
 
   const [updated] = await FormCheck.update(
     {
@@ -344,7 +341,7 @@ export async function updateFormResult(eventId, studentId, data) {
     },
     {
       where: {
-        HC_ID: healthCheck.HC_ID,
+        HC_ID: HC_ID,
         Student_ID: studentId
       }
     }
@@ -402,13 +399,12 @@ export async function resetFormResult(formId) {
   return 'Đã reset kết quả khám'
 }
 
-export async function getFormResult(eventId, studentId) {
-  const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
-  if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
+export async function getFormResult(HC_ID, studentId) {
+
 
   const form = await FormCheck.findOne({
     where: {
-      HC_ID: healthCheck.HC_ID,
+      HC_ID: HC_ID,
       Student_ID: studentId
     }
   })
@@ -430,13 +426,11 @@ export async function getAllFormsByEvent(eventId) {
   return forms
 }
 
-export async function sendResult(eventId) {
-  const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
-  if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
-  await healthCheck.update({ status: 'checked' })
+export async function sendResult(HC_ID) {
+
 
   const forms = await FormCheck.findAll({
-    where: { HC_ID: healthCheck.HC_ID },
+    where: { HC_ID: HC_ID },
     include: [
       {
         model: User,
