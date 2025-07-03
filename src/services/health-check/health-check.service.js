@@ -233,9 +233,11 @@ export async function deleteHealthCheck(id) {
   const healthCheck = await HealthCheck.findByPk(id)
   if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
 
-  const eventId = healthCheck.Event_ID
-  await healthCheck.destroy()
-  await Event.destroy({ where: { eventId } })
+  const event = await Event.findByPk(healthCheck.Event_ID)
+  if (!event) throw new Error('Không tìm thấy sự kiện')
+
+  await healthCheck.destroy() // soft delete
+  await event.destroy() // soft delete
 }
 
 export async function sendConfirmForms(eventId) {
@@ -297,7 +299,6 @@ export async function submitResult(
     is_need_meet
   }
 ) {
-
   // Cập nhật form khám cho học sinh
   await FormCheck.update(
     {
@@ -323,8 +324,6 @@ export async function submitResult(
 }
 
 export async function updateFormResult(HC_ID, studentId, data) {
-
-
   const [updated] = await FormCheck.update(
     {
       Height: data.height,
@@ -400,8 +399,6 @@ export async function resetFormResult(formId) {
 }
 
 export async function getFormResult(HC_ID, studentId) {
-
-
   const form = await FormCheck.findOne({
     where: {
       HC_ID: HC_ID,
@@ -427,8 +424,6 @@ export async function getAllFormsByEvent(eventId) {
 }
 
 export async function sendResult(HC_ID) {
-
-
   const forms = await FormCheck.findAll({
     where: { HC_ID: HC_ID },
     include: [
