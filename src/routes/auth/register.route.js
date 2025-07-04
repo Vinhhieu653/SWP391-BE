@@ -41,7 +41,7 @@ const router = express.Router()
  *         description: Server error
  */
 
-router.get('/', authenticateToken, authorizeRoles('admin'), userController.getAllUsers)
+router.get('/', authenticateToken, authorizeRoles('admin', 'guardian'), userController.getAllUsers)
 
 /**
  * @swagger
@@ -88,7 +88,7 @@ router.get('/', authenticateToken, authorizeRoles('admin'), userController.getAl
  *         description: User not found
  */
 
-router.get('/:id', authenticateToken, authorizeRoles('admin'), userController.getUserById)
+router.get('/:id', authenticateToken, authorizeRoles('admin', 'guardian'), userController.getUserById)
 
 /**
  * @swagger
