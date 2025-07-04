@@ -38,6 +38,10 @@ const VaccineHistory = sequelize.define(
     Is_created_by_guardian: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
+    },
+    Is_deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   },
   {

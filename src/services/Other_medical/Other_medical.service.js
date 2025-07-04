@@ -34,8 +34,9 @@ export const createOtherMedicalService = async (data, creator_by) => {
       const dateObj = new Date(historyOtherMedical.Date_create)
       dateObj.setHours(dateObj.getHours() + 7)
       const dateStr = dateObj.toLocaleDateString('vi-VN')
+      const son = await User.findByPk(medicalRecord.userId, { attributes: ['fullname'] })
       await Notification.create({
-        title: `Con bạn có vài vấn đề về sức khỏe vào ngày ${dateStr}`,
+        title: `Cháu ${son ? son.fullname : 'con bạn'} con bạn có vấn đề về sức khỏe vào ngày ${dateStr}`,
         mess: 'Bấm vào để xem chi tiết về vấn đề sức khỏe của con bạn.',
         userId: guardian.userId
       })
@@ -51,7 +52,7 @@ export const createOtherMedicalService = async (data, creator_by) => {
 }
 
 export const getAllOtherMedicalService = async () => {
-  const otherMedicalRecords = await OtherMedical.findAll()
+  const otherMedicalRecords = await OtherMedical.findAll({ where: { Is_deleted: false } })
   const result = await Promise.all(
     otherMedicalRecords.map(async (record) => {
       const history = await HistoryOtherMedical.findAll({ where: { OrtherM_ID: record.OrtherM_ID } })
@@ -80,7 +81,7 @@ export const getAllOtherMedicalService = async () => {
 }
 
 export const getOtherMedicalByIdService = async (id) => {
-  const otherMedical = await OtherMedical.findByPk(id)
+  const otherMedical = await OtherMedical.findOne({ where: { OrtherM_ID: id, Is_deleted: false } })
   if (!otherMedical) throw { status: 404, message: 'Other medical record not found' }
 
   const history = await HistoryOtherMedical.findAll({ where: { OrtherM_ID: id } })
@@ -121,21 +122,63 @@ export const getOtherMedicalByIdService = async (id) => {
 }
 
 export const updateOtherMedicalService = async (id, updateData) => {
-  const otherMedical = await OtherMedical.findByPk(id)
+  const otherMedical = await OtherMedical.findOne({ where: { OrtherM_ID: id, Is_deleted: false } })
   if (!otherMedical) throw { status: 404, message: 'Other medical record not found' }
   await otherMedical.update(updateData)
+  const history = await HistoryOtherMedical.findOne({ where: { OrtherM_ID: id } })
   await HistoryOtherMedical.update({ Date_create: new Date() }, { where: { OrtherM_ID: id } })
+
+  if (history) {
+    const medicalRecord = await MedicalRecord.findByPk(history.ID)
+    if (medicalRecord) {
+      const guardianUsers = await GuardianUser.findAll({ where: { userId: medicalRecord.userId } })
+      for (const guardianUser of guardianUsers) {
+        const guardian = await Guardian.findByPk(guardianUser.obId)
+        if (guardian && guardian.userId) {
+          const son = await User.findByPk(medicalRecord.userId, { attributes: ['fullname'] })
+          const dateObj = new Date()
+          dateObj.setHours(dateObj.getHours() + 7)
+          const dateStr = dateObj.toLocaleDateString('vi-VN')
+          await Notification.create({
+            title: `Cập nhật vấn đề về sức khỏe vào ngày ${dateStr} cho cháu ${son ? son.fullname : 'con bạn'}`,
+            mess: `Thông tin sức khỏe của cháu đã được cập nhật vào ngày ${dateStr}. Vui lòng kiểm tra.`,
+            userId: guardian.userId
+          })
+        }
+      }
+    }
+  }
 
   return otherMedical
 }
 
 export const deleteOtherMedicalService = async (id) => {
-  const otherMedical = await OtherMedical.findByPk(id)
+  const otherMedical = await OtherMedical.findOne({ where: { OrtherM_ID: id, Is_deleted: false } })
   if (!otherMedical) throw { status: 404, message: 'Other medical record not found' }
 
-  await HistoryOtherMedical.destroy({ where: { OrtherM_ID: id } })
+  const history = await HistoryOtherMedical.findOne({ where: { OrtherM_ID: id } })
+  if (history) {
+    const medicalRecord = await MedicalRecord.findByPk(history.ID)
+    if (medicalRecord) {
+      const guardianUsers = await GuardianUser.findAll({ where: { userId: medicalRecord.userId } })
+      for (const guardianUser of guardianUsers) {
+        const guardian = await Guardian.findByPk(guardianUser.obId)
+        if (guardian && guardian.userId) {
+          const son = await User.findByPk(medicalRecord.userId, { attributes: ['fullname'] })
+          const dateObj = new Date()
+          dateObj.setHours(dateObj.getHours() + 7)
+          const dateStr = dateObj.toLocaleDateString('vi-VN')
+          await Notification.create({
+            title: `Một vấn đề về sức khỏe vào ngày ${dateStr} của cháu ${son ? son.fullname : 'con bạn'} đã được xóa`,
+            mess: `Một ghi chú về sức khỏe của cháu đã được xóa. Chúng tôi xin lỗi vì sự nhầm lẫn này. Chúng tôi sẽ tiếp tục theo dõi và cập nhật thông tin sức khỏe của cháu trong tương lai.`,
+            userId: guardian.userId
+          })
+        }
+      }
+    }
+  }
 
-  await otherMedical.destroy()
+  await otherMedical.update({ Is_deleted: true })
 }
 
 export const getOtherMedicalByGuardianUserIdService = async (guardianUserId) => {
@@ -159,7 +202,9 @@ export const getOtherMedicalByGuardianUserIdService = async (guardianUserId) => 
 
   const otherMedicalIds = histories.map((h) => h.OrtherM_ID)
 
-  const otherMedicals = await OtherMedical.findAll({ where: { OrtherM_ID: otherMedicalIds } })
+  const otherMedicals = await OtherMedical.findAll({
+    where: { OrtherM_ID: otherMedicalIds, Is_deleted: false }
+  })
 
   const result = await Promise.all(
     otherMedicals.map(async (record) => {

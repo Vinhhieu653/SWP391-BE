@@ -84,7 +84,7 @@ export const deleteOtherMedical = async (req, res) => {
     res.status(200).json({
       status: 200,
       success: true,
-      message: 'delete successfully'
+      message: 'Other medical record deleted successfully'
     })
   } catch (error) {
     res.status(error.status || 500).json({ message: error.message || 'Internal server error' })

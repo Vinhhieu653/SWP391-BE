@@ -20,6 +20,10 @@ const OtherMedical = sequelize.define(
     },
     Is_calLOb: {
       type: DataTypes.BOOLEAN
+    },
+    Is_deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   },
   {
