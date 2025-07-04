@@ -329,7 +329,7 @@ const upload = multer({ dest: 'uploads/' })
  * @swagger
  * /api/v1/vaccine/delete-by-name-date-grade:
  *   delete:
- *     summary: Xóa nhiều lịch sử tiêm chủng theo tên vaccine và ngày tiêm (Chỉ dành cho Nurse)
+ *     summary: Xóa (soft delete) nhiều lịch sử tiêm chủng theo tên vaccine và ngày tiêm (Chỉ dành cho Nurse)
  *     tags: [Vaccine]
  *     security:
  *       - bearerAuth: []
@@ -368,20 +368,13 @@ const upload = multer({ dest: 'uploads/' })
  */
 
 router.post('/', authenticateToken, authorizeRoles('nurse'), createVaccineHistory)
-router.post(
-  '/evidence',
-  authenticateToken,
-  authorizeRoles('guardian'),
-  upload.single('evidence'),
-  createVaccineWithEvidence
-)
-router.get('/', authenticateToken, authorizeRoles('nurse'), getAllVaccineHistory)
-router.get('/types', authenticateToken, authorizeRoles('nurse'), getAllVaccineTypes)
-router.get('/medical-record/:mrId', authenticateToken, authorizeRoles('nurse', 'guardian'), getVaccineHistoryByMRId)
-router.get('/event/:eventId/students', authenticateToken, authorizeRoles('nurse'), getStudentsByEventId)
-router.get('/:id', authenticateToken, authorizeRoles('nurse'), getVaccineHistoryById)
-router.put('/:id', authenticateToken, updateVaccineHistory)
-router.put('/:id/confirm', authenticateToken, confirmVaccineHistory)
+router.post('/evidence', authenticateToken, authorizeRoles('guardian'), upload.single('evidence'), createVaccineWithEvidence)
+router.get('/', getAllVaccineHistory)
+router.get('/types', getAllVaccineTypes)
+router.get('/medical-record/:mrId', getVaccineHistoryByMRId)
+router.get('/event/:eventId/students', getStudentsByEventId)
+router.get('/by-name/:vaccineName', getVaccineHistoryByVaccineName)
+router.get('/guardian/:guardianUserId', getVaccineHistoryByGuardianUserId)
 router.put('/vaccine-history/status', authenticateToken, updateVaccineStatusByMRId)
 router.delete(
   '/delete-by-name-date-grade',
@@ -389,8 +382,9 @@ router.delete(
   authorizeRoles('nurse'),
   deleteVaccineHistoriesByNameDateGrade
 )
+router.get('/:id', getVaccineHistoryById)
+router.put('/:id', authenticateToken, updateVaccineHistory)
+router.put('/:id/confirm', authenticateToken, confirmVaccineHistory)
 router.delete('/:id', authenticateToken, authorizeRoles('nurse'), deleteVaccineHistory)
-router.get('/by-name/:vaccineName', getVaccineHistoryByVaccineName)
-router.get('/guardian/:guardianUserId', getVaccineHistoryByGuardianUserId)
 
 export default router

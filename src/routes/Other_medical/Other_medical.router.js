@@ -135,7 +135,7 @@ router.put('/:id', authenticateToken, authorizeRoles('nurse', 'admin'), upload.s
  * @swagger
  * /api/v1/other-medical/{id}:
  *   delete:
- *     summary: Delete an other medical record by ID
+ *     summary: Soft delete an other medical record by ID
  *     tags: [OtherMedical]
  *     security:
  *       - bearerAuth: []
@@ -148,7 +148,7 @@ router.put('/:id', authenticateToken, authorizeRoles('nurse', 'admin'), upload.s
  *         description: Other medical record ID
  *     responses:
  *       200:
- *         description: Deleted successfully
+ *         description: Other medical record soft deleted successfully
  *       404:
  *         description: Not found
  */
