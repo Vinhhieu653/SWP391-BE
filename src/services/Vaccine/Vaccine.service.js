@@ -517,10 +517,13 @@ export const deleteVaccineHistoriesByNameDateGradeService = async (vaccineName, 
         for (const guardianUser of guardianUsers) {
           const guardian = await Guardian.findByPk(guardianUser.obId)
           if (guardian) {
-            const son = await User.findByPk(medicalRecord.userId, { attributes: ['fullname'] })
+            const dateObj = new Date(dateInjection).toDateStringLocale('vi-VN');
+            dateObj.setHours(dateObj.getHours() + 7)
+            const dateStr = dateObj.toLocaleDateString('vi-VN')
+            const son = await User.findByPk(medicalRecord.userId, { attributes: ['fullname'] });
             await Notification.create({
               title: `Lịch tiêm chủng đã bị hủy`,
-              mess: `Lịch tiêm chủng cho cháu ${son ? son.fullname : 'Không rõ tên'} với vaccine ${vaccineName} vào ngày ${dateInjection} đã bị hủy, chúng tôi sẽ thông báo khi có lịch tiêm chủng mới.`,
+              mess: `Lịch tiêm chủng vaccine ${vaccineName} cho cháu ${son ? son.fullname : 'Không rõ tên'} vào ngày ${dateStr} đã bị hủy, chúng tôi sẽ thông báo khi có lịch tiêm chủng mới.`,
               userId: guardian.userId
             })
           }
