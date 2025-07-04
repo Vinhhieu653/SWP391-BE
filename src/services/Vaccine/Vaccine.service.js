@@ -46,7 +46,8 @@ export const createVaccineHistoryService = async (data) => {
     const existed = await VaccineHistory.findOne({
       where: {
         ID: mrId,
-        Vaccine_name: vaccineName
+        Vaccine_name: vaccineName,
+        Is_deleted: false
       }
     })
     if (existed && existed.Status !== 'Không tiêm') continue
@@ -136,6 +137,7 @@ export const createVaccineHistoryWithEvidenceService = async (data, imageFile) =
 
 export const getAllVaccineHistoryService = async () => {
   const records = await VaccineHistory.findAll({
+    where: { Is_deleted: false },
     order: [['Date_injection', 'DESC']]
   })
 
@@ -163,7 +165,9 @@ export const getAllVaccineHistoryService = async () => {
 }
 
 export const getVaccineHistoryByIdService = async (id) => {
-  const record = await VaccineHistory.findByPk(id)
+  const record = await VaccineHistory.findOne({
+    where: { VH_ID: id, Is_deleted: false }
+  })
   if (!record) {
     throw { status: 404, message: 'Vaccine history record not found' }
   }
@@ -182,15 +186,15 @@ export const getVaccineHistoryByIdService = async (id) => {
 
 export const getVaccineHistoryByMRIdService = async (ID) => {
   const records = await VaccineHistory.findAll({
-    where: { ID },
+    where: { ID, Is_deleted: false },
     order: [['Date_injection', 'DESC']]
   })
 
   const medicalRecord = await MedicalRecord.findByPk(ID)
   const user = medicalRecord
     ? await User.findByPk(medicalRecord.userId, {
-        attributes: ['fullname', 'dateOfBirth']
-      })
+      attributes: ['fullname', 'dateOfBirth']
+    })
     : null
 
   return {
@@ -214,7 +218,7 @@ export const updateVaccineHistoryService = async (id, updateData) => {
 }
 
 export const confirmVaccineHistoryService = async (id, isConfirmed) => {
-  const record = await VaccineHistory.findByPk(id)
+  const record = await getVaccineHistoryByIdService(id)
   if (!record) {
     throw { status: 404, message: 'Vaccine history record not found' }
   }
@@ -244,18 +248,18 @@ export const confirmVaccineHistoryService = async (id, isConfirmed) => {
 }
 
 export const deleteVaccineHistoryService = async (id) => {
-  const record = await VaccineHistory.findByPk(id)
+  const record = await getVaccineHistoryByIdService(id)
   if (!record) {
     throw { status: 404, message: 'Vaccine history record not found' }
   }
 
-  await record.destroy()
+  await record.update({ Is_deleted: true })
   return { message: 'Vaccine history record deleted successfully' }
 }
 
 export const getStudentsByEventIdService = async (eventId) => {
   const vaccineHistories = await VaccineHistory.findAll({
-    where: { Event_ID: eventId }
+    where: { Event_ID: eventId, Is_deleted: false }
   })
 
   const result = await Promise.all(
@@ -298,7 +302,7 @@ export const updateVaccineStatusByMRIdService = async (updates) => {
 
   const vhIdList = updates.map((item) => item.VH_ID)
 
-  const records = await VaccineHistory.findAll({ where: { VH_ID: vhIdList } })
+  const records = await VaccineHistory.findAll({ where: { VH_ID: vhIdList, Is_deleted: false } })
   if (records.length !== vhIdList.length) {
     throw { status: 404, message: 'Some VH_IDs do not exist in vaccine history' }
   }
@@ -346,7 +350,8 @@ export const updateVaccineStatusByMRIdService = async (updates) => {
 export const getAllVaccineTypesService = async () => {
   const types = await VaccineHistory.findAll({
     where: {
-      Is_created_by_guardian: false
+      Is_created_by_guardian: false,
+      Is_deleted: false
     },
     attributes: ['Vaccine_name', 'ID', 'Event_ID'],
     raw: true
@@ -384,7 +389,7 @@ export const getAllVaccineTypesService = async () => {
 }
 
 export const getVaccineHistoryByVaccineNameService = async (vaccineName, grade, eventDate) => {
-  let whereClause = { Vaccine_name: vaccineName }
+  let whereClause = { Vaccine_name: vaccineName, Is_deleted: false }
   const filterByGrade = !!grade
   const filterByDate = !!eventDate
 
@@ -470,7 +475,7 @@ export const getVaccineHistoryByGuardianUserIdService = async (guardianUserId) =
     medicalRecords.map(async (mr) => {
       const user = await User.findByPk(mr.userId, { attributes: ['id', 'fullname', 'dateOfBirth'] })
       const vaccineHistory = await VaccineHistory.findAll({
-        where: { ID: mr.ID },
+        where: { ID: mr.ID, Is_deleted: false },
         order: [['Date_injection', 'DESC']]
       })
       totalVaccine += vaccineHistory.filter((vh) => vh.Status === 'Đã tiêm').length
@@ -496,7 +501,7 @@ export const deleteVaccineHistoriesByNameDateGradeService = async (vaccineName, 
   }
 
   const histories = await VaccineHistory.findAll({
-    where: { Vaccine_name: vaccineName }
+    where: { Vaccine_name: vaccineName, Is_deleted: false }
   })
 
   let deletedCount = 0
@@ -517,16 +522,20 @@ export const deleteVaccineHistoriesByNameDateGradeService = async (vaccineName, 
         for (const guardianUser of guardianUsers) {
           const guardian = await Guardian.findByPk(guardianUser.obId)
           if (guardian) {
+            const dateObj = new Date(dateInjection)
+            dateObj.setHours(dateObj.getHours() + 7)
+            const dateStr = dateObj.toLocaleDateString('vi-VN')
             const son = await User.findByPk(medicalRecord.userId, { attributes: ['fullname'] })
             await Notification.create({
               title: `Lịch tiêm chủng đã bị hủy`,
-              mess: `Lịch tiêm chủng cho cháu ${son ? son.fullname : 'Không rõ tên'} với vaccine ${vaccineName} vào ngày ${dateInjection} đã bị hủy, chúng tôi sẽ thông báo khi có lịch tiêm chủng mới.`,
+              mess: `Lịch tiêm chủng vaccine ${vaccineName} cho cháu ${son ? son.fullname : 'Không rõ tên'
+                } vào ngày ${dateStr} đã bị hủy, chúng tôi sẽ thông báo khi có lịch tiêm chủng mới.`,
               userId: guardian.userId
             })
           }
         }
       }
-      await history.destroy()
+      await history.update({ Is_deleted: true })
       deletedCount++
     }
   }
