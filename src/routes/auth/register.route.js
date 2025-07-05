@@ -231,7 +231,7 @@ router.post('/register', authenticateToken, authorizeRoles('admin'), userControl
  *         description: Server error
  */
 
-router.put('/edit/:id', authenticateToken, authorizeRoles('admin'), userController.update)
+router.put('/edit/:id', authenticateToken, authorizeRoles('admin', 'guardian'), userController.update)
 
 /**
  * @swagger
