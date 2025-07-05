@@ -8,14 +8,21 @@ import Notification from '../../models/data/noti.model.js'
 
 // Tạo mới MedicalSent và liên kết OutpatientMedication
 export const createMedicalSentService = async (data, creator_by = 'system') => {
-  const { userId, Class: studentClass, prescriptionImage, medications, deliveryTime, status, notes } = data
+  let { userId, fullname, Class: studentClass, prescriptionImage, medications, deliveryTime, status, notes } = data
 
-  if (!userId) throw { status: 400, message: 'userId is required' }
+  // Nếu không có userId, tạo mới user
+  if (!userId) {
+    if (!fullname || !studentClass) throw { status: 400, message: 'Thiếu tên học sinh hoặc lớp!' }
+    const newUser = await User.create({ fullname, Class: studentClass, roleId: 3 })
+    userId = newUser.id
+  }
 
-  // 1. Tìm MedicalRecord theo userId
-  const medicalRecord = await MedicalRecord.findOne({ where: { userId: userId } })
-  if (!medicalRecord) throw { status: 404, message: 'Medical record not found for this user' }
-
+  // 1. Tìm MedicalRecord theo userId (nếu có)
+  let medicalRecord = await MedicalRecord.findOne({ where: { userId: userId } })
+  if (!medicalRecord) {
+    // Nếu chưa có, tạo mới MedicalRecord
+    medicalRecord = await MedicalRecord.create({ userId: userId, Class: studentClass })
+  }
   const ID = medicalRecord.ID
 
   // 2. Tìm hoặc tạo OutpatientMedication theo ID
@@ -24,16 +31,16 @@ export const createMedicalSentService = async (data, creator_by = 'system') => {
     outpatient = await OutpatientMedication.create({ ID: ID })
   }
 
-  const links = await GuardianUser.findAll({ where: { userId: userId } })
-
-  const obId = links.length > 0 ? links[0].obId : null
-
-  if (!obId) throw { status: 404, message: 'No guardian found for this student' }
-
-  const guardianLink = await Guardian.findOne({ where: { obId: obId } })
-  if (!guardianLink) throw { status: 404, message: 'Guardian not found for this student' }
-
-  const guardianPhone = guardianLink.phoneNumber
+  // 2. Lấy guardianPhone nếu có guardian, nếu không thì để rỗng
+  let guardianPhone = ''
+  if (userId) {
+    const links = await GuardianUser.findAll({ where: { userId: userId } })
+    const obId = links.length > 0 ? links[0].obId : null
+    if (obId) {
+      const guardianLink = await Guardian.findOne({ where: { obId: obId } })
+      if (guardianLink) guardianPhone = guardianLink.phoneNumber
+    }
+  }
 
   // Lấy notes từ cả hai key, ưu tiên notes (chữ thường)
   const notesValue = data.notes !== undefined ? data.notes : data.Notes
@@ -41,7 +48,7 @@ export const createMedicalSentService = async (data, creator_by = 'system') => {
   // 3. Tạo bản ghi MedicalSent
   const medicalSent = await MedicalSent.create({
     User_ID: userId,
-    Guardian_phone: guardianPhone,
+    Guardian_phone: guardianPhone || data.guardianPhone || '',
     Class: studentClass,
     Image_prescription: prescriptionImage,
     Medications: medications,
