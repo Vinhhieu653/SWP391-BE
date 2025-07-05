@@ -1,4 +1,5 @@
 import * as srv from '../../services/health-check/health-check.service.js'
+import cloudinary from '../../utils/cloudinary.js'
 
 export async function createHealthCheck(req, res) {
   try {
@@ -72,14 +73,30 @@ export async function sendConfirmForms(req, res) {
   }
 }
 
-export async function submitResult(req, res) {
+export const createdResult = async (req, res) => {
   try {
     const { id } = req.params
-    await srv.submitResult(+id, req.body)
-    return res.json({ success: true, message: 'Submit kết quả thành công' })
-  } catch (e) {
-    console.error(e)
-    return res.status(500).json({ success: false, message: e.message || 'Internal Server Error' })
+    let imageUrl = null
+
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path)
+      imageUrl = result.secure_url
+    }
+
+    await srv.createdResult(id, {
+      ...req.body,
+      image: imageUrl
+    })
+
+    res.status(200).json({
+      success: true,
+      message: 'Submit kết quả thành công'
+    })
+  } catch (error) {
+    res.status(error.status || 500).json({
+      success: false,
+      message: error.message || 'Server error'
+    })
   }
 }
 
@@ -106,14 +123,29 @@ export const handleGetAllForms = async (req, res) => {
 
 export const handleUpdateForm = async (req, res) => {
   try {
-    const { id } = req.params
-    const { student_id } = req.body
-    const result = await srv.updateFormResult(id, student_id, req.body) // ✅ đổi sang srv
-    res.status(200).json({ message: result })
+    const { id } = req.params;
+    const { student_id } = req.body;
+
+    let imageUrl = null
+    if (req.file) {
+      // up cloudinary ở đây, ví dụ:
+      const result = await cloudinary.uploader.upload(req.file.path)
+      imageUrl = result.secure_url
+    }
+
+    const updatedData = {
+      ...req.body,
+      image: imageUrl
+    };
+    console.log('Updated Data:', updatedData);
+    const result = await srv.updateFormResult(id, student_id, updatedData);
+
+    res.status(200).json({ message: result });
   } catch (err) {
-    res.status(400).json({ error: err.message })
+    res.status(400).json({ error: err.message });
   }
-}
+};
+
 
 export const handleResetForm = async (req, res) => {
   try {

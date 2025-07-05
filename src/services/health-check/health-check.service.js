@@ -281,7 +281,7 @@ export async function sendConfirmForms(eventId) {
   return { createdForms: forms.length }
 }
 
-export async function submitResult(
+export async function createdResult(
   HC_ID,
   {
     student_id,
@@ -294,7 +294,8 @@ export async function submitResult(
     ent_status,
     skin_status,
     general_conclusion,
-    is_need_meet
+    is_need_meet,
+    image,
   }
 ) {
 
@@ -311,7 +312,8 @@ export async function submitResult(
       Skin_Status: skin_status,
       General_Conclusion: general_conclusion,
       Is_need_meet: is_need_meet,
-      status: 'checked'
+      // status: 'checked',
+      image: image,
     },
     {
       where: {
@@ -324,7 +326,7 @@ export async function submitResult(
 
 export async function updateFormResult(HC_ID, studentId, data) {
 
-
+  console.log('Updating form result:', { data });
   const [updated] = await FormCheck.update(
     {
       Height: data.height,
@@ -337,7 +339,8 @@ export async function updateFormResult(HC_ID, studentId, data) {
       Skin_Status: data.skin_status,
       General_Conclusion: data.general_conclusion,
       Is_need_meet: data.is_need_meet,
-      status: data.status
+      status: data.status,
+      image: data.image
     },
     {
       where: {
@@ -412,6 +415,7 @@ export async function getFormResult(HC_ID, studentId) {
   if (!form) throw new Error('Không tìm thấy form khám')
   return form
 }
+
 
 export async function getAllFormsByEvent(eventId) {
   const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
