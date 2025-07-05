@@ -123,8 +123,8 @@ export const handleGetAllForms = async (req, res) => {
 
 export const handleUpdateForm = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { student_id } = req.body;
+    const { id } = req.params
+    const { student_id } = req.body
 
     let imageUrl = null
     if (req.file) {
@@ -136,16 +136,15 @@ export const handleUpdateForm = async (req, res) => {
     const updatedData = {
       ...req.body,
       image: imageUrl
-    };
-    console.log('Updated Data:', updatedData);
-    const result = await srv.updateFormResult(id, student_id, updatedData);
+    }
+    console.log('Updated Data:', updatedData)
+    const result = await srv.updateFormResult(id, student_id, updatedData)
 
-    res.status(200).json({ message: result });
+    res.status(200).json({ message: result })
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: err.message })
   }
-};
-
+}
 
 export const handleResetForm = async (req, res) => {
   try {

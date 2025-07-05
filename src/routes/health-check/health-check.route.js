@@ -294,7 +294,13 @@ router.post('/:id/send-confirm', authenticateToken, authorizeRoles('nurse'), ctr
  *       200:
  *         description: Đã lưu kết quả
  */
-router.post('/:id/submit-result', authenticateToken, authorizeRoles('nurse'), upload.single('image'), ctrl.createdResult)
+router.post(
+  '/:id/submit-result',
+  authenticateToken,
+  authorizeRoles('nurse'),
+  upload.single('image'),
+  ctrl.createdResult
+)
 /**
  * @swagger
  * /api/v1/health-check/{id}/form-result:
@@ -414,7 +420,13 @@ router.get(
  *       400:
  *         description: Lỗi
  */
-router.put('/:id/form-result', authenticateToken, authorizeRoles('nurse'), upload.single('image'), ctrl.handleUpdateForm)
+router.put(
+  '/:id/form-result',
+  authenticateToken,
+  authorizeRoles('nurse'),
+  upload.single('image'),
+  ctrl.handleUpdateForm
+)
 
 /**
  * @swagger
