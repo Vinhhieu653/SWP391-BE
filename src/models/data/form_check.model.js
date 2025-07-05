@@ -18,6 +18,10 @@ const FormCheck = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    image: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     Height: DataTypes.INTEGER,
     Weight: DataTypes.FLOAT,
     Blood_Pressure: DataTypes.STRING,

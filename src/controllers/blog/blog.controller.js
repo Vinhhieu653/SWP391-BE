@@ -85,6 +85,8 @@ export const getBlogByIdController = async (req, res) => {
 // [PUT] /blogs/:id
 export const updateBlogController = async (req, res) => {
   try {
+    console.log('req.body', req.file.path)
+
     const { id } = req.params
     const updateData = { ...req.body }
 

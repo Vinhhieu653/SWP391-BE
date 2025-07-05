@@ -1,7 +1,10 @@
 import { Router } from 'express'
 import * as ctrl from '../../controllers/health-check/health-check.controller.js'
 import { authenticateToken, authorizeRoles } from '../../middlewares/auth.middleware.js'
+import multer from 'multer'
+
 const router = Router()
+const upload = multer({ dest: 'uploads/' })
 
 /**
  * @swagger
@@ -284,11 +287,20 @@ router.post('/:id/send-confirm', authenticateToken, authorizeRoles('nurse'), ctr
  *               is_need_meet:
  *                 type: boolean
  *                 example: false
+ *               image:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       200:
  *         description: Đã lưu kết quả
  */
-router.post('/:id/submit-result', authenticateToken, authorizeRoles('nurse'), ctrl.submitResult)
+router.post(
+  '/:id/submit-result',
+  authenticateToken,
+  authorizeRoles('nurse'),
+  upload.single('image'),
+  ctrl.createdResult
+)
 /**
  * @swagger
  * /api/v1/health-check/{id}/form-result:
@@ -357,7 +369,7 @@ router.get(
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -399,15 +411,22 @@ router.get(
  *               status:
  *                 type: string
  *                 example: "approved"
+ *               image:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       200:
  *         description: Cập nhật thành công
  *       400:
  *         description: Lỗi
  */
-router.put('/:id/form-result', authenticateToken, authorizeRoles('nurse'), ctrl.handleUpdateForm)
-
-router.put('/:id/form-result', authenticateToken, authorizeRoles('nurse'), ctrl.handleUpdateForm)
+router.put(
+  '/:id/form-result',
+  authenticateToken,
+  authorizeRoles('nurse'),
+  upload.single('image'),
+  ctrl.handleUpdateForm
+)
 
 /**
  * @swagger
