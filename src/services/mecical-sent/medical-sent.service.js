@@ -35,6 +35,9 @@ export const createMedicalSentService = async (data, creator_by = 'system') => {
 
   const guardianPhone = guardianLink.phoneNumber
 
+  // Lấy notes từ cả hai key, ưu tiên notes (chữ thường)
+  const notesValue = data.notes !== undefined ? data.notes : data.Notes
+
   // 3. Tạo bản ghi MedicalSent
   const medicalSent = await MedicalSent.create({
     User_ID: userId,
@@ -44,7 +47,7 @@ export const createMedicalSentService = async (data, creator_by = 'system') => {
     Medications: medications,
     Delivery_time: deliveryTime,
     Status: status,
-    Notes: notes,
+    Notes: notesValue,
     Created_at: new Date()
   })
 
@@ -106,7 +109,11 @@ export const updateMedicalSentService = async (id, updateData) => {
   const record = await MedicalSent.findByPk(id)
   if (!record) throw { status: 404, message: 'Medical sent record not found' }
 
-  await record.update(updateData)
+  // Lấy notes từ cả hai key, ưu tiên notes (chữ thường)
+  const notesValue = updateData.notes !== undefined ? updateData.notes : updateData.Notes
+  const updatePayload = { ...updateData, Notes: notesValue }
+
+  await record.update(updatePayload)
   const { Form_ID, Outpatient_medication, OM_ID, ...cleaned } = record.get({ plain: true })
   return cleaned
 }
