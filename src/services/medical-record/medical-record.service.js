@@ -9,26 +9,25 @@ export const getAllMedicalRecords = async () => {
       model: User,
       attributes: ['fullname']
     }
-  });
-
+  })
 
   return await Promise.all(
     records.map(async (record) => {
-      const plain = record.get({ plain: true });
-      const fullname = plain.User?.fullname || null;
-      delete plain.User; // xoá key User
+      const plain = record.get({ plain: true })
+      const fullname = plain.User?.fullname || null
+      delete plain.User // xoá key User
 
-      const guardianUser = await GuardianUser.findOne({ where: { userId: record.userId } });
-      let guardian = null;
+      const guardianUser = await GuardianUser.findOne({ where: { userId: record.userId } })
+      let guardian = null
       if (guardianUser) {
-        const guardianRecord = await Guardian.findByPk(guardianUser.obId);
+        const guardianRecord = await Guardian.findByPk(guardianUser.obId)
         if (guardianRecord) {
           // Lấy tên phụ huynh từ bảng User với userId trong bảng Guardian
-          const guardianUserInfo = await User.findByPk(guardianRecord.userId, { attributes: ['fullname'] });
+          const guardianUserInfo = await User.findByPk(guardianRecord.userId, { attributes: ['fullname'] })
           guardian = {
             ...guardianRecord.get({ plain: true }),
             fullname: guardianUserInfo ? guardianUserInfo.fullname : null
-          };
+          }
         }
       }
 
@@ -36,9 +35,9 @@ export const getAllMedicalRecords = async () => {
         ...plain,
         fullname,
         guardian
-      };
+      }
     })
-  );
+  )
 }
 
 // Lấy hồ sơ y tế theo ID
@@ -81,18 +80,15 @@ export const updateMedicalRecord = async (id, data) => {
   return await record.update(converted)
 }
 
-
 export const deleteMedicalRecord = async (id) => {
   const record = await MedicalRecord.findByPk(id)
   if (!record) return null
 
   const studentUserId = record.userId
 
-
   await GuardianUser.destroy({
     where: { userId: studentUserId }
   })
-
 
   await User.destroy({
     where: { id: studentUserId }
@@ -103,14 +99,11 @@ export const deleteMedicalRecord = async (id) => {
   return true
 }
 
-
 export const getMedicalRecordsByGuardianUserIdService = async (guardianUserId) => {
-
   const guardianLink = await Guardian.findOne({ where: { userId: guardianUserId } })
   if (!guardianLink) throw { status: 404, message: 'Không tìm thấy liên kết phụ huynh-học sinh' }
 
   const obId = guardianLink.obId
-
 
   const relatedGuardianUsers = await GuardianUser.findAll({ where: { obId } })
 

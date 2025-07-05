@@ -281,8 +281,8 @@ export async function sendConfirmForms(eventId) {
   return { createdForms: forms.length }
 }
 
-export async function submitResult(
-  eventId,
+export async function createdResult(
+  HC_ID,
   {
     student_id,
     height,
@@ -294,11 +294,10 @@ export async function submitResult(
     ent_status,
     skin_status,
     general_conclusion,
-    is_need_meet
+    is_need_meet,
+    image,
   }
 ) {
-  const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
-  if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
 
   // Cập nhật form khám cho học sinh
   await FormCheck.update(
@@ -313,21 +312,21 @@ export async function submitResult(
       Skin_Status: skin_status,
       General_Conclusion: general_conclusion,
       Is_need_meet: is_need_meet,
-      status: 'checked'
+      // status: 'checked',
+      image: image,
     },
     {
       where: {
-        HC_ID: healthCheck.HC_ID,
+        HC_ID: HC_ID,
         Student_ID: student_id
       }
     }
   )
 }
 
-export async function updateFormResult(eventId, studentId, data) {
-  const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
-  if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
+export async function updateFormResult(HC_ID, studentId, data) {
 
+  console.log('Updating form result:', { data });
   const [updated] = await FormCheck.update(
     {
       Height: data.height,
@@ -340,11 +339,12 @@ export async function updateFormResult(eventId, studentId, data) {
       Skin_Status: data.skin_status,
       General_Conclusion: data.general_conclusion,
       Is_need_meet: data.is_need_meet,
-      status: data.status
+      status: data.status,
+      image: data.image
     },
     {
       where: {
-        HC_ID: healthCheck.HC_ID,
+        HC_ID: HC_ID,
         Student_ID: studentId
       }
     }
@@ -402,13 +402,12 @@ export async function resetFormResult(formId) {
   return 'Đã reset kết quả khám'
 }
 
-export async function getFormResult(eventId, studentId) {
-  const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
-  if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
+export async function getFormResult(HC_ID, studentId) {
+
 
   const form = await FormCheck.findOne({
     where: {
-      HC_ID: healthCheck.HC_ID,
+      HC_ID: HC_ID,
       Student_ID: studentId
     }
   })
@@ -416,6 +415,7 @@ export async function getFormResult(eventId, studentId) {
   if (!form) throw new Error('Không tìm thấy form khám')
   return form
 }
+
 
 export async function getAllFormsByEvent(eventId) {
   const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
@@ -430,13 +430,11 @@ export async function getAllFormsByEvent(eventId) {
   return forms
 }
 
-export async function sendResult(eventId) {
-  const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
-  if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
-  await healthCheck.update({ status: 'checked' })
+export async function sendResult(HC_ID) {
+
 
   const forms = await FormCheck.findAll({
-    where: { HC_ID: healthCheck.HC_ID },
+    where: { HC_ID: HC_ID },
     include: [
       {
         model: User,

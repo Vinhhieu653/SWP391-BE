@@ -20,17 +20,17 @@ export const createVaccineHistoryService = async (data) => {
   const vaccineName = data.Vaccine_name
 
   if (!mrIds) {
-    const medicalRecords = await MedicalRecord.findAll({ attributes: ['ID', 'Class'] });
+    const medicalRecords = await MedicalRecord.findAll({ attributes: ['ID', 'Class'] })
     mrIds = medicalRecords
-      .filter(record => {
-        if (!classFilter) return true;
-        const match = record.Class ? record.Class.match(/^(\d+)/) : null;
-        const grade = match ? match[1] : null;
-        return grade === classFilter;
+      .filter((record) => {
+        if (!classFilter) return true
+        const match = record.Class ? record.Class.match(/^(\d+)/) : null
+        const grade = match ? match[1] : null
+        return grade === classFilter
       })
-      .map(record => record.ID);
+      .map((record) => record.ID)
   } else {
-    mrIds = Array.isArray(mrIds) ? mrIds : [mrIds];
+    mrIds = Array.isArray(mrIds) ? mrIds : [mrIds]
   }
 
   const vaccineHistories = []
@@ -39,16 +39,17 @@ export const createVaccineHistoryService = async (data) => {
     const medicalRecord = await MedicalRecord.findByPk(mrId)
     if (!medicalRecord) continue
     if (classFilter) {
-      const match = medicalRecord.Class ? medicalRecord.Class.match(/^(\d+)/) : null;
-      const grade = match ? match[1] : null;
-      if (grade !== classFilter) continue;
+      const match = medicalRecord.Class ? medicalRecord.Class.match(/^(\d+)/) : null
+      const grade = match ? match[1] : null
+      if (grade !== classFilter) continue
     }
     const existed = await VaccineHistory.findOne({
       where: {
         ID: mrId,
-        Vaccine_name: vaccineName
+        Vaccine_name: vaccineName,
+        Is_deleted: false
       }
-    });
+    })
     if (existed && existed.Status !== 'Không tiêm') continue
 
     const vaccineHistory = await VaccineHistory.create({
@@ -82,9 +83,8 @@ export const createVaccineHistoryService = async (data) => {
     )
   }
 
-
   if (vaccineHistories.length === 0) {
-    await event.destroy();
+    await event.destroy()
     throw { status: 400, message: 'Không có học sinh nào hợp lệ để tạo đợt tiêm chủng.' }
   }
 
@@ -137,6 +137,7 @@ export const createVaccineHistoryWithEvidenceService = async (data, imageFile) =
 
 export const getAllVaccineHistoryService = async () => {
   const records = await VaccineHistory.findAll({
+    where: { Is_deleted: false },
     order: [['Date_injection', 'DESC']]
   })
 
@@ -151,8 +152,8 @@ export const getAllVaccineHistoryService = async () => {
         })
         record.dataValues.PatientName = user ? user.fullname : null
         if (medicalRecord.Class) {
-          const match = medicalRecord.Class.charAt(0);
-          grade = match ? parseInt(match, 10) : null;
+          const match = medicalRecord.Class.charAt(0)
+          grade = match ? parseInt(match, 10) : null
         }
       }
       record.dataValues.grade = grade
@@ -164,7 +165,9 @@ export const getAllVaccineHistoryService = async () => {
 }
 
 export const getVaccineHistoryByIdService = async (id) => {
-  const record = await VaccineHistory.findByPk(id)
+  const record = await VaccineHistory.findOne({
+    where: { VH_ID: id, Is_deleted: false }
+  })
   if (!record) {
     throw { status: 404, message: 'Vaccine history record not found' }
   }
@@ -183,7 +186,7 @@ export const getVaccineHistoryByIdService = async (id) => {
 
 export const getVaccineHistoryByMRIdService = async (ID) => {
   const records = await VaccineHistory.findAll({
-    where: { ID },
+    where: { ID, Is_deleted: false },
     order: [['Date_injection', 'DESC']]
   })
 
@@ -215,7 +218,7 @@ export const updateVaccineHistoryService = async (id, updateData) => {
 }
 
 export const confirmVaccineHistoryService = async (id, isConfirmed) => {
-  const record = await VaccineHistory.findByPk(id)
+  const record = await getVaccineHistoryByIdService(id)
   if (!record) {
     throw { status: 404, message: 'Vaccine history record not found' }
   }
@@ -245,18 +248,18 @@ export const confirmVaccineHistoryService = async (id, isConfirmed) => {
 }
 
 export const deleteVaccineHistoryService = async (id) => {
-  const record = await VaccineHistory.findByPk(id)
+  const record = await getVaccineHistoryByIdService(id)
   if (!record) {
     throw { status: 404, message: 'Vaccine history record not found' }
   }
 
-  await record.destroy()
+  await record.update({ Is_deleted: true })
   return { message: 'Vaccine history record deleted successfully' }
 }
 
 export const getStudentsByEventIdService = async (eventId) => {
   const vaccineHistories = await VaccineHistory.findAll({
-    where: { Event_ID: eventId }
+    where: { Event_ID: eventId, Is_deleted: false }
   })
 
   const result = await Promise.all(
@@ -299,7 +302,7 @@ export const updateVaccineStatusByMRIdService = async (updates) => {
 
   const vhIdList = updates.map((item) => item.VH_ID)
 
-  const records = await VaccineHistory.findAll({ where: { VH_ID: vhIdList } })
+  const records = await VaccineHistory.findAll({ where: { VH_ID: vhIdList, Is_deleted: false } })
   if (records.length !== vhIdList.length) {
     throw { status: 404, message: 'Some VH_IDs do not exist in vaccine history' }
   }
@@ -325,9 +328,10 @@ export const updateVaccineStatusByMRIdService = async (updates) => {
               const son = await User.findByPk(mr.userId, { attributes: ['fullname'] })
               const namevaccine = vh.Vaccine_name || 'Không rõ tên vaccine'
               const status = item.status
-              const mess = status === 'Đã tiêm'
-                ? `Cháu đã được tiêm, triệu chứng sau tiêm của cháu ${son ? son.fullname : 'Không rõ tên'} đã được cập nhật.`
-                : `Cháu đã Chưa được tiêm, lý do chưa được tiêm của cháu ${son ? son.fullname : 'Không rõ tên'} đã được cập nhật.`
+              const mess =
+                status === 'Đã tiêm'
+                  ? `Cháu đã được tiêm, triệu chứng sau tiêm của cháu ${son ? son.fullname : 'Không rõ tên'} đã được cập nhật.`
+                  : `Cháu đã Chưa được tiêm, lý do chưa được tiêm của cháu ${son ? son.fullname : 'Không rõ tên'} đã được cập nhật.`
               await Notification.create({
                 title: `Cập nhật về việc tiêm chủng ${namevaccine}`,
                 mess: mess,
@@ -346,98 +350,94 @@ export const updateVaccineStatusByMRIdService = async (updates) => {
 export const getAllVaccineTypesService = async () => {
   const types = await VaccineHistory.findAll({
     where: {
-      Is_created_by_guardian: false
+      Is_created_by_guardian: false,
+      Is_deleted: false
     },
-    attributes: [
-      'Vaccine_name',
-      'ID',
-      'Event_ID'
-    ],
+    attributes: ['Vaccine_name', 'ID', 'Event_ID'],
     raw: true
-  });
+  })
 
-  const grouped = {};
+  const grouped = {}
 
   for (const item of types) {
-    let grade = null;
+    let grade = null
     if (item.ID) {
-      const medicalRecord = await MedicalRecord.findByPk(item.ID);
+      const medicalRecord = await MedicalRecord.findByPk(item.ID)
       if (medicalRecord && medicalRecord.Class) {
-        const match = medicalRecord.Class.match(/^(\d+)/);
-        grade = match ? parseInt(match[1], 10) : null;
+        const match = medicalRecord.Class.match(/^(\d+)/)
+        grade = match ? parseInt(match[1], 10) : null
       }
     }
-    let eventdate = null;
-    let eventDateStr = '';
+    let eventdate = null
+    let eventDateStr = ''
     if (item.Event_ID) {
-      const event = await Event.findByPk(item.Event_ID);
-      eventdate = event ? event.dateEvent : null;
-      eventDateStr = eventdate ? new Date(eventdate).toISOString().slice(0, 10) : '';
+      const event = await Event.findByPk(item.Event_ID)
+      eventdate = event ? event.dateEvent : null
+      eventDateStr = eventdate ? new Date(eventdate).toISOString().slice(0, 10) : ''
     }
-    const key = `${item.Vaccine_name}_${grade}_${eventDateStr}`;
+    const key = `${item.Vaccine_name}_${grade}_${eventDateStr}`
     if (!grouped[key]) {
       grouped[key] = {
         vaccineName: item.Vaccine_name,
         grade,
         eventdate
-      };
+      }
     }
   }
 
-  return Object.values(grouped);
+  return Object.values(grouped)
 }
 
 export const getVaccineHistoryByVaccineNameService = async (vaccineName, grade, eventDate) => {
-
-  let whereClause = { Vaccine_name: vaccineName };
-  const filterByGrade = !!grade;
-  const filterByDate = !!eventDate;
+  let whereClause = { Vaccine_name: vaccineName, Is_deleted: false }
+  const filterByGrade = !!grade
+  const filterByDate = !!eventDate
 
   const allRecords = await VaccineHistory.findAll({
     where: whereClause,
     order: [['Date_injection', 'DESC']]
-  });
+  })
 
-  const filteredRecords = [];
+  const filteredRecords = []
   for (const record of allRecords) {
-    const medicalRecord = await MedicalRecord.findByPk(record.ID);
-    let recordGrade = null;
+    const medicalRecord = await MedicalRecord.findByPk(record.ID)
+    let recordGrade = null
     if (medicalRecord && medicalRecord.Class) {
-      const match = medicalRecord.Class.match(/^(\d+)/);
-      recordGrade = match ? parseInt(match[1], 10) : null;
+      const match = medicalRecord.Class.match(/^(\d+)/)
+      recordGrade = match ? parseInt(match[1], 10) : null
     }
 
-    let eventDateStr = null;
+    let eventDateStr = null
     if (record.Event_ID) {
-      const event = await Event.findByPk(record.Event_ID);
+      const event = await Event.findByPk(record.Event_ID)
       if (event && event.dateEvent) {
-        eventDateStr = new Date(event.dateEvent).toISOString().slice(0, 10);
+        eventDateStr = new Date(event.dateEvent).toISOString().slice(0, 10)
       }
     }
 
-    let matchGrade = true;
-    let matchDate = true;
+    let matchGrade = true
+    let matchDate = true
     if (filterByGrade) {
-      matchGrade = recordGrade === parseInt(grade, 10);
+      matchGrade = recordGrade === parseInt(grade, 10)
     }
     if (filterByDate) {
-      matchDate = eventDateStr === eventDate;
+      matchDate = eventDateStr === eventDate
     }
 
     if (matchGrade && matchDate) {
-      record.dataValues.grade = recordGrade;
-      record.dataValues.eventDate = eventDateStr;
-      record.dataValues.MedicalRecord = medicalRecord;
+      record.dataValues.grade = recordGrade
+      record.dataValues.eventDate = eventDateStr
+      record.dataValues.MedicalRecord = medicalRecord
       if (medicalRecord) {
         const user = await User.findByPk(medicalRecord.userId, {
           attributes: ['fullname', 'dateOfBirth']
-        });
-        record.dataValues.PatientName = user ? user.fullname : null;
+        })
+        record.dataValues.PatientName = user ? user.fullname : null
       }
-      filteredRecords.push(record);
+      filteredRecords.push(record)
     }
   }
-  return filteredRecords;
+  return filteredRecords
 }
 
 export const getVaccineHistoryByGuardianUserIdService = async (guardianUserId) => {
@@ -475,7 +475,7 @@ export const getVaccineHistoryByGuardianUserIdService = async (guardianUserId) =
     medicalRecords.map(async (mr) => {
       const user = await User.findByPk(mr.userId, { attributes: ['id', 'fullname', 'dateOfBirth'] })
       const vaccineHistory = await VaccineHistory.findAll({
-        where: { ID: mr.ID },
+        where: { ID: mr.ID, Is_deleted: false },
         order: [['Date_injection', 'DESC']]
       })
       totalVaccine += vaccineHistory.filter((vh) => vh.Status === 'Đã tiêm').length
@@ -497,45 +497,48 @@ export const getVaccineHistoryByGuardianUserIdService = async (guardianUserId) =
 
 export const deleteVaccineHistoriesByNameDateGradeService = async (vaccineName, dateInjection) => {
   if (!vaccineName || !dateInjection || typeof dateInjection !== 'string') {
-    throw { status: 400, message: 'vaccineName và dateInjection (YYYY-MM-DD) là bắt buộc' };
+    throw { status: 400, message: 'vaccineName và dateInjection (YYYY-MM-DD) là bắt buộc' }
   }
 
   const histories = await VaccineHistory.findAll({
-    where: { Vaccine_name: vaccineName }
-  });
+    where: { Vaccine_name: vaccineName, Is_deleted: false }
+  })
 
-  let deletedCount = 0;
+  let deletedCount = 0
 
   for (const history of histories) {
-    const medicalRecord = await MedicalRecord.findByPk(history.ID);
+    const medicalRecord = await MedicalRecord.findByPk(history.ID)
 
-
-    let historyDate = null;
+    let historyDate = null
     if (history.Date_injection instanceof Date) {
-      historyDate = history.Date_injection.toISOString().slice(0, 10);
+      historyDate = history.Date_injection.toISOString().slice(0, 10)
     } else if (typeof history.Date_injection === 'string') {
-      historyDate = history.Date_injection.slice(0, 10);
+      historyDate = history.Date_injection.slice(0, 10)
     }
 
     if (historyDate === dateInjection) {
       if (medicalRecord) {
-        const guardianUsers = await GuardianUser.findAll({ where: { userId: medicalRecord.userId } });
+        const guardianUsers = await GuardianUser.findAll({ where: { userId: medicalRecord.userId } })
         for (const guardianUser of guardianUsers) {
-          const guardian = await Guardian.findByPk(guardianUser.obId);
+          const guardian = await Guardian.findByPk(guardianUser.obId)
           if (guardian) {
-            const son = await User.findByPk(medicalRecord.userId, { attributes: ['fullname'] });
+            const dateObj = new Date(dateInjection)
+            dateObj.setHours(dateObj.getHours() + 7)
+            const dateStr = dateObj.toLocaleDateString('vi-VN')
+            const son = await User.findByPk(medicalRecord.userId, { attributes: ['fullname'] })
             await Notification.create({
               title: `Lịch tiêm chủng đã bị hủy`,
-              mess: `Lịch tiêm chủng cho cháu ${son ? son.fullname : 'Không rõ tên'} với vaccine ${vaccineName} vào ngày ${dateInjection} đã bị hủy, chúng tôi sẽ thông báo khi có lịch tiêm chủng mới.`,
+              mess: `Lịch tiêm chủng vaccine ${vaccineName} cho cháu ${son ? son.fullname : 'Không rõ tên'
+                } vào ngày ${dateStr} đã bị hủy, chúng tôi sẽ thông báo khi có lịch tiêm chủng mới.`,
               userId: guardian.userId
-            });
+            })
           }
         }
       }
-      await history.destroy();
-      deletedCount++;
+      await history.update({ Is_deleted: true })
+      deletedCount++
     }
   }
 
-  return { deletedCount };
+  return { deletedCount }
 }

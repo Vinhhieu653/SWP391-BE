@@ -18,6 +18,10 @@ const FormCheck = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    image: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     Height: DataTypes.INTEGER,
     Weight: DataTypes.FLOAT,
     Blood_Pressure: DataTypes.STRING,
@@ -34,7 +38,7 @@ const FormCheck = sequelize.define(
     status: {
       type: DataTypes.ENUM('created', 'pending', 'approved', 'rejected', 'checked'),
       defaultValue: 'created'
-    }
+    },
   },
   {
     tableName: 'Form_Check',

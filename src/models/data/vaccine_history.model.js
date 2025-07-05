@@ -39,6 +39,10 @@ const VaccineHistory = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
+    Is_deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    }
   },
   {
     tableName: 'Vaccine_History',
