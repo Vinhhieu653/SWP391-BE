@@ -46,7 +46,9 @@ const MedicalSent = sequelize.define(
   },
   {
     tableName: 'MedicalSent',
-    timestamps: true
+    timestamps: true,
+    paranoid: true,
+    deletedAt: 'deletedAt'
   }
 )
 

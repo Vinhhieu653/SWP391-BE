@@ -184,17 +184,24 @@ export const updateGuardian = async (obId, data) => {
 
 // Delete guardian, its links, and user record
 export const deleteGuardian = async (obId) => {
-  const guardian = await Guardian.findOne({ where: { obId } })
-  if (!guardian) throw Object.assign(new Error('Guardian not found'), { status: 404 })
+  const guardian = await Guardian.findOne({ where: { obId }, paranoid: false })
+  if (!guardian || guardian.deletedAt) {
+    throw Object.assign(new Error('Guardian not found or already deleted'), { status: 404 })
+  }
 
-  // remove links
+  // remove links (cứng luôn cũng được, vì liên kết trung gian)
   await GuardianUser.destroy({ where: { obId } })
-  // remove guardian record
-  await guardian.destroy()
-  // remove user account
-  await User.destroy({ where: { id: guardian.userId } })
 
-  return { message: 'Guardian and associated students links deleted' }
+  // soft delete guardian
+  await guardian.destroy()
+
+  // soft delete user
+  const user = await User.findByPk(guardian.userId, { paranoid: false })
+  if (user && !user.deletedAt) {
+    await user.destroy()
+  }
+
+  return { message: 'Guardian and associated students links soft deleted' }
 }
 
 // Get students associated with a guardian by userId
@@ -351,8 +358,8 @@ export const updateStudentByGuardianId = async (obId, studentId, studentData) =>
 }
 
 export const deleteStudentByGuardianId = async (obId, studentId) => {
-  const guardian = await Guardian.findOne({ where: { obId } })
-  if (!guardian) {
+  const guardian = await Guardian.findOne({ where: { obId }, paranoid: false })
+  if (!guardian || guardian.deletedAt) {
     throw Object.assign(new Error('Guardian not found'), { status: 404 })
   }
 
@@ -360,16 +367,22 @@ export const deleteStudentByGuardianId = async (obId, studentId) => {
   const link = await GuardianUser.findOne({
     where: { obId: guardian.obId, userId: studentId }
   })
+
   if (!link) {
     throw Object.assign(new Error('Student not found for this guardian'), { status: 404 })
   }
 
-  // Delete link and student user
+  // Delete link
   await GuardianUser.destroy({ where: { obId: guardian.obId, userId: studentId } })
-  await User.destroy({ where: { id: studentId } })
+
+  // Soft delete student (User)
+  const student = await User.findByPk(studentId, { paranoid: false })
+  if (student && !student.deletedAt) {
+    await student.destroy()
+  }
 
   return {
-    message: 'Student deleted successfully'
+    message: 'Student deleted successfully (soft)'
   }
 }
 

@@ -37,8 +37,8 @@ const HealthCheck = sequelize.define(
   {
     tableName: 'Health_check',
     timestamps: true,
-    paranoid: true, // 👈 bật soft delete
-    deletedAt: 'deletedAt' // default là 'deletedAt', có thể custom
+    paranoid: true,
+    deletedAt: 'deletedAt'
   }
 )
 
