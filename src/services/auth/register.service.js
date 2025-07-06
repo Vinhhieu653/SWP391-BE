@@ -86,9 +86,11 @@ export async function updateUser(userId, { username, fullname, email, phoneNumbe
 }
 
 export async function deleteUser(userId) {
-  const user = await User.findByPk(userId)
-  if (!user) throw new Error('User not found')
+  const user = await User.findByPk(userId, { paranoid: false })
+  if (!user || user.deletedAt) throw new Error('User not found or already deleted')
+
   if (user.roleId === 1) throw new Error('Cannot delete admin user')
+
   await user.destroy()
   return user
 }

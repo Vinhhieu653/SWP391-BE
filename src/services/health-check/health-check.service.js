@@ -236,8 +236,8 @@ export async function deleteHealthCheck(id) {
   const event = await Event.findByPk(healthCheck.Event_ID)
   if (!event) throw new Error('Không tìm thấy sự kiện')
 
-  await healthCheck.destroy() // soft delete
-  await event.destroy() // soft delete
+  await healthCheck.destroy()
+  await event.destroy()
 }
 
 export async function sendConfirmForms(eventId) {
@@ -405,13 +405,17 @@ export async function resetFormResult(formId) {
 export async function getFormResult(HC_ID, studentId) {
   const form = await FormCheck.findOne({
     where: {
-      HC_ID: HC_ID,
+      HC_ID,
       Student_ID: studentId
     }
   })
 
   if (!form) throw new Error('Không tìm thấy form khám')
-  return form
+
+  return {
+    ...form.toJSON(),
+    nurseRoleId: 2
+  }
 }
 
 export async function getAllFormsByEvent(eventId) {

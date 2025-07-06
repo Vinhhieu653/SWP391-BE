@@ -36,7 +36,9 @@ const Blog = sequelize.define(
   },
   {
     tableName: 'blogs',
-    timestamps: true
+    timestamps: true,
+    paranoid: true,
+    deletedAt: 'deletedAt'
   }
 )
 

@@ -29,7 +29,9 @@ const Category = sequelize.define(
   },
   {
     tableName: 'Category',
-    timestamps: true
+    timestamps: true,
+    paranoid: true,
+    deletedAt: 'deletedAt'
   }
 )
 

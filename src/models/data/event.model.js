@@ -21,7 +21,7 @@ const Event = sequelize.define(
   {
     tableName: 'Event',
     timestamps: true,
-    paranoid: true, // 👈 THÊM VÔ
+    paranoid: true,
     deletedAt: 'deletedAt'
   }
 )

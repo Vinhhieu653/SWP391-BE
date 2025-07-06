@@ -127,8 +127,10 @@ export const updateMedicalSentService = async (id, updateData) => {
 
 // Xóa MedicalSent
 export const deleteMedicalSentService = async (id) => {
-  const record = await MedicalSent.findByPk(id)
-  if (!record) throw { status: 404, message: 'Medical sent record not found' }
+  const record = await MedicalSent.findByPk(id, { paranoid: false })
+  if (!record || record.deletedAt) {
+    throw { status: 404, message: 'Medical sent record not found or already deleted' }
+  }
 
   await record.destroy()
   return { message: 'Deleted successfully' }

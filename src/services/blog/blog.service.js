@@ -40,9 +40,11 @@ export const updateBlogService = async (id, updateData, imageFile) => {
 
 // Xoá blog
 export const deleteBlogService = async (id) => {
-  const blog = await Blog.findByPk(id)
+  const blog = await Blog.findByPk(id, { paranoid: false })
 
-  if (!blog) throw { status: 404, message: 'Blog not found' }
+  if (!blog || blog.deletedAt) {
+    throw { status: 404, message: 'Blog not found or already deleted' }
+  }
 
   await blog.destroy()
   return blog
