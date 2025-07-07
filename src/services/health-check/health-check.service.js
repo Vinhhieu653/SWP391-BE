@@ -297,6 +297,7 @@ export async function createdResult(
     skin_status,
     general_conclusion,
     is_need_meet,
+    userId,
     image
   }
 ) {
@@ -314,7 +315,8 @@ export async function createdResult(
       General_Conclusion: general_conclusion,
       Is_need_meet: is_need_meet,
       // status: 'checked',
-      image: image
+      image: image,
+      Created_By: userId
     },
     {
       where: {
@@ -402,7 +404,7 @@ export async function resetFormResult(formId) {
   return 'Đã reset kết quả khám'
 }
 
-export async function getFormResult(HC_ID, studentId, userId) {
+export async function getFormResult(HC_ID, studentId) {
   const form = await FormCheck.findOne({
     where: {
       HC_ID,
@@ -414,7 +416,7 @@ export async function getFormResult(HC_ID, studentId, userId) {
 
   return {
     ...form.toJSON(),
-    userId // thằng đang gọi API
+    userId: form.Created_By || null
   }
 }
 
