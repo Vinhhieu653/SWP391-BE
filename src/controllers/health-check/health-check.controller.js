@@ -85,7 +85,8 @@ export const createdResult = async (req, res) => {
 
     await srv.createdResult(id, {
       ...req.body,
-      image: imageUrl
+      image: imageUrl,
+      userId: req.user.userId
     })
 
     res.status(200).json({
@@ -104,9 +105,9 @@ export const handleGetForm = async (req, res) => {
   try {
     const { id } = req.params
     const { student_id } = req.query
-    const userId = req.user?.userId // 👈 lấy userId từ token
+    const { userId, roleId } = req.user
 
-    const form = await srv.getFormResult(id, student_id, userId)
+    const form = await srv.getFormResult(id, student_id, userId, roleId)
     res.status(200).json(form)
   } catch (err) {
     res.status(404).json({ error: err.message })
