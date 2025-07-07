@@ -46,6 +46,10 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true
     },
+    address: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     roleId: {
       type: DataTypes.INTEGER,
       references: {
