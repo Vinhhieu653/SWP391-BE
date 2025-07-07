@@ -402,7 +402,7 @@ export async function resetFormResult(formId) {
   return 'Đã reset kết quả khám'
 }
 
-export async function getFormResult(HC_ID, studentId) {
+export async function getFormResult(HC_ID, studentId, userId) {
   const form = await FormCheck.findOne({
     where: {
       HC_ID,
@@ -414,7 +414,7 @@ export async function getFormResult(HC_ID, studentId) {
 
   return {
     ...form.toJSON(),
-    nurseRoleId: 2
+    userId // thằng đang gọi API
   }
 }
 
