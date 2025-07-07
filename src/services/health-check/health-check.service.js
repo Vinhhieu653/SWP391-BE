@@ -233,9 +233,11 @@ export async function deleteHealthCheck(id) {
   const healthCheck = await HealthCheck.findByPk(id)
   if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
 
-  const eventId = healthCheck.Event_ID
+  const event = await Event.findByPk(healthCheck.Event_ID)
+  if (!event) throw new Error('Không tìm thấy sự kiện')
+
   await healthCheck.destroy()
-  await Event.destroy({ where: { eventId } })
+  await event.destroy()
 }
 
 export async function sendConfirmForms(eventId) {
@@ -295,10 +297,9 @@ export async function createdResult(
     skin_status,
     general_conclusion,
     is_need_meet,
-    image,
+    image
   }
 ) {
-
   // Cập nhật form khám cho học sinh
   await FormCheck.update(
     {
@@ -313,7 +314,7 @@ export async function createdResult(
       General_Conclusion: general_conclusion,
       Is_need_meet: is_need_meet,
       // status: 'checked',
-      image: image,
+      image: image
     },
     {
       where: {
@@ -325,8 +326,7 @@ export async function createdResult(
 }
 
 export async function updateFormResult(HC_ID, studentId, data) {
-
-  console.log('Updating form result:', { data });
+  console.log('Updating form result:', { data })
   const [updated] = await FormCheck.update(
     {
       Height: data.height,
@@ -403,19 +403,20 @@ export async function resetFormResult(formId) {
 }
 
 export async function getFormResult(HC_ID, studentId) {
-
-
   const form = await FormCheck.findOne({
     where: {
-      HC_ID: HC_ID,
+      HC_ID,
       Student_ID: studentId
     }
   })
 
   if (!form) throw new Error('Không tìm thấy form khám')
-  return form
-}
 
+  return {
+    ...form.toJSON(),
+    nurseRoleId: 2
+  }
+}
 
 export async function getAllFormsByEvent(eventId) {
   const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
@@ -431,8 +432,6 @@ export async function getAllFormsByEvent(eventId) {
 }
 
 export async function sendResult(HC_ID) {
-
-
   const forms = await FormCheck.findAll({
     where: { HC_ID: HC_ID },
     include: [

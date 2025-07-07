@@ -368,7 +368,13 @@ const upload = multer({ dest: 'uploads/' })
  */
 
 router.post('/', authenticateToken, authorizeRoles('nurse'), createVaccineHistory)
-router.post('/evidence', authenticateToken, authorizeRoles('guardian'), upload.single('evidence'), createVaccineWithEvidence)
+router.post(
+  '/evidence',
+  authenticateToken,
+  authorizeRoles('guardian'),
+  upload.single('evidence'),
+  createVaccineWithEvidence
+)
 router.get('/', getAllVaccineHistory)
 router.get('/types', getAllVaccineTypes)
 router.get('/medical-record/:mrId', getVaccineHistoryByMRId)

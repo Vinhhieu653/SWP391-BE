@@ -37,7 +37,9 @@ const Guardian = sequelize.define(
   },
   {
     tableName: 'guardians',
-    timestamps: true
+    timestamps: true,
+    paranoid: true,
+    deletedAt: 'deletedAt'
   }
 )
 

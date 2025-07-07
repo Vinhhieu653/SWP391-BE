@@ -81,19 +81,23 @@ export const updateMedicalRecord = async (id, data) => {
 }
 
 export const deleteMedicalRecord = async (id) => {
-  const record = await MedicalRecord.findByPk(id)
-  if (!record) return null
+  const record = await MedicalRecord.findByPk(id, { paranoid: false })
+  if (!record || record.deletedAt) return null
 
   const studentUserId = record.userId
 
+  // Xoá mềm GuardianUser (nếu model có paranoid), nếu không thì hard vẫn ok
   await GuardianUser.destroy({
     where: { userId: studentUserId }
   })
 
-  await User.destroy({
-    where: { id: studentUserId }
-  })
+  // Soft delete user
+  const user = await User.findByPk(studentUserId, { paranoid: false })
+  if (user && !user.deletedAt) {
+    await user.destroy()
+  }
 
+  // Soft delete MedicalRecord
   await record.destroy()
 
   return true

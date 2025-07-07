@@ -36,7 +36,9 @@ const HealthCheck = sequelize.define(
   },
   {
     tableName: 'Health_check',
-    timestamps: true
+    timestamps: true,
+    paranoid: true,
+    deletedAt: 'deletedAt'
   }
 )
 

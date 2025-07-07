@@ -30,8 +30,11 @@ export const updateCategoryService = async (id, updateData) => {
 
 // Xoá danh mục
 export const deleteCategoryService = async (id) => {
-  const category = await Category.findByPk(id)
-  if (!category) throw { status: 404, message: 'Category not found' }
+  const category = await Category.findByPk(id, { paranoid: false })
+
+  if (!category || category.deletedAt) {
+    throw { status: 404, message: 'Category not found or already deleted' }
+  }
 
   await category.destroy()
   return category
