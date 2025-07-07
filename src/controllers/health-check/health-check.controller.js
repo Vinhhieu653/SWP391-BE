@@ -104,7 +104,9 @@ export const handleGetForm = async (req, res) => {
   try {
     const { id } = req.params
     const { student_id } = req.query
-    const form = await srv.getFormResult(id, student_id) // ✅ đổi sang srv
+    const userId = req.user?.userId // 👈 lấy userId từ token
+
+    const form = await srv.getFormResult(id, student_id, userId)
     res.status(200).json(form)
   } catch (err) {
     res.status(404).json({ error: err.message })
