@@ -28,6 +28,9 @@ const VaccineHistory = sequelize.define(
     Date_injection: {
       type: DataTypes.DATE
     },
+    batch_number: {
+      type: DataTypes.STRING
+    },
     note_affter_injection: {
       type: DataTypes.STRING
     },
