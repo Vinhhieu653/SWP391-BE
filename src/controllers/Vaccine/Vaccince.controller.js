@@ -105,8 +105,9 @@ export const getStudentsByEventId = async (req, res) => {
 
 export const updateVaccineStatusByMRId = async (req, res) => {
   try {
-    const updates = req.body.updates
-    const records = await VaccineService.updateVaccineStatusByMRIdService(updates)
+    const updates = JSON.parse(req.body.updates)
+    const files = req.files
+    const records = await VaccineService.updateVaccineStatusByMRIdService(updates, files)
     res.status(200).json({
       message: 'Vaccine status updated successfully',
       data: records
