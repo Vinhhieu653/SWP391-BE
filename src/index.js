@@ -24,7 +24,11 @@ import guardianRouter from './routes/guardian/guardian.route.js'
 import healthCheckRouter from './routes/health-check/health-check.route.js'
 import vaccineRouter from './routes/vaccince/Vaccine.router.js'
 import medicalSentRouter from './routes/medical-sent/medical-sent.route.js'
+import dashboardHealthCHeckRouter from './routes/dashboard/health-check.dashboard.route.js'
 import dashboardRouter from './routes/dashboard/dashboard.route.js'
+import medicineDashboardRouter from './routes/dashboard/medicine.dashboard.route.js'
+import vaccineDashboardRouter from './routes/dashboard/vaccine.dashboard.route.js'
+import eventDashboardRouter from './routes/dashboard/event.dashboard.route.js'
 import exportExcelRouter from './routes/export-excel/export.route.js'
 import { basicAuth } from './middlewares/authSwagger.js'
 import { notFoundHandler, errorHandler } from './middlewares/responseUtils.js'
@@ -86,6 +90,10 @@ app.use('/api/v1/health-check', healthCheckRouter)
 app.use('/api/v1/vaccine', vaccineRouter)
 app.use('/api/v1/medical-records', medicalRecordRouter)
 app.use('/api/v1/medical-sents', medicalSentRouter)
+app.use('/api/v1/dashboard/health-check', dashboardHealthCHeckRouter)
+app.use('/api/v1/dashboard/medicine', medicineDashboardRouter)
+app.use('/api/v1/dashboard/vaccine', vaccineDashboardRouter)
+app.use('/api/v1/dashboard/event', eventDashboardRouter)
 app.use('/api/v1/dashboard', dashboardRouter)
 app.use('/api/v1/export-excel', exportExcelRouter)
 // Xử lý lỗi
