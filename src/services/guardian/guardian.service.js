@@ -15,7 +15,7 @@ export const createGuardianWithStudents = async ({ guardian }) => {
   // Loại bỏ students nếu truyền nhầm
   const { students, ...guardianData } = guardian
 
-  // Check username/email trùng
+  // Check username/email/phone trùng
   const existingUsername = await User.findOne({ where: { username: guardianData.username } })
   if (existingUsername) {
     throw Object.assign(new Error('Guardian username already taken'), { status: 400 })
@@ -24,6 +24,11 @@ export const createGuardianWithStudents = async ({ guardian }) => {
   const existingEmail = await User.findOne({ where: { email: guardianData.email } })
   if (existingEmail) {
     throw Object.assign(new Error('Guardian email already taken'), { status: 400 })
+  }
+
+  const existingPhone = await User.findOne({ where: { phoneNumber: guardianData.phoneNumber } })
+  if (existingPhone) {
+    throw Object.assign(new Error('Guardian phone number already taken'), { status: 400 })
   }
 
   // Tạo user với role guardian
@@ -89,9 +94,9 @@ export const getGuardianById = async (obId) => {
   const studentIds = links.map((l) => l.userId)
   const students = studentIds.length
     ? await User.findAll({
-        where: { id: studentIds },
-        attributes: ['id', 'username', 'fullname', 'email', 'phoneNumber']
-      })
+      where: { id: studentIds },
+      attributes: ['id', 'username', 'fullname', 'email', 'phoneNumber']
+    })
     : []
 
   return {
@@ -117,9 +122,9 @@ export const getAllGuardians = async () => {
       const studentIds = links.map((l) => l.userId)
       const students = studentIds.length
         ? await User.findAll({
-            where: { id: studentIds },
-            attributes: ['id', 'fullname', 'dateOfBirth', 'gender']
-          })
+          where: { id: studentIds },
+          attributes: ['id', 'fullname', 'dateOfBirth', 'gender']
+        })
         : []
 
       return {
@@ -222,9 +227,9 @@ export const getStudentsByUserId = async (userId) => {
   // Truy vấn các học sinh
   const students = studentIds.length
     ? await User.findAll({
-        where: { id: studentIds },
-        attributes: ['id', 'username', 'fullname', 'dateOfBirth']
-      })
+      where: { id: studentIds },
+      attributes: ['id', 'username', 'fullname', 'dateOfBirth']
+    })
     : []
 
   // Truy vấn thông tin Class từ bảng MedicalRecord

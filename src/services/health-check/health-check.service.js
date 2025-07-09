@@ -96,8 +96,22 @@ export async function getAllHealthChecks() {
     order: [['createdAt', 'DESC']]
   })
 
+  const today = new Date()
+
+  // Cập nhật status nếu cần
+  await Promise.all(
+    healthChecks.map(async (hc) => {
+      const eventDate = new Date(hc.Event?.dateEvent)
+      if (hc.status === 'pending' && eventDate <= today) {
+        await hc.update({ status: 'in progress' })
+        hc.status = 'in progress' // cập nhật giá trị trong object trả về
+      }
+    })
+  )
+
   return healthChecks
 }
+
 
 export async function getHealthCheckById(id) {
   const hc = await HealthCheck.findByPk(id, {
