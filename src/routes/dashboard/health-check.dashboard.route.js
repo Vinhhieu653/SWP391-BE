@@ -108,7 +108,7 @@ router.get('/students/unchecked', healthCheckDashboardController.getUncheckedStu
  *                   type: integer
  *                   example: 150
  */
-router.get('/students/approved', healthCheckDashboardController.countApprovedStudents)
+router.get('/students/approved', healthCheckDashboardController.countCreatedStudents)
 
 /**
  * @swagger
@@ -128,7 +128,7 @@ router.get('/students/approved', healthCheckDashboardController.countApprovedStu
  *                   type: integer
  *                   example: 45
  */
-router.get('/students/rejected', healthCheckDashboardController.countRejectedStudents)
+router.get('/students/rejected', healthCheckDashboardController.countInProgressStudents)
 
 /**
  * @swagger
@@ -169,5 +169,34 @@ router.get('/students/pending', healthCheckDashboardController.countPendingStude
  *                   example: 42
  */
 router.get('/issues/count', healthCheckDashboardController.countHealthIssues)
+
+/**
+ * @swagger
+ * /api/v1/dashboard/health-check/rounds/statuses:
+ *   get:
+ *     summary: Tổng hợp các trạng thái đợt khám sức khỏe
+ *     tags: [HealthCheckDashboard]
+ *     responses:
+ *       200:
+ *         description: Trạng thái các đợt khám sức khỏe
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 created:
+ *                   type: integer
+ *                   example: 5
+ *                 inProgress:
+ *                   type: integer
+ *                   example: 3
+ *                 pending:
+ *                   type: integer
+ *                   example: 2
+ *                 checked:
+ *                   type: integer
+ *                   example: 12
+ */
+router.get('/rounds/statuses', healthCheckDashboardController.countAllHealthCheckStatuses)
 
 export default router

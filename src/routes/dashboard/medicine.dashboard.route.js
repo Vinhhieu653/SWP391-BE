@@ -110,4 +110,35 @@ router.get('/prescriptions/rejected', medicineDashboardController.countRejectedP
  */
 router.get('/prescriptions/given', medicineDashboardController.countGivenPrescriptions)
 
+
+/**
+ * @swagger
+ * /api/v1/dashboard/medicine/prescriptions/statuses:
+ *   get:
+ *     summary: Tổng hợp các trạng thái đơn thuốc
+ *     tags: [MedicineDashboard]
+ *     responses:
+ *       200:
+ *         description: Trạng thái đơn thuốc
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 countPending:
+ *                   type: integer
+ *                   example: 10
+ *                 countReceived:
+ *                   type: integer
+ *                   example: 5
+ *                 countRejected:
+ *                   type: integer
+ *                   example: 3
+ *                 countGiven:
+ *                   type: integer
+ *                   example: 8
+ */
+router.get('/prescriptions/statuses', medicineDashboardController.countAllPrescriptionStatuses);
+
+
 export default router

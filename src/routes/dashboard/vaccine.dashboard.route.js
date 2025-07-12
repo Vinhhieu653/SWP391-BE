@@ -136,4 +136,33 @@ router.get('/rounds/status/rejected', controller.countVaccineByStatus('Không ti
  */
 router.get('/rounds/monthly', controller.getRoundsByMonth)
 
+/**
+ * @swagger
+ * /api/v1/dashboard/vaccine/status/count:
+ *   get:
+ *     summary: Tổng số đợt tiêm theo từng trạng thái
+ *     tags: [VaccineDashboard]
+ *     responses:
+ *       200:
+ *         description: Số lượng đợt tiêm theo trạng thái
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 countPending:
+ *                   type: integer
+ *                   example: 10
+ *                 countAllowed:
+ *                   type: integer
+ *                   example: 15
+ *                 countInjected:
+ *                   type: integer
+ *                   example: 20
+ *                 countRejected:
+ *                   type: integer
+ *                   example: 5
+ */
+router.get('/status/count', controller.countAllVaccineStatuses)
+
 export default router

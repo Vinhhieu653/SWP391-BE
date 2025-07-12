@@ -36,18 +36,18 @@ export const countHealthIssues = async (req, res, next) => {
   }
 }
 
-export const countApprovedStudents = async (req, res, next) => {
+export const countCreatedStudents = async (req, res, next) => {
   try {
-    const count = await healthCheckDashboardService.countApprovedStudents()
+    const count = await healthCheckDashboardService.countCreatedStudents()
     res.json({ count })
   } catch (err) {
     next(err)
   }
 }
 
-export const countRejectedStudents = async (req, res, next) => {
+export const countInProgressStudents = async (req, res, next) => {
   try {
-    const count = await healthCheckDashboardService.countRejectedStudents()
+    const count = await healthCheckDashboardService.countInProgressStudents()
     res.json({ count })
   } catch (err) {
     next(err)
@@ -69,5 +69,30 @@ export const countCheckedRounds = async (req, res, next) => {
     res.json({ count })
   } catch (err) {
     next(err)
+  }
+}
+
+export const countAllHealthCheckStatuses = async (req, res, next) => {
+  try {
+    const [
+      created,
+      inProgress,
+      pending,
+      checked
+    ] = await Promise.all([
+      healthCheckDashboardService.countCreatedStudents(),
+      healthCheckDashboardService.countInProgressStudents(),
+      healthCheckDashboardService.countPendingStudents(),
+      healthCheckDashboardService.countCheckedRounds()
+    ]);
+
+    res.json({
+      countCreated: created,
+      countInProgress: inProgress,
+      countPending: pending,
+      countChecked: checked
+    });
+  } catch (err) {
+    next(err);
   }
 }
