@@ -35,10 +35,10 @@ export const countHealthIssues = async () => {
   })
 }
 
-export const countApprovedStudents = () => FormCheck.count({ where: { status: 'approved' } })
+export const countCreatedStudents = () => HealthCheck.count({ where: { status: 'created' } })
 
-export const countRejectedStudents = () => FormCheck.count({ where: { status: 'rejected' } })
+export const countInProgressStudents = () => HealthCheck.count({ where: { status: 'in progress' } })
 
-export const countPendingStudents = () => FormCheck.count({ where: { status: 'pending' } })
+export const countPendingStudents = () => HealthCheck.count({ where: { status: 'pending' } })
 
-export const countCheckedRounds = () => FormCheck.count({ where: { status: 'checked' } })
+export const countCheckedRounds = () => HealthCheck.count({ where: { status: 'checked' } })

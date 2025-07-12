@@ -17,3 +17,46 @@ export const getHealthCheckEventsByMonth = async (req, res, next) => {
     next(err)
   }
 }
+
+export const getOtherMedicalCount = async (req, res, next) => {
+  try {
+    const count = await eventDashboardService.countOtherMedical()
+    res.json({ count })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export const getOtherMedicalCountMonthly = async (req, res, next) => {
+  try {
+    const count = await eventDashboardService.countOtherMedicalMonthly()
+    res.json({ count })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export const getDashboardCounts = async (req, res, next) => {
+  try {
+    const [
+      countUsers,
+      countBlog,
+      countVaccineRounds,
+      countHealthChecks
+    ] = await Promise.all([
+      eventDashboardService.countUsers(),
+      eventDashboardService.countBlog(),
+      eventDashboardService.countVaccineRounds(),
+      eventDashboardService.countHealthChecks()
+    ])
+
+    res.json({
+      countUsers,
+      countBlog,
+      countVaccineRounds,
+      countHealthChecks
+    })
+  } catch (err) {
+    next(err)
+  }
+}

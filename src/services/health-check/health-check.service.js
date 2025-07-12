@@ -481,10 +481,13 @@ export async function sendResult(HC_ID) {
         })
       )
     }
+    form.status = 'checked';
+    await form.save();
     const healthCheck = await HealthCheck.findByPk(HC_ID);
     if (healthCheck) {
       healthCheck.status = 'checked';
       await healthCheck.save();
+
     }
   }
 }
