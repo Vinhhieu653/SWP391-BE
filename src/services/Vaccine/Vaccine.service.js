@@ -196,8 +196,8 @@ export const getVaccineHistoryByMRIdService = async (ID) => {
   const medicalRecord = await MedicalRecord.findByPk(ID)
   const user = medicalRecord
     ? await User.findByPk(medicalRecord.userId, {
-        attributes: ['fullname', 'dateOfBirth']
-      })
+      attributes: ['fullname', 'dateOfBirth']
+    })
     : null
 
   return {
@@ -383,7 +383,7 @@ export const getAllVaccineTypesService = async () => {
       Is_created_by_guardian: false,
       Is_deleted: false
     },
-    attributes: ['Vaccine_name', 'ID', 'Event_ID', 'batch_number'],
+    attributes: ['Vaccine_name', 'ID', 'Event_ID', 'batch_number', 'Vaccince_type'],
     raw: true
   })
 
@@ -405,10 +405,11 @@ export const getAllVaccineTypesService = async () => {
       eventdate = event ? event.dateEvent : null
       eventDateStr = eventdate ? new Date(eventdate).toISOString().slice(0, 10) : ''
     }
-    const key = `${item.Vaccine_name}_${grade}_${eventDateStr}_${item.batch_number}`
+    const key = `${item.Vaccine_name}_${item.Vaccince_type}_${grade}_${eventDateStr}_${item.batch_number}`
     if (!grouped[key]) {
       grouped[key] = {
         vaccineName: item.Vaccine_name,
+        vaccineType: item.Vaccince_type,
         grade,
         eventdate,
         batch_number: item.batch_number
@@ -571,9 +572,8 @@ export const deleteVaccineHistoriesByNameDateGradeService = async (vaccineName, 
             const son = await User.findByPk(medicalRecord.userId, { attributes: ['fullname'] })
             await Notification.create({
               title: `Lịch tiêm chủng đã bị hủy`,
-              mess: `Lịch tiêm chủng vaccine ${vaccineName} cho cháu ${
-                son ? son.fullname : 'Không rõ tên'
-              } vào ngày ${dateStr} đã bị hủy, chúng tôi sẽ thông báo khi có lịch tiêm chủng mới.`,
+              mess: `Lịch tiêm chủng vaccine ${vaccineName} cho cháu ${son ? son.fullname : 'Không rõ tên'
+                } vào ngày ${dateStr} đã bị hủy, chúng tôi sẽ thông báo khi có lịch tiêm chủng mới.`,
               userId: guardian.userId
             })
           }
