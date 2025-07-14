@@ -38,12 +38,7 @@ export const getOtherMedicalCountMonthly = async (req, res, next) => {
 
 export const getDashboardCounts = async (req, res, next) => {
   try {
-    const [
-      countUsers,
-      countBlog,
-      countVaccineRounds,
-      countHealthChecks
-    ] = await Promise.all([
+    const [countUsers, countBlog, countVaccineRounds, countHealthChecks] = await Promise.all([
       eventDashboardService.countUsers(),
       eventDashboardService.countBlog(),
       eventDashboardService.countVaccineRounds(),

@@ -96,8 +96,6 @@ export const deleteStudentByGuardian = async (req, res) => {
 
 export async function importGuardiansFromExcel(req, res) {
   try {
-    console.log('req.file:', req.file) // ✅ debug
-
     if (!req.file) {
       return res.status(400).json({ message: 'Vui lòng upload file Excel' })
     }

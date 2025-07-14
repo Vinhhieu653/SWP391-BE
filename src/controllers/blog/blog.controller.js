@@ -8,12 +8,10 @@ import {
 
 import cloudinary from '../../utils/cloudinary.js'
 
-// [POST] /blogs
 export const createBlogController = async (req, res) => {
   try {
     let imageUrl = null
     if (req.file) {
-      // up cloudinary ở đây, ví dụ:
       const result = await cloudinary.uploader.upload(req.file.path)
       imageUrl = result.secure_url
     }
@@ -40,7 +38,6 @@ export const createBlogController = async (req, res) => {
   }
 }
 
-// [GET] /blogs
 export const getAllBlogsController = async (req, res) => {
   try {
     const blogs = await getAllBlogsService()
@@ -61,7 +58,6 @@ export const getAllBlogsController = async (req, res) => {
   }
 }
 
-// [GET] /blogs/:id
 export const getBlogByIdController = async (req, res) => {
   try {
     const blog = await getBlogByIdService(req.params.id)
@@ -82,7 +78,6 @@ export const getBlogByIdController = async (req, res) => {
   }
 }
 
-// [PUT] /blogs/:id
 export const updateBlogController = async (req, res) => {
   try {
     console.log('req.body', req.file.path)
@@ -113,7 +108,6 @@ export const updateBlogController = async (req, res) => {
   }
 }
 
-// [DELETE] /blogs/:id
 export const deleteBlogController = async (req, res) => {
   try {
     await deleteBlogService(req.params.id)
