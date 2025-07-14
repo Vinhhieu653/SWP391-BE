@@ -110,7 +110,6 @@ router.get('/prescriptions/rejected', medicineDashboardController.countRejectedP
  */
 router.get('/prescriptions/given', medicineDashboardController.countGivenPrescriptions)
 
-
 /**
  * @swagger
  * /api/v1/dashboard/medicine/prescriptions/statuses:
@@ -138,7 +137,6 @@ router.get('/prescriptions/given', medicineDashboardController.countGivenPrescri
  *                   type: integer
  *                   example: 8
  */
-router.get('/prescriptions/statuses', medicineDashboardController.countAllPrescriptionStatuses);
-
+router.get('/prescriptions/statuses', medicineDashboardController.countAllPrescriptionStatuses)
 
 export default router

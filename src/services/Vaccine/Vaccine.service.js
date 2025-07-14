@@ -320,10 +320,8 @@ export const updateVaccineStatusByMRIdService = async (updates, files) => {
 
   await Promise.all(
     updates.map(async (item) => {
-
       const vaccineHistoryRecord = records.find((r) => r.VH_ID === item.VH_ID)
       const existingEvidence = await Evidence.findOne({ where: { VH_ID: item.VH_ID } })
-
 
       if (item.status === 'Đã tiêm' && !filesByVhId[item.VH_ID] && !existingEvidence) {
         throw { status: 400, message: `Evidence image is required for VH_ID ${item.VH_ID}` }
@@ -348,7 +346,6 @@ export const updateVaccineStatusByMRIdService = async (updates, files) => {
       } else if (existingEvidence) {
         await existingEvidence.destroy()
       }
-
 
       const vh = await VaccineHistory.findByPk(item.VH_ID)
       if (vh) {

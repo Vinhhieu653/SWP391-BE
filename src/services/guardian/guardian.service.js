@@ -4,7 +4,7 @@ import GuardianUser from '../../models/data/guardian_user.model.js'
 import * as registerService from '../auth/register.service.js'
 import MedicalRecord from '../../models/data/medicalRecord.model.js'
 import ExcelJS from 'exceljs'
-// Create guardian with associated student users
+
 export const createGuardianWithStudents = async ({ guardian }) => {
   if (!guardian) {
     const error = new Error('Missing guardian data')
@@ -94,9 +94,9 @@ export const getGuardianById = async (obId) => {
   const studentIds = links.map((l) => l.userId)
   const students = studentIds.length
     ? await User.findAll({
-      where: { id: studentIds },
-      attributes: ['id', 'username', 'fullname', 'email', 'phoneNumber']
-    })
+        where: { id: studentIds },
+        attributes: ['id', 'username', 'fullname', 'email', 'phoneNumber']
+      })
     : []
 
   return {
@@ -122,9 +122,9 @@ export const getAllGuardians = async () => {
       const studentIds = links.map((l) => l.userId)
       const students = studentIds.length
         ? await User.findAll({
-          where: { id: studentIds },
-          attributes: ['id', 'fullname', 'dateOfBirth', 'gender']
-        })
+            where: { id: studentIds },
+            attributes: ['id', 'fullname', 'dateOfBirth', 'gender']
+          })
         : []
 
       return {
@@ -227,9 +227,9 @@ export const getStudentsByUserId = async (userId) => {
   // Truy vấn các học sinh
   const students = studentIds.length
     ? await User.findAll({
-      where: { id: studentIds },
-      attributes: ['id', 'username', 'fullname', 'dateOfBirth']
-    })
+        where: { id: studentIds },
+        attributes: ['id', 'username', 'fullname', 'dateOfBirth']
+      })
     : []
 
   // Truy vấn thông tin Class từ bảng MedicalRecord

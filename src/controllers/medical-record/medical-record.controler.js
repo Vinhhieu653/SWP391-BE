@@ -1,6 +1,5 @@
 import * as medicalRecordService from '../../services/medical-record/medical-record.service.js'
 
-// Lấy tất cả hồ sơ y tế
 export const getAllMedicalRecords = async (req, res) => {
   try {
     const records = await medicalRecordService.getAllMedicalRecords()
@@ -10,7 +9,6 @@ export const getAllMedicalRecords = async (req, res) => {
   }
 }
 
-// Lấy hồ sơ y tế theo ID
 export const getMedicalRecordById = async (req, res) => {
   try {
     const record = await medicalRecordService.getMedicalRecordById(req.params.id)
@@ -21,7 +19,6 @@ export const getMedicalRecordById = async (req, res) => {
   }
 }
 
-// Cập nhật hồ sơ y tế
 export const updateMedicalRecord = async (req, res) => {
   try {
     const updatedRecord = await medicalRecordService.updateMedicalRecord(req.params.id, req.body)
@@ -32,7 +29,6 @@ export const updateMedicalRecord = async (req, res) => {
   }
 }
 
-// Xóa hồ sơ y tế
 export const deleteMedicalRecord = async (req, res) => {
   try {
     const deleted = await medicalRecordService.deleteMedicalRecord(req.params.id)
@@ -43,7 +39,6 @@ export const deleteMedicalRecord = async (req, res) => {
   }
 }
 
-// Lấy các hồ sơ y tế của học sinh do 1 guardian quản lý
 export const getMedicalRecordsByGuardian = async (req, res) => {
   try {
     const guardianUserId = req.user?.userId
