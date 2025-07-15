@@ -1,5 +1,6 @@
 import ExcelJS from 'exceljs'
 
+
 export const exportToExcel = async (data, sheetName = 'Sheet1') => {
   const workbook = new ExcelJS.Workbook()
   const worksheet = workbook.addWorksheet(sheetName)
@@ -11,10 +12,9 @@ export const exportToExcel = async (data, sheetName = 'Sheet1') => {
     width: 20
   }))
 
-  data.forEach((item) => {
-    worksheet.addRow(item)
+  data.forEach((row) => {
+    worksheet.addRow(row)
   })
 
-  const buffer = await workbook.xlsx.writeBuffer()
-  return buffer
+  return await workbook.xlsx.writeBuffer()
 }
