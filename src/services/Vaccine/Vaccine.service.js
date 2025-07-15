@@ -276,27 +276,18 @@ export const getStudentsByEventIdService = async (eventId) => {
 
       if (!student) return null
 
-      return {
-        studentId: student.id,
-        fullname: student.fullname,
-        Class: medicalRecord.Class,
-        vaccineHistory: {
-          id: history.VH_ID,
-          vaccine_name: history.Vaccine_name,
-          vaccine_type: history.Vaccince_type,
-          date_injection: history.Date_injection,
-          batch_number: history.batch_number
-        }
-      }
+      history.dataValues.MedicalRecord = medicalRecord
+      history.dataValues.PatientName = student.fullname
+
+      const evidence = await Evidence.findOne({ where: { VH_ID: history.VH_ID } })
+      history.dataValues.image_after_injection = evidence ? evidence.Image : null
+
+      return history
     })
   )
   const filteredResult = result.filter((item) => item !== null)
 
-  return {
-    eventId,
-    totalStudents: filteredResult.length,
-    students: filteredResult
-  }
+  return filteredResult
 }
 
 export const updateVaccineStatusByMRIdService = async (updates, files) => {
