@@ -14,7 +14,6 @@ const options = {
       }
     ],
     tags: [
-      // thứ tự tags hiển thị
       { name: 'Test', description: 'Test server' },
       { name: 'Auth', description: 'Authentication endpoints' }
     ],

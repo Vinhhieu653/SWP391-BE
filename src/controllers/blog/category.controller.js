@@ -6,7 +6,6 @@ import {
   deleteCategoryService
 } from '../../services/blog/category.service.js'
 
-// [POST] /categories
 export const createCategoryController = async (req, res) => {
   try {
     const newCategory = await createCategoryService({
@@ -30,7 +29,6 @@ export const createCategoryController = async (req, res) => {
   }
 }
 
-// [GET] /categories
 export const getAllCategoriesController = async (req, res) => {
   try {
     const categories = await getAllCategoriesService()
@@ -51,7 +49,6 @@ export const getAllCategoriesController = async (req, res) => {
   }
 }
 
-// [GET] /categories/:id
 export const getCategoryByIdController = async (req, res) => {
   try {
     const category = await getCategoryByIdService(req.params.id)
@@ -72,7 +69,6 @@ export const getCategoryByIdController = async (req, res) => {
   }
 }
 
-// [PUT] /categories/:id
 export const updateCategoryController = async (req, res) => {
   try {
     const { id } = req.params
@@ -96,7 +92,6 @@ export const updateCategoryController = async (req, res) => {
   }
 }
 
-// [DELETE] /categories/:id
 export const deleteCategoryController = async (req, res) => {
   try {
     const deletedCategory = await deleteCategoryService(req.params.id)

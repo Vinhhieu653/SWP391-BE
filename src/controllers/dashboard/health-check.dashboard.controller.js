@@ -74,25 +74,20 @@ export const countCheckedRounds = async (req, res, next) => {
 
 export const countAllHealthCheckStatuses = async (req, res, next) => {
   try {
-    const [
-      created,
-      inProgress,
-      pending,
-      checked
-    ] = await Promise.all([
+    const [created, inProgress, pending, checked] = await Promise.all([
       healthCheckDashboardService.countCreatedStudents(),
       healthCheckDashboardService.countInProgressStudents(),
       healthCheckDashboardService.countPendingStudents(),
       healthCheckDashboardService.countCheckedRounds()
-    ]);
+    ])
 
     res.json({
       countCreated: created,
       countInProgress: inProgress,
       countPending: pending,
       countChecked: checked
-    });
+    })
   } catch (err) {
-    next(err);
+    next(err)
   }
 }

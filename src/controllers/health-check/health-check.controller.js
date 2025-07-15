@@ -117,7 +117,7 @@ export const handleGetForm = async (req, res) => {
 export const handleGetAllForms = async (req, res) => {
   try {
     const { id } = req.params
-    const forms = await srv.getAllFormsByEvent(id) // ✅ đổi sang srv
+    const forms = await srv.getAllFormsByEvent(id)
     res.status(200).json(forms)
   } catch (err) {
     res.status(404).json({ error: err.message })
@@ -153,7 +153,7 @@ export const handleResetForm = async (req, res) => {
   try {
     const { id } = req.params
     const { student_id } = req.query
-    const result = await srv.resetFormResult(id, student_id) // ✅ đổi sang srv
+    const result = await srv.resetFormResult(id, student_id)
     res.status(200).json({ message: result })
   } catch (err) {
     res.status(400).json({ error: err.message })

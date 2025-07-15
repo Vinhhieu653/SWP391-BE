@@ -51,7 +51,6 @@ export const countHealthCheckEventsMonthly = async () => {
   }))
 }
 
-
 export const countOtherMedicalMonthly = async () => {
   const result = await HistoryOtherMedical.findAll({
     attributes: [
@@ -62,19 +61,16 @@ export const countOtherMedicalMonthly = async () => {
     order: [[literal('month'), 'ASC']]
   })
 
-  // Tạo object { 'MM/yyyy': count }
   const rawData = result.reduce((acc, item) => {
-    const date = item.getDataValue('month');
+    const date = item.getDataValue('month')
     const key = date.toLocaleDateString('en-GB', {
       month: '2-digit',
       year: 'numeric'
-    }); // "07/2025"
-    acc[key] = Number(item.getDataValue('count'));
-    return acc;
-  }, {});
+    }) // "07/2025"
+    acc[key] = Number(item.getDataValue('count'))
+    return acc
+  }, {})
 
-
-  // Tạo danh sách 12 tháng gần nhất
   const now = new Date()
   const months = []
   for (let i = 0; i < 12; i++) {

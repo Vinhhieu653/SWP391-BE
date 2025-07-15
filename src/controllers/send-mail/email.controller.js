@@ -9,13 +9,10 @@ export const sendEmailController = async (req, res) => {
 
   try {
     if (template) {
-      // Gửi theo template client truyền + context nếu có
       await sendMail({ to, subject, template, context: context || {} })
     } else if (message) {
-      // Gửi theo message HTML client truyền
       await sendMail({ to, subject, html: message })
     } else {
-      // Mặc định gửi template email-noti
       await sendMail({ to, subject, template: 'email-noti', context: context || {} })
     }
 

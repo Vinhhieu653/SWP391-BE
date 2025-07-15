@@ -47,25 +47,20 @@ export const countGivenPrescriptions = async (req, res, next) => {
 
 export const countAllPrescriptionStatuses = async (req, res, next) => {
   try {
-    const [
-      pending,
-      received,
-      rejected,
-      given
-    ] = await Promise.all([
+    const [pending, received, rejected, given] = await Promise.all([
       dashboardService.countPendingPrescriptions(),
       dashboardService.countReceivedPrescriptions(),
       dashboardService.countRejectedPrescriptions(),
       dashboardService.countGivenPrescriptions()
-    ]);
+    ])
 
     res.json({
       countPending: pending,
       countReceived: received,
       countRejected: rejected,
       countGiven: given
-    });
+    })
   } catch (err) {
-    next(err);
+    next(err)
   }
-};
+}

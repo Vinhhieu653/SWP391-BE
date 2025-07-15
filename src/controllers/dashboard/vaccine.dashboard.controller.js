@@ -29,26 +29,20 @@ export const getRoundsByMonth = async (req, res, next) => {
 
 export const countAllVaccineStatuses = async (req, res, next) => {
   try {
-    const [
-      pending,
-      allowed,
-      injected,
-      rejected
-    ] = await Promise.all([
+    const [pending, allowed, injected, rejected] = await Promise.all([
       dashboardService.countByStatus('Chờ xác nhận'),
       dashboardService.countByStatus('Cho phép tiêm'),
       dashboardService.countByStatus('Đã tiêm'),
       dashboardService.countByStatus('Không tiêm')
-    ]);
+    ])
 
     res.json({
       countPending: pending,
       countAllowed: allowed,
       countInjected: injected,
       countRejected: rejected
-    });
+    })
   } catch (err) {
-    next(err);
+    next(err)
   }
-};
-
+}

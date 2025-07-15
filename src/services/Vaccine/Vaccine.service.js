@@ -320,10 +320,8 @@ export const updateVaccineStatusByMRIdService = async (updates, files) => {
 
   await Promise.all(
     updates.map(async (item) => {
-
       const vaccineHistoryRecord = records.find((r) => r.VH_ID === item.VH_ID)
       const existingEvidence = await Evidence.findOne({ where: { VH_ID: item.VH_ID } })
-
 
       if (item.status === 'Đã tiêm' && !filesByVhId[item.VH_ID] && !existingEvidence) {
         throw { status: 400, message: `Evidence image is required for VH_ID ${item.VH_ID}` }
@@ -348,7 +346,6 @@ export const updateVaccineStatusByMRIdService = async (updates, files) => {
       } else if (existingEvidence) {
         await existingEvidence.destroy()
       }
-
 
       const vh = await VaccineHistory.findByPk(item.VH_ID)
       if (vh) {
@@ -386,7 +383,7 @@ export const getAllVaccineTypesService = async () => {
       Is_created_by_guardian: false,
       Is_deleted: false
     },
-    attributes: ['Vaccine_name', 'ID', 'Event_ID', 'batch_number'],
+    attributes: ['Vaccine_name', 'ID', 'Event_ID', 'batch_number', 'Vaccince_type'],
     raw: true
   })
 
@@ -408,10 +405,11 @@ export const getAllVaccineTypesService = async () => {
       eventdate = event ? event.dateEvent : null
       eventDateStr = eventdate ? new Date(eventdate).toISOString().slice(0, 10) : ''
     }
-    const key = `${item.Vaccine_name}_${grade}_${eventDateStr}_${item.batch_number}`
+    const key = `${item.Vaccine_name}_${item.Vaccince_type}_${grade}_${eventDateStr}_${item.batch_number}`
     if (!grouped[key]) {
       grouped[key] = {
         vaccineName: item.Vaccine_name,
+        vaccineType: item.Vaccince_type,
         grade,
         eventdate,
         batch_number: item.batch_number

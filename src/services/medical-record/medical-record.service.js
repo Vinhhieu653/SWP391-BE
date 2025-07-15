@@ -7,7 +7,7 @@ export const getAllMedicalRecords = async () => {
   const records = await MedicalRecord.findAll({
     include: {
       model: User,
-      attributes: ['fullname']
+      attributes: ['fullname', 'dateOfBirth', 'gender']
     }
   })
 
@@ -15,6 +15,8 @@ export const getAllMedicalRecords = async () => {
     records.map(async (record) => {
       const plain = record.get({ plain: true })
       const fullname = plain.User?.fullname || null
+      const dateOfBirth = plain.User?.dateOfBirth || null
+      const gender = plain.User?.gender || null
       delete plain.User // xoá key User
 
       const guardianUser = await GuardianUser.findOne({ where: { userId: record.userId } })
@@ -34,6 +36,8 @@ export const getAllMedicalRecords = async () => {
       return {
         ...plain,
         fullname,
+        dateOfBirth,
+        gender,
         guardian
       }
     })
@@ -45,7 +49,7 @@ export const getMedicalRecordById = async (id) => {
   const record = await MedicalRecord.findByPk(id, {
     include: {
       model: User,
-      attributes: ['fullname']
+      attributes: ['fullname', 'dateOfBirth', 'gender']
     }
   })
 
@@ -53,11 +57,15 @@ export const getMedicalRecordById = async (id) => {
 
   const plain = record.get({ plain: true })
   const fullname = plain.User?.fullname || null
+  const dateOfBirth = plain.User?.dateOfBirth || null
+  const gender = plain.User?.gender || null
   delete plain.User
 
   return {
     ...plain,
-    fullname
+    fullname,
+    dateOfBirth,
+    gender
   }
 }
 
