@@ -123,4 +123,24 @@ router.get('/other-medical/monthly', eventDashboardController.getOtherMedicalCou
  */
 router.get('/admin/count', eventDashboardController.getDashboardCounts)
 
+/**
+ * @swagger
+ * /api/v1/dashboard/event/medical-record/count:
+ *   get:
+ *     summary: Tổng số hồ sơ y tế
+ *     tags: [EventDashboard]
+ *     responses:
+ *       200:
+ *         description: Số lượng hồ sơ y tế
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
+ *                   example: 100
+ */
+router.get('/medical-record/count', eventDashboardController.getCountMedicalRecord)
+
 export default router
