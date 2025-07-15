@@ -58,7 +58,8 @@ export const updateMedicalSent = async (req, res) => {
     }
 
     const formData = {
-      ...req.body
+      ...req.body,
+      prescriptionImage: imageUrl
     }
 
     if (imageUrl) {

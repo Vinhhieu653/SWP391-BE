@@ -7,8 +7,10 @@ export async function registerUser({ fullname, username, email, phoneNumber, rol
     throw new Error('Missing required fields')
   }
 
-  const existUser = await User.findOne({ where: { username } })
-  if (existUser) throw new Error('Username taken')
+  const existingUsername = await User.findOne({ where: { username } })
+  if (existingUsername) {
+    throw Object.assign(new Error('Username already taken'), { status: 400 })
+  }
 
   let finalRoleId = roleId
   if (!finalRoleId) {
@@ -17,8 +19,17 @@ export async function registerUser({ fullname, username, email, phoneNumber, rol
     finalRoleId = role.id
   }
 
-  const existEmail = await User.findOne({ where: { email } })
-  if (existEmail) throw new Error('Email taken')
+  const existingEmail = await User.findOne({ where: { email } })
+  if (existingEmail) {
+    throw Object.assign(new Error('Email already taken'), { status: 400 })
+  }
+
+  if (phoneNumber) {
+    const existingPhone = await User.findOne({ where: { phoneNumber } })
+    if (existingPhone) {
+      throw Object.assign(new Error('Phone number already taken'), { status: 400 })
+    }
+  }
 
   const newUser = await User.create({
     fullname,

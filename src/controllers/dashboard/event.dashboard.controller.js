@@ -60,3 +60,12 @@ export const getDashboardCounts = async (req, res, next) => {
     next(err)
   }
 }
+
+export const getCountMedicalRecord = async (req, res, next) => {
+  try {
+    const count = await eventDashboardService.countMedicalRecords()
+    res.json({ count })
+  } catch (err) {
+    next(err)
+  }
+}

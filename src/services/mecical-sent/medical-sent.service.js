@@ -10,12 +10,6 @@ import Notification from '../../models/data/noti.model.js'
 export const createMedicalSentService = async (data, creator_by = 'system') => {
   let { userId, fullname, Class: studentClass, prescriptionImage, medications, deliveryTime, status, notes } = data
 
-  // Nếu không có userId, tạo mới user
-  if (!userId) {
-    if (!fullname || !studentClass) throw { status: 400, message: 'Thiếu tên học sinh hoặc lớp!' }
-    const newUser = await User.create({ fullname, Class: studentClass, roleId: 3 })
-    userId = newUser.id
-  }
 
   // 1. Tìm MedicalRecord theo userId (nếu có)
   let medicalRecord = await MedicalRecord.findOne({ where: { userId: userId } })
@@ -118,7 +112,9 @@ export const updateMedicalSentService = async (id, updateData) => {
 
   // Lấy notes từ cả hai key, ưu tiên notes (chữ thường)
   const notesValue = updateData.notes !== undefined ? updateData.notes : updateData.Notes
-  const updatePayload = { ...updateData, Notes: notesValue }
+  const updatePayload = { ...updateData, Notes: notesValue, Image_prescription: updateData.prescriptionImage }
+
+  console.log('updatePayload:', updatePayload)
 
   await record.update(updatePayload)
   const { Form_ID, Outpatient_medication, OM_ID, ...cleaned } = record.get({ plain: true })

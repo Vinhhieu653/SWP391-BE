@@ -6,6 +6,7 @@ import User from '../../models/data/user.model.js'
 import Blog from '../../models/data/blog.model.js'
 import HealthCheck from '../../models/data/health_check.model.js'
 import VaccineHistory from '../../models/data/vaccine_history.model.js'
+import MedicalRecord from '../../models/data/medicalRecord.model.js'
 
 export const countVaccineEventsByMonth = async () => {
   const result = await Event.findAll({
@@ -105,5 +106,10 @@ export const countHealthChecks = async () => {
 
 export const countVaccineRounds = async () => {
   const count = await VaccineHistory.count()
+  return count
+}
+
+export const countMedicalRecords = async () => {
+  const count = await MedicalRecord.count()
   return count
 }
