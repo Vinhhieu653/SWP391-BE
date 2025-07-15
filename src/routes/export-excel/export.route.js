@@ -37,7 +37,6 @@ const router = Router()
  *         description: Lỗi khi export file
  */
 
-
 router.get('/', handleExportExcel)
 
 export default router
