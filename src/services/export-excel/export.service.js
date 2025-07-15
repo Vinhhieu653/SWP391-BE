@@ -1,6 +1,5 @@
 import ExcelJS from 'exceljs'
 
-
 export const exportToExcel = async (data, sheetName = 'Sheet1') => {
   const workbook = new ExcelJS.Workbook()
   const worksheet = workbook.addWorksheet(sheetName)

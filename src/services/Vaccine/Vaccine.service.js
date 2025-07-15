@@ -196,8 +196,8 @@ export const getVaccineHistoryByMRIdService = async (ID) => {
   const medicalRecord = await MedicalRecord.findByPk(ID)
   const user = medicalRecord
     ? await User.findByPk(medicalRecord.userId, {
-      attributes: ['fullname', 'dateOfBirth']
-    })
+        attributes: ['fullname', 'dateOfBirth']
+      })
     : null
 
   return {
@@ -572,8 +572,9 @@ export const deleteVaccineHistoriesByNameDateGradeService = async (vaccineName, 
             const son = await User.findByPk(medicalRecord.userId, { attributes: ['fullname'] })
             await Notification.create({
               title: `Lịch tiêm chủng đã bị hủy`,
-              mess: `Lịch tiêm chủng vaccine ${vaccineName} cho cháu ${son ? son.fullname : 'Không rõ tên'
-                } vào ngày ${dateStr} đã bị hủy, chúng tôi sẽ thông báo khi có lịch tiêm chủng mới.`,
+              mess: `Lịch tiêm chủng vaccine ${vaccineName} cho cháu ${
+                son ? son.fullname : 'Không rõ tên'
+              } vào ngày ${dateStr} đã bị hủy, chúng tôi sẽ thông báo khi có lịch tiêm chủng mới.`,
               userId: guardian.userId
             })
           }
