@@ -524,13 +524,11 @@ export async function getStudentsByEvent(HC_ID) {
     attributes: ['userId', 'Class']
   })
 
-  // Tạo map userId -> Class
   const classMap = {}
   records.forEach((record) => {
     classMap[record.userId] = record.Class
   })
 
-  // Gán Class vào Student
   forms.forEach((form) => {
     const student = form.Student
     if (student && classMap[student.id]) {
@@ -538,7 +536,36 @@ export async function getStudentsByEvent(HC_ID) {
     }
   })
 
-  return forms
+  const result = await Promise.all(forms.map(async form => {
+    const student = form.Student;
+    
+    const guardianUsers = await GuardianUser.findAll({
+      where: { userId: student.id },
+      include: [{
+        model: Guardian,
+      }]
+    });
+
+
+    const guardianInfo = await Promise.all(guardianUsers.map(async gu => {
+      const guardian = gu.Guardian;
+      const user = await User.findByPk(guardian.userId, { attributes: ['fullname'] });
+      return {
+        ...guardian.get({ plain: true }),
+        fullName: user ? user.fullname : null
+      };
+    }));
+
+    return {
+      ...form.get({ plain: true }),
+      Student: {
+        ...student.get({ plain: true }),
+        Guardians: guardianInfo
+      }
+    };
+  }));
+
+  return result;
 }
 
 export async function getFormDetail(formId) {
