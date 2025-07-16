@@ -32,10 +32,10 @@ export const handleExportExcel = async (req, res) => {
         Ngày_tiêm: st.vaccineHistory.date_injection
           ? new Date(st.vaccineHistory.date_injection).toISOString().split('T')[0]
           : '',
-        Số_lô: st.vaccineHistory.batch_number ?? '',
+        Số_lô: st.vaccineHistory.batch_number ?? ''
       }))
-    }
-    else { // type === 'health'
+    } else {
+      // type === 'health'
       // 2b. Lấy raw data từ service health
       rawData = await getStudentsByEvent(Number(eventId))
       // rawData ở đây là Array — kiểm tra ít nhất 1 phần tử
@@ -58,10 +58,7 @@ export const handleExportExcel = async (req, res) => {
         Kết_quả_tổng_quát: form.General_Conclusion ?? '',
         Cần_gặp: form.Is_need_meet ? 'Có' : 'Không',
         Trạng_thái: form.status,
-        Ngày_khám: form.createdAt
-          ? new Date(form.createdAt).toISOString().split('T')[0]
-          : '',
-
+        Ngày_khám: form.createdAt ? new Date(form.createdAt).toISOString().split('T')[0] : ''
       }))
     }
 
@@ -75,38 +72,29 @@ export const handleExportExcel = async (req, res) => {
     const buffer = await exportToExcel(flatData, sheetName)
 
     // trước khi send buffer
-    const rawName = `${sheetName}.xlsx`;
+    const rawName = `${sheetName}.xlsx`
 
     // 1) Nếu bạn không cần dấu, dùng phương án normalize + replace
     const safeName = rawName
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^\w\.]/g, '_');
+      .replace(/[^\w\.]/g, '_')
 
     // 2) Hoặc nếu muốn giữ dấu, dùng encodeURIComponent
-    const encodedName = encodeURIComponent(rawName);
+    const encodedName = encodeURIComponent(rawName)
 
-    res.setHeader('Content-Type',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    );
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     // Chọn 1 trong 2:
     // res.setHeader('Content-Disposition',
     //   `attachment; filename="${safeName}"`
     // );
     // hoặc
-    res.setHeader('Content-Disposition',
-      `attachment; filename*=UTF-8''${encodedName}`
-    );
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodedName}`)
 
-    res.send(buffer);
-
-  }
-  catch (err) {
+    res.send(buffer)
+  } catch (err) {
     console.error(err)
     // **Chuyển content-type về JSON** để Swagger và Postman hiển thị
-    return res
-      .status(500)
-      .type('application/json')
-      .json({ message: 'Export failed', error: err.message })
+    return res.status(500).type('application/json').json({ message: 'Export failed', error: err.message })
   }
 }

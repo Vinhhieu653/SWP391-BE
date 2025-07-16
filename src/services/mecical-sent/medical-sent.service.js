@@ -10,7 +10,6 @@ import Notification from '../../models/data/noti.model.js'
 export const createMedicalSentService = async (data, creator_by = 'system') => {
   let { userId, fullname, Class: studentClass, prescriptionImage, medications, deliveryTime, status, notes } = data
 
-
   // 1. Tìm MedicalRecord theo userId (nếu có)
   let medicalRecord = await MedicalRecord.findOne({ where: { userId: userId } })
   if (!medicalRecord) {
