@@ -536,36 +536,41 @@ export async function getStudentsByEvent(HC_ID) {
     }
   })
 
-  const result = await Promise.all(forms.map(async form => {
-    const student = form.Student;
-    
-    const guardianUsers = await GuardianUser.findAll({
-      where: { userId: student.id },
-      include: [{
-        model: Guardian,
-      }]
-    });
+  const result = await Promise.all(
+    forms.map(async (form) => {
+      const student = form.Student
 
+      const guardianUsers = await GuardianUser.findAll({
+        where: { userId: student.id },
+        include: [
+          {
+            model: Guardian
+          }
+        ]
+      })
 
-    const guardianInfo = await Promise.all(guardianUsers.map(async gu => {
-      const guardian = gu.Guardian;
-      const user = await User.findByPk(guardian.userId, { attributes: ['fullname'] });
+      const guardianInfo = await Promise.all(
+        guardianUsers.map(async (gu) => {
+          const guardian = gu.Guardian
+          const user = await User.findByPk(guardian.userId, { attributes: ['fullname'] })
+          return {
+            ...guardian.get({ plain: true }),
+            fullName: user ? user.fullname : null
+          }
+        })
+      )
+
       return {
-        ...guardian.get({ plain: true }),
-        fullName: user ? user.fullname : null
-      };
-    }));
-
-    return {
-      ...form.get({ plain: true }),
-      Student: {
-        ...student.get({ plain: true }),
-        Guardians: guardianInfo
+        ...form.get({ plain: true }),
+        Student: {
+          ...student.get({ plain: true }),
+          Guardians: guardianInfo
+        }
       }
-    };
-  }));
+    })
+  )
 
-  return result;
+  return result
 }
 
 export async function getFormDetail(formId) {

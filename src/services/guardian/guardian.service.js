@@ -4,6 +4,8 @@ import GuardianUser from '../../models/data/guardian_user.model.js'
 import * as registerService from '../auth/register.service.js'
 import MedicalRecord from '../../models/data/medicalRecord.model.js'
 import ExcelJS from 'exceljs'
+import argon2 from 'argon2'
+import { sendRandomPasswordMail } from '../../services/send-mail/email.service.js'
 
 export const createGuardianWithStudents = async ({ guardian }) => {
   if (!guardian) {
@@ -391,6 +393,15 @@ export const deleteStudentByGuardianId = async (obId, studentId) => {
   }
 }
 
+function generateRandomPassword(length = 6) {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}'
+  let password = ''
+  for (let i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return password
+}
+
 export async function importGuardiansExcelService(fileBuffer) {
   const workbook = new ExcelJS.Workbook()
   await workbook.xlsx.load(fileBuffer)
@@ -411,6 +422,9 @@ export async function importGuardiansExcelService(fileBuffer) {
     })
 
     try {
+      const rawPassword = generateRandomPassword()
+      const hashedPassword = await argon2.hash(rawPassword)
+
       const guardianData = {
         fullname: rowData.fullname,
         username: rowData.username,
@@ -420,9 +434,9 @@ export async function importGuardiansExcelService(fileBuffer) {
         isCallFirst: rowData.iscallfirst === true || rowData.iscallfirst === 'TRUE',
         dateOfBirth:
           rowData.dateofbirth instanceof Date ? rowData.dateofbirth.toISOString().split('T')[0] : rowData.dateofbirth,
-
         gender: rowData.gender,
-        address: rowData.address
+        address: rowData.address,
+        password: hashedPassword
       }
 
       if (!guardianData.phoneNumber || !guardianData.roleInFamily) {
@@ -430,6 +444,21 @@ export async function importGuardiansExcelService(fileBuffer) {
       }
 
       await createGuardianWithStudents({ guardian: guardianData })
+
+      try {
+        if (guardianData.email) {
+          const actionLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?email=${encodeURIComponent(guardianData.email)}`
+          await sendRandomPasswordMail({
+            to: guardianData.email,
+            studentName: guardianData.fullname || 'Phụ huynh',
+            password: rawPassword,
+            actionLink
+          })
+        }
+      } catch (mailErr) {
+        console.error(`Gửi mail thất bại cho ${guardianData.email}:`, mailErr.message)
+      }
+
       results.push({ username: guardianData.username, status: 'success' })
     } catch (err) {
       results.push({ username: rowData.username, status: 'failed', error: err.message })

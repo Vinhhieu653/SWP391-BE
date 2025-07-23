@@ -196,8 +196,8 @@ export const getVaccineHistoryByMRIdService = async (ID) => {
   const medicalRecord = await MedicalRecord.findByPk(ID)
   const user = medicalRecord
     ? await User.findByPk(medicalRecord.userId, {
-      attributes: ['fullname', 'dateOfBirth']
-    })
+        attributes: ['fullname', 'dateOfBirth']
+      })
     : null
 
   return {
@@ -276,27 +276,18 @@ export const getStudentsByEventIdService = async (eventId) => {
 
       if (!student) return null
 
-      return {
-        studentId: student.id,
-        fullname: student.fullname,
-        Class: medicalRecord.Class,
-        vaccineHistory: {
-          id: history.VH_ID,
-          vaccine_name: history.Vaccine_name,
-          vaccine_type: history.Vaccince_type,
-          date_injection: history.Date_injection,
-          batch_number: history.batch_number
-        }
-      }
+      history.dataValues.MedicalRecord = medicalRecord
+      history.dataValues.PatientName = student.fullname
+
+      const evidence = await Evidence.findOne({ where: { VH_ID: history.VH_ID } })
+      history.dataValues.image_after_injection = evidence ? evidence.Image : null
+
+      return history
     })
   )
   const filteredResult = result.filter((item) => item !== null)
 
-  return {
-    eventId,
-    totalStudents: filteredResult.length,
-    students: filteredResult
-  }
+  return filteredResult
 }
 
 export const updateVaccineStatusByMRIdService = async (updates, files) => {
@@ -572,8 +563,9 @@ export const deleteVaccineHistoriesByNameDateGradeService = async (vaccineName, 
             const son = await User.findByPk(medicalRecord.userId, { attributes: ['fullname'] })
             await Notification.create({
               title: `Lịch tiêm chủng đã bị hủy`,
-              mess: `Lịch tiêm chủng vaccine ${vaccineName} cho cháu ${son ? son.fullname : 'Không rõ tên'
-                } vào ngày ${dateStr} đã bị hủy, chúng tôi sẽ thông báo khi có lịch tiêm chủng mới.`,
+              mess: `Lịch tiêm chủng vaccine ${vaccineName} cho cháu ${
+                son ? son.fullname : 'Không rõ tên'
+              } vào ngày ${dateStr} đã bị hủy, chúng tôi sẽ thông báo khi có lịch tiêm chủng mới.`,
               userId: guardian.userId
             })
           }
