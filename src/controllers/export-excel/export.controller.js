@@ -24,16 +24,17 @@ export const handleExportExcel = async (req, res) => {
 
       flatData = rawData.students.map((st, idx) => ({
         STT: idx + 1,
-        Mã_HS: st.studentId,
-        Họ_tên: st.fullname,
-        Lớp: st.Class,
-        Vaccine: st.vaccineHistory.vaccine_name,
-        Loại: st.vaccineHistory.vaccine_type,
-        Ngày_tiêm: st.vaccineHistory.date_injection
+        'Mã HS': st.studentId,
+        'Họ tên': st.fullname,
+        'Lớp': st.Class,
+        'Vaccine': st.vaccineHistory.vaccine_name,
+        'Loại': st.vaccineHistory.vaccine_type,
+        'Ngày tiêm': st.vaccineHistory.date_injection
           ? new Date(st.vaccineHistory.date_injection).toISOString().split('T')[0]
           : '',
-        Số_lô: st.vaccineHistory.batch_number ?? '',
+        'Số lô': st.vaccineHistory.batch_number ?? '',
       }))
+
     }
     else { // type === 'health'
       // 2b. Lấy raw data từ service health
@@ -46,23 +47,23 @@ export const handleExportExcel = async (req, res) => {
 
       flatData = rawData.map((form, idx) => ({
         STT: idx + 1,
-        Form_ID: form.Form_ID,
-        Mã_HS: form.Student?.id ?? '',
-        Họ_tên: form.Student?.fullname ?? '',
-        Lớp: form.Student?.Class ?? '',
-        Chiều_cao: form.Height ?? '',
-        Cân_nặng: form.Weight ?? '',
-        Huyết_áp: form.Blood_Pressure ?? '',
-        Thị_lực_trái: form.Vision_Left ?? '',
-        Thị_lực_phải: form.Vision_Right ?? '',
-        Kết_quả_tổng_quát: form.General_Conclusion ?? '',
-        Cần_gặp: form.Is_need_meet ? 'Có' : 'Không',
-        Trạng_thái: form.status,
-        Ngày_khám: form.createdAt
+        'Form ID': form.Form_ID,
+        'Mã HS': form.Student?.id ?? '',
+        'Họ tên': form.Student?.fullname ?? '',
+        'Lớp': form.Student?.Class ?? '',
+        'Chiều cao': form.Height ?? '',
+        'Cân nặng': form.Weight ?? '',
+        'Huyết áp': form.Blood_Pressure ?? '',
+        'Thị lực trái': form.Vision_Left ?? '',
+        'Thị lực phải': form.Vision_Right ?? '',
+        'Kết quả tổng quát': form.General_Conclusion ?? '',
+        'Cần gặp': form.Is_need_meet ? 'Có' : 'Không',
+        'Trạng thái': form.status,
+        'Ngày khám': form.createdAt
           ? new Date(form.createdAt).toISOString().split('T')[0]
           : '',
-
       }))
+
     }
 
     // 3. Nếu flatData rỗng, vẫn tạo sheet có header

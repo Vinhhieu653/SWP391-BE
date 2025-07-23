@@ -5,13 +5,27 @@ export const createOtherMedical = async (req, res) => {
   try {
     const userId = req.user?.id
     let imageUrl = null
+    let videoUrl = null
 
-    if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path)
+    if (req.files?.Image?.[0]) {
+      const result = await cloudinary.uploader.upload(req.files.Image[0].path)
       imageUrl = result.secure_url
     }
 
-    const data = imageUrl ? { ...req.body, Image: imageUrl } : req.body
+    if (req.files?.Video?.[0]) {
+      const result = await cloudinary.uploader.upload(req.files.Video[0].path, {
+        resource_type: 'video'
+      })
+      videoUrl = result.secure_url
+    }
+
+    const data = {
+      ...req.body,
+      Image: imageUrl,
+      Video: videoUrl
+    }
+
+    console.log('Creating other medical record with data:', data)
 
     const otherMedical = await OtherMedicalService.createOtherMedicalService(data, userId)
     res.status(201).json({
