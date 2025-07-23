@@ -35,8 +35,11 @@ const upload = multer({ dest: 'uploads/' })
  *               Image:
  *                 type: string
  *                 format: binary
+ *               Video:
+ *                 type: string
+ *                 format: binary
  *               Handle:
- *                type: string
+ *                 type: string
  *               Is_calLOb:
  *                 type: boolean
  *     responses:
@@ -51,7 +54,10 @@ const upload = multer({ dest: 'uploads/' })
  *       500:
  *         description: Server error
  */
-router.post('/', authenticateToken, authorizeRoles('nurse', 'admin'), upload.single('Image'), createOtherMedical)
+router.post('/', authenticateToken, authorizeRoles('nurse', 'admin'), upload.fields([
+  { name: 'Image', maxCount: 1 },
+  { name: 'Video', maxCount: 1 }
+]), createOtherMedical)
 
 /**
  * @swagger
