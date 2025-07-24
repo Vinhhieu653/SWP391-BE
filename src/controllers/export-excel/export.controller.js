@@ -26,17 +26,16 @@ export const handleExportExcel = async (req, res) => {
         STT: idx + 1,
         'Mã HS': st.studentId,
         'Họ tên': st.fullname,
-        'Lớp': st.Class,
-        'Vaccine': st.vaccineHistory.vaccine_name,
-        'Loại': st.vaccineHistory.vaccine_type,
+        Lớp: st.Class,
+        Vaccine: st.vaccineHistory.vaccine_name,
+        Loại: st.vaccineHistory.vaccine_type,
         'Ngày tiêm': st.vaccineHistory.date_injection
           ? new Date(st.vaccineHistory.date_injection).toISOString().split('T')[0]
           : '',
         'Số lô': st.vaccineHistory.batch_number ?? ''
       }))
-
-    }
-    else { // type === 'health'
+    } else {
+      // type === 'health'
       // 2b. Lấy raw data từ service health
       rawData = await getStudentsByEvent(Number(eventId))
       // rawData ở đây là Array — kiểm tra ít nhất 1 phần tử
@@ -50,7 +49,7 @@ export const handleExportExcel = async (req, res) => {
         'Form ID': form.Form_ID,
         'Mã HS': form.Student?.id ?? '',
         'Họ tên': form.Student?.fullname ?? '',
-        'Lớp': form.Student?.Class ?? '',
+        Lớp: form.Student?.Class ?? '',
         'Chiều cao': form.Height ?? '',
         'Cân nặng': form.Weight ?? '',
         'Huyết áp': form.Blood_Pressure ?? '',
@@ -59,11 +58,8 @@ export const handleExportExcel = async (req, res) => {
         'Kết quả tổng quát': form.General_Conclusion ?? '',
         'Cần gặp': form.Is_need_meet ? 'Có' : 'Không',
         'Trạng thái': form.status,
-        'Ngày khám': form.createdAt
-          ? new Date(form.createdAt).toISOString().split('T')[0]
-          : '',
+        'Ngày khám': form.createdAt ? new Date(form.createdAt).toISOString().split('T')[0] : ''
       }))
-
     }
 
     // 3. Nếu flatData rỗng, vẫn tạo sheet có header

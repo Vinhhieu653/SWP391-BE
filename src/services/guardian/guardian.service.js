@@ -5,7 +5,7 @@ import * as registerService from '../auth/register.service.js'
 import MedicalRecord from '../../models/data/medicalRecord.model.js'
 import ExcelJS from 'exceljs'
 import argon2 from 'argon2'
-import { sendRandomPasswordMail } from '../../services/send-mail/email.service.js'
+import { sendRandomPassword } from '../../services/auth/password.service.js'
 
 export const createGuardianWithStudents = async ({ guardian }) => {
   if (!guardian) {
@@ -446,15 +446,7 @@ export async function importGuardiansExcelService(fileBuffer) {
       await createGuardianWithStudents({ guardian: guardianData })
 
       try {
-        if (guardianData.email) {
-          const actionLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?email=${encodeURIComponent(guardianData.email)}`
-          await sendRandomPasswordMail({
-            to: guardianData.email,
-            studentName: guardianData.fullname || 'Phụ huynh',
-            password: rawPassword,
-            actionLink
-          })
-        }
+        await sendRandomPassword(guardianData.email)
       } catch (mailErr) {
         console.error(`Gửi mail thất bại cho ${guardianData.email}:`, mailErr.message)
       }

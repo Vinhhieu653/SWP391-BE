@@ -440,7 +440,7 @@ router.put(
  *         required: true
  *         schema:
  *           type: integer
- *         description: ID đợt khám
+ *         description: ID form khám
  *       - in: query
  *         name: student_id
  *         required: true
