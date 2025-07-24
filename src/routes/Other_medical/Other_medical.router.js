@@ -54,10 +54,16 @@ const upload = multer({ dest: 'uploads/' })
  *       500:
  *         description: Server error
  */
-router.post('/', authenticateToken, authorizeRoles('nurse', 'admin'), upload.fields([
-  { name: 'Image', maxCount: 1 },
-  { name: 'Video', maxCount: 1 }
-]), createOtherMedical)
+router.post(
+  '/',
+  authenticateToken,
+  authorizeRoles('nurse', 'admin'),
+  upload.fields([
+    { name: 'Image', maxCount: 1 },
+    { name: 'Video', maxCount: 1 }
+  ]),
+  createOtherMedical
+)
 
 /**
  * @swagger
