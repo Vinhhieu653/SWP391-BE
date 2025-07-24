@@ -76,12 +76,8 @@ export async function sendConfirmForms(req, res) {
 export const createdResult = async (req, res) => {
   try {
     const { id } = req.params
-    let imageUrl = null
 
-    if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path)
-      imageUrl = result.secure_url
-    }
+    const imageUrl = req.file ? (await cloudinary.uploader.upload(req.file.path)).secure_url : req.body.image || null
 
     await srv.createdResult(id, {
       ...req.body,
