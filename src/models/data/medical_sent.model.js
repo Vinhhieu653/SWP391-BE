@@ -42,6 +42,10 @@ const MedicalSent = sequelize.define(
     Notes: {
       type: DataTypes.TEXT,
       allowNull: true
+    },
+    Create_by: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   },
   {
