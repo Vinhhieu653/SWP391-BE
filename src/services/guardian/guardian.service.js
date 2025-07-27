@@ -444,13 +444,16 @@ export async function importGuardiansExcelService(fileBuffer) {
       }
 
       await createGuardianWithStudents({ guardian: guardianData })
+      await User.update(
+        { address: guardianData.address },
+        { where: { email: guardianData.email } } // hoặc theo username nếu cần
+      )
 
       try {
         await sendRandomPassword(guardianData.email)
       } catch (mailErr) {
         console.error(`Gửi mail thất bại cho ${guardianData.email}:`, mailErr.message)
       }
-
 
       results.push({ username: guardianData.username, status: 'success' })
     } catch (err) {
