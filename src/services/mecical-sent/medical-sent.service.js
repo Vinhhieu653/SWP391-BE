@@ -7,8 +7,18 @@ import Guardian from '../../models/data/guardian.model.js'
 import Notification from '../../models/data/noti.model.js'
 
 // Tạo mới MedicalSent và liên kết OutpatientMedication
-export const createMedicalSentService = async (data, creator_by = 'system') => {
-  let { userId, fullname, Class: studentClass, prescriptionImage, medications, deliveryTime, status, notes } = data
+export const createMedicalSentService = async (data) => {
+  let {
+    userId,
+    fullname,
+    Class: studentClass,
+    prescriptionImage,
+    medications,
+    deliveryTime,
+    status,
+    notes,
+    create_by
+  } = data
 
   // 1. Tìm MedicalRecord theo userId (nếu có)
   let medicalRecord = await MedicalRecord.findOne({ where: { userId: userId } })
@@ -48,23 +58,26 @@ export const createMedicalSentService = async (data, creator_by = 'system') => {
     Delivery_time: deliveryTime,
     Status: status,
     Notes: notesValue,
-    Created_at: new Date()
+    Created_at: new Date(),
+    Create_by: create_by || 'guardian'
   })
 
   // 4. Gửi thông báo cho tất cả nurse
-  const nurseUsers = await User.findAll({
-    where: { roleId: 2 } // thay 2 bằng roleId thực tế của nurse nếu khác
-  })
-
-  await Promise.all(
-    nurseUsers.map(async (nurse) => {
-      await Notification.create({
-        title: 'Có đơn thuốc mới từ phụ huynh',
-        mess: `Vui lòng kiểm tra đơn thuốc vừa được gửi để xử lý.`,
-        userId: nurse.id
-      })
+  if (create_by === 'guardian') {
+    const nurseUsers = await User.findAll({
+      where: { roleId: 2 } // thay 2 bằng roleId thực tế của nurse nếu khác
     })
-  )
+
+    await Promise.all(
+      nurseUsers.map(async (nurse) => {
+        await Notification.create({
+          title: 'Có đơn thuốc mới từ phụ huynh',
+          mess: `Vui lòng kiểm tra đơn thuốc vừa được gửi để xử lý.`,
+          userId: nurse.id
+        })
+      })
+    )
+  }
 
   const { Form_ID, Outpatient_medication, OM_ID, ...cleaned } = medicalSent.get({ plain: true })
   return cleaned

@@ -111,6 +111,9 @@ router.get('/:id', getMedicalSentById)
  *               notes:
  *                 type: string
  *                 example: "Giao hàng thành công"
+ *               create_by:
+ *                type: string
+ *                example: "gurardian"
  *     responses:
  *       201:
  *         description: Tạo đơn thuốc thành công
