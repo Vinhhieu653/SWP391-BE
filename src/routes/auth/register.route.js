@@ -88,7 +88,7 @@ router.get('/', authenticateToken, authorizeRoles('admin', 'guardian'), userCont
  *         description: User not found
  */
 
-router.get('/:id', authenticateToken, authorizeRoles('admin', 'guardian'), userController.getUserById)
+router.get('/:id', authenticateToken, authorizeRoles('admin', 'guardian', 'nurse'), userController.getUserById)
 
 /**
  * @swagger
