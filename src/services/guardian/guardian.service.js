@@ -4,7 +4,9 @@ import GuardianUser from '../../models/data/guardian_user.model.js'
 import * as registerService from '../auth/register.service.js'
 import MedicalRecord from '../../models/data/medicalRecord.model.js'
 import ExcelJS from 'exceljs'
-// Create guardian with associated student users
+import argon2 from 'argon2'
+import { sendRandomPassword } from '../../services/auth/password.service.js'
+
 export const createGuardianWithStudents = async ({ guardian }) => {
   if (!guardian) {
     const error = new Error('Missing guardian data')
@@ -15,7 +17,7 @@ export const createGuardianWithStudents = async ({ guardian }) => {
   // Loại bỏ students nếu truyền nhầm
   const { students, ...guardianData } = guardian
 
-  // Check username/email trùng
+  // Check username/email/phone trùng
   const existingUsername = await User.findOne({ where: { username: guardianData.username } })
   if (existingUsername) {
     throw Object.assign(new Error('Guardian username already taken'), { status: 400 })
@@ -24,6 +26,11 @@ export const createGuardianWithStudents = async ({ guardian }) => {
   const existingEmail = await User.findOne({ where: { email: guardianData.email } })
   if (existingEmail) {
     throw Object.assign(new Error('Guardian email already taken'), { status: 400 })
+  }
+
+  const existingPhone = await User.findOne({ where: { phoneNumber: guardianData.phoneNumber } })
+  if (existingPhone) {
+    throw Object.assign(new Error('Guardian phone number already taken'), { status: 400 })
   }
 
   // Tạo user với role guardian
@@ -184,17 +191,24 @@ export const updateGuardian = async (obId, data) => {
 
 // Delete guardian, its links, and user record
 export const deleteGuardian = async (obId) => {
-  const guardian = await Guardian.findOne({ where: { obId } })
-  if (!guardian) throw Object.assign(new Error('Guardian not found'), { status: 404 })
+  const guardian = await Guardian.findOne({ where: { obId }, paranoid: false })
+  if (!guardian || guardian.deletedAt) {
+    throw Object.assign(new Error('Guardian not found or already deleted'), { status: 404 })
+  }
 
-  // remove links
+  // remove links (cứng luôn cũng được, vì liên kết trung gian)
   await GuardianUser.destroy({ where: { obId } })
-  // remove guardian record
-  await guardian.destroy()
-  // remove user account
-  await User.destroy({ where: { id: guardian.userId } })
 
-  return { message: 'Guardian and associated students links deleted' }
+  // soft delete guardian
+  await guardian.destroy()
+
+  // soft delete user
+  const user = await User.findByPk(guardian.userId, { paranoid: false })
+  if (user && !user.deletedAt) {
+    await user.destroy()
+  }
+
+  return { message: 'Guardian and associated students links soft deleted' }
 }
 
 // Get students associated with a guardian by userId
@@ -351,8 +365,8 @@ export const updateStudentByGuardianId = async (obId, studentId, studentData) =>
 }
 
 export const deleteStudentByGuardianId = async (obId, studentId) => {
-  const guardian = await Guardian.findOne({ where: { obId } })
-  if (!guardian) {
+  const guardian = await Guardian.findOne({ where: { obId }, paranoid: false })
+  if (!guardian || guardian.deletedAt) {
     throw Object.assign(new Error('Guardian not found'), { status: 404 })
   }
 
@@ -360,17 +374,32 @@ export const deleteStudentByGuardianId = async (obId, studentId) => {
   const link = await GuardianUser.findOne({
     where: { obId: guardian.obId, userId: studentId }
   })
+
   if (!link) {
     throw Object.assign(new Error('Student not found for this guardian'), { status: 404 })
   }
 
-  // Delete link and student user
+  // Delete link
   await GuardianUser.destroy({ where: { obId: guardian.obId, userId: studentId } })
-  await User.destroy({ where: { id: studentId } })
+
+  // Soft delete student (User)
+  const student = await User.findByPk(studentId, { paranoid: false })
+  if (student && !student.deletedAt) {
+    await student.destroy()
+  }
 
   return {
-    message: 'Student deleted successfully'
+    message: 'Student deleted successfully (soft)'
   }
+}
+
+function generateRandomPassword(length = 6) {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}'
+  let password = ''
+  for (let i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return password
 }
 
 export async function importGuardiansExcelService(fileBuffer) {
@@ -393,6 +422,9 @@ export async function importGuardiansExcelService(fileBuffer) {
     })
 
     try {
+      const rawPassword = generateRandomPassword()
+      const hashedPassword = await argon2.hash(rawPassword)
+
       const guardianData = {
         fullname: rowData.fullname,
         username: rowData.username,
@@ -402,9 +434,9 @@ export async function importGuardiansExcelService(fileBuffer) {
         isCallFirst: rowData.iscallfirst === true || rowData.iscallfirst === 'TRUE',
         dateOfBirth:
           rowData.dateofbirth instanceof Date ? rowData.dateofbirth.toISOString().split('T')[0] : rowData.dateofbirth,
-
         gender: rowData.gender,
-        address: rowData.address
+        address: rowData.address,
+        password: hashedPassword
       }
 
       if (!guardianData.phoneNumber || !guardianData.roleInFamily) {
@@ -412,6 +444,17 @@ export async function importGuardiansExcelService(fileBuffer) {
       }
 
       await createGuardianWithStudents({ guardian: guardianData })
+      await User.update(
+        { address: guardianData.address },
+        { where: { email: guardianData.email } } // hoặc theo username nếu cần
+      )
+
+      try {
+        await sendRandomPassword(guardianData.email)
+      } catch (mailErr) {
+        console.error(`Gửi mail thất bại cho ${guardianData.email}:`, mailErr.message)
+      }
+
       results.push({ username: guardianData.username, status: 'success' })
     } catch (err) {
       results.push({ username: rowData.username, status: 'failed', error: err.message })

@@ -18,6 +18,10 @@ const OtherMedical = sequelize.define(
     Image: {
       type: DataTypes.TEXT
     },
+    Video: {
+      type: DataTypes.TEXT
+    },
+
     Is_calLOb: {
       type: DataTypes.BOOLEAN
     },

@@ -24,16 +24,6 @@ const users = [
     gender: 'female'
   },
   {
-    fullname: 'Student One',
-    username: 'student1',
-    email: 'student1@example.com',
-    password: 'Login123@',
-    phoneNumber: '0909090909',
-    roleName: 'student',
-    dateOfBirth: '2010-08-10',
-    gender: 'male'
-  },
-  {
     fullname: 'Guardian One',
     username: 'guardian1',
     email: 'guardian1@example.com',

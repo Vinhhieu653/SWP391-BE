@@ -42,11 +42,17 @@ const MedicalSent = sequelize.define(
     Notes: {
       type: DataTypes.TEXT,
       allowNull: true
+    },
+    Create_by: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   },
   {
     tableName: 'MedicalSent',
-    timestamps: true
+    timestamps: true,
+    paranoid: true,
+    deletedAt: 'deletedAt'
   }
 )
 

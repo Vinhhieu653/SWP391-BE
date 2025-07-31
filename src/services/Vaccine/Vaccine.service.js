@@ -8,6 +8,7 @@ import GuardianUser from '../../models/data/guardian_user.model.js'
 import Notification from '../../models/data/noti.model.js'
 import Event from '../../models/data/event.model.js'
 import UserEvent from '../../models/data/user_event.model.js'
+import sequelize from 'sequelize'
 
 export const createVaccineHistoryService = async (data) => {
   const event = await Event.create({
@@ -46,7 +47,9 @@ export const createVaccineHistoryService = async (data) => {
     const existed = await VaccineHistory.findOne({
       where: {
         ID: mrId,
-        Vaccine_name: vaccineName,
+        [sequelize.Op.and]: [
+          sequelize.where(sequelize.fn('LOWER', sequelize.col('Vaccine_name')), sequelize.fn('LOWER', vaccineName))
+        ],
         Is_deleted: false
       }
     })
@@ -193,8 +196,8 @@ export const getVaccineHistoryByMRIdService = async (ID) => {
   const medicalRecord = await MedicalRecord.findByPk(ID)
   const user = medicalRecord
     ? await User.findByPk(medicalRecord.userId, {
-      attributes: ['fullname', 'dateOfBirth']
-    })
+        attributes: ['fullname', 'dateOfBirth']
+      })
     : null
 
   return {
@@ -273,34 +276,33 @@ export const getStudentsByEventIdService = async (eventId) => {
 
       if (!student) return null
 
-      return {
-        studentId: student.id,
-        fullname: student.fullname,
-        Class: medicalRecord.Class,
-        vaccineHistory: {
-          id: history.VH_ID,
-          vaccine_name: history.Vaccine_name,
-          vaccine_type: history.Vaccince_type,
-          date_injection: history.Date_injection
-        }
-      }
+      history.dataValues.MedicalRecord = medicalRecord
+      history.dataValues.PatientName = student.fullname
+
+      const evidence = await Evidence.findOne({ where: { VH_ID: history.VH_ID } })
+      history.dataValues.image_after_injection = evidence ? evidence.Image : null
+
+      return history
     })
   )
   const filteredResult = result.filter((item) => item !== null)
 
-  return {
-    eventId,
-    totalStudents: filteredResult.length,
-    students: filteredResult
-  }
+  return filteredResult
 }
 
-export const updateVaccineStatusByMRIdService = async (updates) => {
+export const updateVaccineStatusByMRIdService = async (updates, files) => {
   if (!Array.isArray(updates) || updates.length === 0) {
     throw { status: 400, message: 'Input must be a non-empty array of update objects' }
   }
 
   const vhIdList = updates.map((item) => item.VH_ID)
+  const filesByVhId = (files || []).reduce((acc, file) => {
+    const vhId = file.fieldname.split('_')[1]
+    if (vhId) {
+      acc[vhId] = file
+    }
+    return acc
+  }, {})
 
   const records = await VaccineHistory.findAll({ where: { VH_ID: vhIdList, Is_deleted: false } })
   if (records.length !== vhIdList.length) {
@@ -309,13 +311,32 @@ export const updateVaccineStatusByMRIdService = async (updates) => {
 
   await Promise.all(
     updates.map(async (item) => {
-      await VaccineHistory.update(
-        {
-          Status: item.status,
-          note_affter_injection: item.note_affter_injection
-        },
-        { where: { VH_ID: item.VH_ID } }
-      )
+      const vaccineHistoryRecord = records.find((r) => r.VH_ID === item.VH_ID)
+      const existingEvidence = await Evidence.findOne({ where: { VH_ID: item.VH_ID } })
+
+      if (item.status === 'Đã tiêm' && !filesByVhId[item.VH_ID] && !existingEvidence) {
+        throw { status: 400, message: `Evidence image is required for VH_ID ${item.VH_ID}` }
+      }
+
+      await vaccineHistoryRecord.update({
+        Status: item.status,
+        note_affter_injection: item.note_affter_injection
+      })
+
+      const imageFile = filesByVhId[item.VH_ID]
+      if (imageFile) {
+        const result = await cloudinary.uploader.upload(imageFile.path)
+        if (existingEvidence) {
+          await existingEvidence.update({ Image: result.secure_url })
+        } else {
+          await Evidence.create({
+            VH_ID: item.VH_ID,
+            Image: result.secure_url
+          })
+        }
+      } else if (existingEvidence) {
+        await existingEvidence.destroy()
+      }
 
       const vh = await VaccineHistory.findByPk(item.VH_ID)
       if (vh) {
@@ -353,7 +374,7 @@ export const getAllVaccineTypesService = async () => {
       Is_created_by_guardian: false,
       Is_deleted: false
     },
-    attributes: ['Vaccine_name', 'ID', 'Event_ID'],
+    attributes: ['Vaccine_name', 'ID', 'Event_ID', 'batch_number', 'Vaccince_type'],
     raw: true
   })
 
@@ -375,12 +396,14 @@ export const getAllVaccineTypesService = async () => {
       eventdate = event ? event.dateEvent : null
       eventDateStr = eventdate ? new Date(eventdate).toISOString().slice(0, 10) : ''
     }
-    const key = `${item.Vaccine_name}_${grade}_${eventDateStr}`
+    const key = `${item.Vaccine_name}_${item.Vaccince_type}_${grade}_${eventDateStr}_${item.batch_number}`
     if (!grouped[key]) {
       grouped[key] = {
         vaccineName: item.Vaccine_name,
+        vaccineType: item.Vaccince_type,
         grade,
-        eventdate
+        eventdate,
+        batch_number: item.batch_number
       }
     }
   }
@@ -434,6 +457,8 @@ export const getVaccineHistoryByVaccineNameService = async (vaccineName, grade, 
         })
         record.dataValues.PatientName = user ? user.fullname : null
       }
+      const evidence = await Evidence.findOne({ where: { VH_ID: record.VH_ID } })
+      record.dataValues.image_after_injection = evidence ? evidence.Image : null
       filteredRecords.push(record)
     }
   }
@@ -474,15 +499,23 @@ export const getVaccineHistoryByGuardianUserIdService = async (guardianUserId) =
   const allHistories = await Promise.all(
     medicalRecords.map(async (mr) => {
       const user = await User.findByPk(mr.userId, { attributes: ['id', 'fullname', 'dateOfBirth'] })
-      const vaccineHistory = await VaccineHistory.findAll({
+      const vaccineHistoriesRaw = await VaccineHistory.findAll({
         where: { ID: mr.ID, Is_deleted: false },
         order: [['Date_injection', 'DESC']]
       })
+
+      const vaccineHistory = await Promise.all(
+        vaccineHistoriesRaw.map(async (vh) => {
+          const evidence = await Evidence.findOne({ where: { VH_ID: vh.VH_ID } })
+          vh.dataValues.image_after_injection = evidence ? evidence.Image : null
+          return vh
+        })
+      )
+
       totalVaccine += vaccineHistory.filter((vh) => vh.Status === 'Đã tiêm').length
       totalNeedConfirm += vaccineHistory.filter((vh) => vh.Status === 'Chờ xác nhận').length
+
       return {
-        totalVaccine,
-        totalNeedConfirm,
         medicalRecord: mr,
         user: user ? { id: user.id, fullname: user.fullname, dateOfBirth: user.dateOfBirth } : null,
         vaccineHistory
@@ -491,6 +524,8 @@ export const getVaccineHistoryByGuardianUserIdService = async (guardianUserId) =
   )
 
   return {
+    totalVaccine,
+    totalNeedConfirm,
     histories: allHistories
   }
 }
@@ -528,8 +563,9 @@ export const deleteVaccineHistoriesByNameDateGradeService = async (vaccineName, 
             const son = await User.findByPk(medicalRecord.userId, { attributes: ['fullname'] })
             await Notification.create({
               title: `Lịch tiêm chủng đã bị hủy`,
-              mess: `Lịch tiêm chủng vaccine ${vaccineName} cho cháu ${son ? son.fullname : 'Không rõ tên'
-                } vào ngày ${dateStr} đã bị hủy, chúng tôi sẽ thông báo khi có lịch tiêm chủng mới.`,
+              mess: `Lịch tiêm chủng vaccine ${vaccineName} cho cháu ${
+                son ? son.fullname : 'Không rõ tên'
+              } vào ngày ${dateStr} đã bị hủy, chúng tôi sẽ thông báo khi có lịch tiêm chủng mới.`,
               userId: guardian.userId
             })
           }

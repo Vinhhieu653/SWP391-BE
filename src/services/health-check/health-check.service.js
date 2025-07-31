@@ -96,6 +96,18 @@ export async function getAllHealthChecks() {
     order: [['createdAt', 'DESC']]
   })
 
+  const today = new Date()
+
+  await Promise.all(
+    healthChecks.map(async (hc) => {
+      const eventDate = new Date(hc.Event?.dateEvent)
+      if (hc.status === 'pending' && eventDate <= today) {
+        await hc.update({ status: 'in progress' })
+        hc.status = 'in progress'
+      }
+    })
+  )
+
   return healthChecks
 }
 
@@ -109,7 +121,6 @@ export async function getHealthCheckById(id) {
 
   if (!hc) throw new Error('Không tìm thấy đợt khám')
 
-  // 👉 Auto update status nếu đến ngày khám
   const today = new Date()
   const eventDate = new Date(hc.Event.dateEvent)
   if (hc.status === 'pending' && eventDate <= today) {
@@ -189,7 +200,6 @@ export async function updateHealthCheck(id, data) {
     type: data.type
   })
 
-  // ✅ Gửi noti cho phụ huynh liên quan
   const forms = await FormCheck.findAll({ where: { HC_ID: healthCheck.HC_ID } })
   const studentIds = forms.map((f) => f.Student_ID)
 
@@ -233,9 +243,11 @@ export async function deleteHealthCheck(id) {
   const healthCheck = await HealthCheck.findByPk(id)
   if (!healthCheck) throw new Error('Không tìm thấy đợt khám')
 
-  const eventId = healthCheck.Event_ID
+  const event = await Event.findByPk(healthCheck.Event_ID)
+  if (!event) throw new Error('Không tìm thấy sự kiện')
+
   await healthCheck.destroy()
-  await Event.destroy({ where: { eventId } })
+  await event.destroy()
 }
 
 export async function sendConfirmForms(eventId) {
@@ -263,7 +275,6 @@ export async function sendConfirmForms(eventId) {
     { returning: true }
   )
 
-  // Gửi noti cho phụ huynh
   for (const student of students) {
     for (const gu of student.GuardianUsers) {
       const guardian = gu.Guardian
@@ -295,10 +306,10 @@ export async function createdResult(
     skin_status,
     general_conclusion,
     is_need_meet,
-    image,
+    userId,
+    image
   }
 ) {
-
   // Cập nhật form khám cho học sinh
   await FormCheck.update(
     {
@@ -314,6 +325,7 @@ export async function createdResult(
       Is_need_meet: is_need_meet,
       // status: 'checked',
       image: image,
+      Created_By: userId
     },
     {
       where: {
@@ -325,8 +337,7 @@ export async function createdResult(
 }
 
 export async function updateFormResult(HC_ID, studentId, data) {
-
-  console.log('Updating form result:', { data });
+  console.log('Updating form result:', { data })
   const [updated] = await FormCheck.update(
     {
       Height: data.height,
@@ -352,7 +363,6 @@ export async function updateFormResult(HC_ID, studentId, data) {
 
   if (!updated) throw new Error('Không tìm thấy form khám để cập nhật')
 
-  // ✅ Gửi noti cho phụ huynh của học sinh này
   const guardianUsers = await GuardianUser.findAll({
     where: { userId: studentId }
   })
@@ -389,7 +399,7 @@ export async function resetFormResult(formId) {
       Skin_Status: null,
       General_Conclusion: null,
       Is_need_meet: null,
-      status: 'approved' // hoặc 'confirmed' tùy logic của m
+      status: 'approved'
     },
     {
       where: {
@@ -403,19 +413,20 @@ export async function resetFormResult(formId) {
 }
 
 export async function getFormResult(HC_ID, studentId) {
-
-
   const form = await FormCheck.findOne({
     where: {
-      HC_ID: HC_ID,
+      HC_ID,
       Student_ID: studentId
     }
   })
 
   if (!form) throw new Error('Không tìm thấy form khám')
-  return form
-}
 
+  return {
+    ...form.toJSON(),
+    userId: form.Created_By || null
+  }
+}
 
 export async function getAllFormsByEvent(eventId) {
   const healthCheck = await HealthCheck.findOne({ where: { Event_ID: eventId } })
@@ -431,8 +442,6 @@ export async function getAllFormsByEvent(eventId) {
 }
 
 export async function sendResult(HC_ID) {
-
-
   const forms = await FormCheck.findAll({
     where: { HC_ID: HC_ID },
     include: [
@@ -468,6 +477,11 @@ export async function sendResult(HC_ID) {
     }
     form.status = 'checked'
     await form.save()
+    const healthCheck = await HealthCheck.findByPk(HC_ID)
+    if (healthCheck) {
+      healthCheck.status = 'checked'
+      await healthCheck.save()
+    }
   }
 }
 
@@ -507,16 +521,14 @@ export async function getStudentsByEvent(HC_ID) {
         [Op.in]: studentsId
       }
     },
-    attributes: ['userId', 'Class'] // nhớ lấy userId để mapping
+    attributes: ['userId', 'Class']
   })
 
-  // Tạo map userId -> Class
   const classMap = {}
   records.forEach((record) => {
     classMap[record.userId] = record.Class
   })
 
-  // Gán Class vào Student
   forms.forEach((form) => {
     const student = form.Student
     if (student && classMap[student.id]) {
@@ -524,7 +536,41 @@ export async function getStudentsByEvent(HC_ID) {
     }
   })
 
-  return forms
+  const result = await Promise.all(
+    forms.map(async (form) => {
+      const student = form.Student
+
+      const guardianUsers = await GuardianUser.findAll({
+        where: { userId: student.id },
+        include: [
+          {
+            model: Guardian
+          }
+        ]
+      })
+
+      const guardianInfo = await Promise.all(
+        guardianUsers.map(async (gu) => {
+          const guardian = gu.Guardian
+          const user = await User.findByPk(guardian.userId, { attributes: ['fullname'] })
+          return {
+            ...guardian.get({ plain: true }),
+            fullName: user ? user.fullname : null
+          }
+        })
+      )
+
+      return {
+        ...form.get({ plain: true }),
+        Student: {
+          ...student.get({ plain: true }),
+          Guardians: guardianInfo
+        }
+      }
+    })
+  )
+
+  return result
 }
 
 export async function getFormDetail(formId) {

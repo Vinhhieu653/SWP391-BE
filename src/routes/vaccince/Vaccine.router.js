@@ -74,6 +74,8 @@ const upload = multer({ dest: 'uploads/' })
  *               Date_injection:
  *                 type: string
  *                 format: date-time
+ *               batch_number:
+ *                 type: string
  *               Grade:
  *                 type: string
  *     responses:
@@ -93,7 +95,10 @@ const upload = multer({ dest: 'uploads/' })
  *                       type: object
  *                     vaccineHistories:
  *                       type: array
- *
+ */
+
+/**
+ * @swagger
  * /api/v1/vaccine/{id}:
  *   get:
  *     summary: Lấy chi tiết lịch sử tiêm chủng theo ID
@@ -150,7 +155,10 @@ const upload = multer({ dest: 'uploads/' })
  *     responses:
  *       200:
  *         description: Xóa thành công
- *
+ */
+
+/**
+ * @swagger
  * /api/v1/vaccine/evidence:
  *   post:
  *     summary: Tạo mới lịch sử tiêm chủng kèm bằng chứng (Chỉ dành cho Phụ huynh)
@@ -177,6 +185,8 @@ const upload = multer({ dest: 'uploads/' })
  *               Date_injection:
  *                 type: string
  *                 format: date-time
+ *               batch_number:
+ *                 type: string
  *               note_affter_injection:
  *                type: string
  *               evidence:
@@ -194,7 +204,10 @@ const upload = multer({ dest: 'uploads/' })
  *                   type: string
  *                 data:
  *                   $ref: '#/components/schemas/VaccineHistory'
- *
+ */
+
+/**
+ * @swagger
  * /api/v1/vaccine/medical-record/{mrId}:
  *   get:
  *     summary: Lấy lịch sử tiêm chủng theo ID hồ sơ y tế
@@ -208,34 +221,30 @@ const upload = multer({ dest: 'uploads/' })
  *     responses:
  *       200:
  *         description: Danh sách lịch sử tiêm chủng
- *
+ */
+
+/**
+ * @swagger
  * /api/v1/vaccine/vaccine-history/status:
  *   put:
- *     summary: Cập nhật trạng thái tiêm chủng cho nhiều VH_ID
+ *     summary: Cập nhật trạng thái tiêm chủng cho nhiều VH_ID (kèm ảnh nếu status là 'Đã tiêm')
  *     tags: [Vaccine]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
  *               updates:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     VH_ID:
- *                       type: integer
- *                     status:
- *                       type: string
- *                       example: Đã tiêm
- *                     note_affter_injection:
- *                       type: string
- *                       example: "Không có phản ứng phụ"
- *                 description: Danh sách cập nhật trạng thái và note cho từng VH_ID
+ *                 type: string
+ *                 description: 'Một chuỗi JSON của một mảng các đối tượng cập nhật.'
+ *               evidence_{VH_ID}:
+ *                 type: string
+ *                 format: binary
+ *                 description: 'Ảnh bằng chứng cho mỗi VH_ID có status là "Đã tiêm". Thay {VH_ID} bằng ID thực tế, ví dụ: evidence_1'
  *     responses:
  *       200:
  *         description: Cập nhật trạng thái thành công
@@ -368,14 +377,20 @@ const upload = multer({ dest: 'uploads/' })
  */
 
 router.post('/', authenticateToken, authorizeRoles('nurse'), createVaccineHistory)
-router.post('/evidence', authenticateToken, authorizeRoles('guardian'), upload.single('evidence'), createVaccineWithEvidence)
+router.post(
+  '/evidence',
+  authenticateToken,
+  authorizeRoles('guardian'),
+  upload.single('evidence'),
+  createVaccineWithEvidence
+)
 router.get('/', getAllVaccineHistory)
 router.get('/types', getAllVaccineTypes)
 router.get('/medical-record/:mrId', getVaccineHistoryByMRId)
 router.get('/event/:eventId/students', getStudentsByEventId)
 router.get('/by-name/:vaccineName', getVaccineHistoryByVaccineName)
 router.get('/guardian/:guardianUserId', getVaccineHistoryByGuardianUserId)
-router.put('/vaccine-history/status', authenticateToken, updateVaccineStatusByMRId)
+router.put('/vaccine-history/status', authenticateToken, upload.any(), updateVaccineStatusByMRId)
 router.delete(
   '/delete-by-name-date-grade',
   authenticateToken,

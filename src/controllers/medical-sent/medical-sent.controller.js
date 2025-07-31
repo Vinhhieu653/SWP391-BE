@@ -1,7 +1,6 @@
 import * as medicalSentService from '../../services/mecical-sent/medical-sent.service.js'
 import cloudinary from '../../utils/cloudinary.js'
 
-// Lấy tất cả đơn thuốc đã gửi
 export const getAllMedicalSents = async (req, res) => {
   try {
     const records = await medicalSentService.getAllMedicalSentService()
@@ -11,7 +10,6 @@ export const getAllMedicalSents = async (req, res) => {
   }
 }
 
-// Lấy đơn thuốc đã gửi theo ID
 export const getMedicalSentById = async (req, res) => {
   try {
     const record = await medicalSentService.getMedicalSentByIdService(req.params.id)
@@ -22,7 +20,6 @@ export const getMedicalSentById = async (req, res) => {
   }
 }
 
-// Tạo mới đơn thuốc đã gửi
 export const createMedicalSent = async (req, res) => {
   try {
     let imageUrl = null
@@ -47,7 +44,6 @@ export const createMedicalSent = async (req, res) => {
   }
 }
 
-// Cập nhật đơn thuốc đã gửi
 export const updateMedicalSent = async (req, res) => {
   try {
     let imageUrl = null
@@ -57,19 +53,19 @@ export const updateMedicalSent = async (req, res) => {
       imageUrl = result.secure_url
     }
 
-    const formData = {
-      ...req.body
+    // Lấy dữ liệu hiện tại (để giữ hình nếu không upload mới)
+    const existing = await medicalSentService.getMedicalSentByIdService(req.params.id)
+    if (!existing) {
+      return res.status(404).json({ message: 'Đơn thuốc không tồn tại' })
     }
 
-    if (imageUrl) {
-      formData.prescriptionImage = imageUrl
+    const formData = {
+      ...req.body,
+      // Chỉ dùng ảnh mới nếu có, ngược lại giữ ảnh cũ
+      prescriptionImage: imageUrl || existing.prescriptionImage
     }
 
     const updated = await medicalSentService.updateMedicalSentService(req.params.id, formData)
-
-    if (!updated) {
-      return res.status(404).json({ message: 'Đơn thuốc không tồn tại' })
-    }
 
     res.status(200).json(updated)
   } catch (error) {
@@ -80,7 +76,6 @@ export const updateMedicalSent = async (req, res) => {
   }
 }
 
-// Xóa đơn thuốc đã gửi
 export const deleteMedicalSent = async (req, res) => {
   try {
     const deleted = await medicalSentService.deleteMedicalSentService(req.params.id)
@@ -91,7 +86,6 @@ export const deleteMedicalSent = async (req, res) => {
   }
 }
 
-// Lấy các toa thuốc của học sinh do 1 guardian quản lý
 export const getMedicalSentsByGuardian = async (req, res, next) => {
   try {
     console.log('res.user:', req.user)
